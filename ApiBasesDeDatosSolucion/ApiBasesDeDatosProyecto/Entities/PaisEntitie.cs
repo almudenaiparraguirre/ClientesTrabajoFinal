@@ -23,10 +23,5 @@ namespace ApiBasesDeDatosProyecto.Entities
 
         public ICollection<Cliente> Clientes { get; set; } // Navegación a la colección de Clientes
 
-
-        public static implicit operator List<object>(Pais? v)
-        {
-            throw new NotImplementedException();
-        }
     }
 }
