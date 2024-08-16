@@ -72,14 +72,33 @@ builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddTransient<ClienteService>();
 
 
+// Configurar MediatR
+builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(Program).Assembly));
+
+// Configurar SignalR
+builder.Services.AddSignalR();
+
+
 // Agregar swagger
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+// Register the SignalR client service with the URL of the simulator's hub
+builder.Services.AddSingleton<SignalRClientService>(provider =>
+    new SignalRClientService("https://localhost:7040/simuladorHub"));
+builder.Services.AddSingleton<SignalRClientService>(provider =>
+    new SignalRClientService("https://localhost:7050/simuladorHub"));
+
+
+
 // Paso intermedio entre el 1 y el 2 (Construye la app)
 var app = builder.Build();
 
+app.MapHub<NotificationHub>("/notificationHub");
+
+
 await CreateRoles(app);
+
 
 // 2. Configurar middleware
 if (app.Environment.IsDevelopment())
@@ -97,8 +116,15 @@ app.UseCors("AllowSpecificOrigins");
 app.UseAuthentication(); // Agregar autenticaci?n
 app.UseAuthorization();
 
-// Enrutamiento, determina qu? controlador y acci?n se ejecutar? en funci?n de la URL solicitada
+// Enrutamiento, determina que controlador y accion se ejecutar en funcion de la URL solicitada
 app.MapControllers();
+
+// Start listening to the SignalR hub
+var signalRClientServices = app.Services.GetServices<SignalRClientService>();
+
+var listeningTasks = signalRClientServices.Select(service => service.StartListeningAsync());
+
+await Task.WhenAll(listeningTasks);
 
 // Ejecutar la aplicaci?n
 app.Run();
