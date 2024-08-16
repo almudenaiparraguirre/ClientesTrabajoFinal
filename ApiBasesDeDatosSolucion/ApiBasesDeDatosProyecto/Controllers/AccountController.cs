@@ -11,6 +11,7 @@ public class AccountController : ControllerBase
     private readonly IClienteService _clienteService;
     private readonly ApiBasesDeDatosProyecto.IDentity.Serivicios.IUserService _userService;
     private readonly IPaisRepository _paisRepository; // Añadido
+    private readonly IMapper _mapper;
 
     public AccountController(
         UserManager<ApplicationUser> userManager,
@@ -19,7 +20,8 @@ public class AccountController : ControllerBase
         ITokenService tokenService,
         IClienteService clienteService,
         ApiBasesDeDatosProyecto.IDentity.Serivicios.IUserService userService,
-        IPaisRepository paisRepository) // Añadido
+        IPaisRepository paisRepository,
+        IMapper mapper) // Añadido
     {
         _userManager = userManager;
         _signInManager = signInManager;
@@ -27,7 +29,8 @@ public class AccountController : ControllerBase
         _tokenService = tokenService;
         _clienteService = clienteService;
         _userService = userService;
-        _paisRepository = paisRepository; // Añadido
+        _paisRepository = paisRepository;
+        _mapper = mapper; // Añadido
     }
     [HttpGet("users")]
     public async Task<ActionResult<IEnumerable<ApplicationUser>>> GetUsers(string? mail = null)
@@ -92,7 +95,6 @@ public class AccountController : ControllerBase
         
         string rolPorDefecto = "Admin";
         DateTime FechaNac = DateTimeOffset.FromUnixTimeMilliseconds(model.FechaNacimiento).UtcDateTime;
-
 
         var user = new ApplicationUser
         {
@@ -199,4 +201,28 @@ public class AccountController : ControllerBase
 
         return Ok(new { message = "Role changed successfully." });
     }
+
+    [HttpPut("update/{email}")]
+    public async Task<IActionResult> UpdateUser(string email, [FromBody] EditUserModel model)
+    {
+        // Buscar el usuario existente por su ID
+        var user = await _userManager.FindByEmailAsync(email);
+        if (user == null)
+        {
+            return NotFound("Usuario no encontrado");
+        }
+
+        // Usar AutoMapper para mapear el modelo al usuario existente
+        _mapper.Map(model, user);
+
+        // Actualizar el usuario en la base de datos
+        var result = await _userManager.UpdateAsync(user);
+        if (!result.Succeeded)
+        {
+            return BadRequest(result.Errors);
+        }
+
+        return Ok(new { message = "User edited successfully." });
+    }
+
 }

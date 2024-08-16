@@ -47,16 +47,27 @@ export class UsersInfoComponent implements OnInit, OnDestroy {
     this.subscription.add(
       this.userService.getUsuarios().subscribe(
         data => {
-          this.usuarios = data;
-          this.filteredUsuarios = data;
-          this.totalUsuarios = data.length;
+          // Procesar cada usuario para separar nombre y apellido
+          this.usuarios = data.map(usuario => {
+            const [nombre, ...resto] = usuario.fullName.split(' ');
+            const apellido = resto.join(' ');
+  
+            return {
+              ...usuario,
+              nombre: nombre,
+              apellido: apellido,
+            };
+          });
+  
+          this.filteredUsuarios = this.usuarios;
+          this.totalUsuarios = this.usuarios.length;
         },
         error => {
           console.error('Error fetching users', error);
         }
       )
     );
-  }
+  }  
 
   loadClientes(): void {
     this.subscription.add(
@@ -111,14 +122,31 @@ export class UsersInfoComponent implements OnInit, OnDestroy {
 
   onSave(): void {
     if (this.editMode === 'user' && this.selectedUsuario) {
-      // Implementa aquí la lógica para guardar el usuario editado
       console.log('Usuario guardado:', this.selectedUsuario);
+      this.userService.editarUsuario(this.selectedUsuario).subscribe(
+        response => {
+          console.log('Usuario actualizado correctamente', response);
+          this.loadUsuarios();  // Recargar la lista de usuarios
+        },
+        error => {
+          console.error('Error al actualizar el usuario', error);
+        }
+      );
     } else if (this.editMode === 'client' && this.selectedCliente) {
-      // Implementa aquí la lógica para guardar el cliente editado
       console.log('Cliente guardado:', this.selectedCliente);
+      this.userService.editarCliente(this.selectedCliente).subscribe(
+        response => {
+          console.log('Cliente actualizado correctamente', response);
+          this.loadClientes();  // Recargar la lista de clientes
+        },
+        error => {
+          console.error('Error al actualizar el cliente', error);
+        }
+      );
     }
     this.closeModal();
   }
+  
 
   ngOnDestroy(): void {
     if (this.subscription) {
