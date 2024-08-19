@@ -63,8 +63,22 @@ public class AccountController : ControllerBase
         }
 
         var roles = await _userManager.GetRolesAsync(user);
-        return Ok(new { roles });
+
+        if (roles == null || !roles.Any())
+        {
+            return NotFound("El usuario no tiene roles asignados.");
+        }
+
+        // Suponiendo que quieres devolver solo el primer rol:
+        var userRoleDto = new UserRoleDto
+        {
+            Email = email,
+            Rol = roles.FirstOrDefault()
+        };
+
+        return Ok(userRoleDto);
     }
+
 
     [HttpDelete("users/{id}")]
     public async Task<IActionResult> DeleteUser(string id)
