@@ -62,11 +62,21 @@ namespace ApiBasesDeDatosProyecto.Repository
                 .Where(c => c.PaisId == paisId)
                 .ToListAsync();
         }
+
         public async Task<List<Cliente>> ObtenerTodos()
         {
             return await contexto.Clientes.ToListAsync();
         }
 
+        public async Task<Cliente?> ObtenerPorEmail(string email)
+        {
+            return await contexto.Clientes.FirstOrDefaultAsync(x => x.Email == email);
+        }
 
+        public async Task EditClienteAsync(Cliente cliente)
+        {
+            contexto.Clientes.Update(cliente);
+            await contexto.SaveChangesAsync();
+        }
     }
 }

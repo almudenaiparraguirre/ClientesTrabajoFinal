@@ -9,6 +9,8 @@
         void Eliminar(Cliente cliente);
         Task<bool> GuardarCambios();
         Task<Cliente?> ObtenerPorId(int id);
+        Task<Cliente?> ObtenerPorEmail(string email);
+        Task EditClienteAsync(Cliente cliente);
 
         Task<Cliente?> ObtenerClientesPais(int id);
         Task<List<Cliente>> ObtenerClientesPorPaisId(int paisId);

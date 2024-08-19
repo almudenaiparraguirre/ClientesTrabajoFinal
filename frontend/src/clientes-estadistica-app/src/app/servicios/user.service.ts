@@ -3,6 +3,7 @@ import { Injectable } from '@angular/core';
 import { map, Observable } from 'rxjs';
 import { Usuario } from '../clases/usuario';
 import { environment } from '../../environments/environment';
+import { Cliente } from '../clases/cliente';
 
 @Injectable({
   providedIn: 'root'
@@ -14,7 +15,7 @@ export class UserService {
   private readonly url_estadistica = environment.apiUrl;
 
   //URL AMIN
-  private readonly URL = "https://localhost:7107/api/";
+  private readonly URL = "https://localhost:44339/api/";
 
   constructor(private http: HttpClient) { }
 
@@ -42,6 +43,18 @@ export class UserService {
     const url = `${this.URL}Paises/nombre/${nombre}`;
     // Hacer la solicitud GET
     return this.http.get<{ id: number }>(url);
+  }
+
+  editarCliente(cliente: Cliente): Observable<any>{
+    const url = `${this.URL}Cliente/${cliente.email}`;
+    cliente.fechaNacimiento = new Date(cliente.fechaNacimiento).getTime();
+    return this.http.put(url, cliente);
+  }
+
+  editarUsuario(usuario: Usuario): Observable<any>{
+    const url = `${this.URL}Account/update/${usuario.email}`;
+    usuario.dateOfBirth = new Date(usuario.dateOfBirth).getTime();
+    return this.http.put(url, usuario);
   }
 
   getEnvios(): Observable<any[]> {

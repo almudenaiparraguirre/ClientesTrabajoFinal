@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { Router } from '@angular/router'; // Importa el Router
 import { UserService } from '../servicios/user.service';
 import { Usuario } from '../interfaces/usuario.interface';
 import { CambioRolModel } from '../interfaces/cambioRol.interface';
@@ -12,9 +13,14 @@ import { CambioRolModel } from '../interfaces/cambioRol.interface';
 export class RegistroComponent implements OnInit {
 
   registroForm: FormGroup;
-  errorMessage: string | null = null; // Mensaje de error general
+  errorMessage: string;
+  isErrorVisible = false; // Propiedad para controlar la visibilidad del mensaje de error
 
-  constructor(private fb: FormBuilder, private miServicio: UserService) { }
+  constructor(
+    private fb: FormBuilder, 
+    private miServicio: UserService,
+    private router: Router // Inyecta el Router
+  ) {}
 
   ngOnInit(): void {
     this.registroForm = this.fb.group({
@@ -56,7 +62,7 @@ export class RegistroComponent implements OnInit {
     }
   
     if (this.registroForm.value.Contraseña !== this.registroForm.value.Contraseña2) {
-      alert('Las contraseñas no coinciden.');
+      this.showError('Las contraseñas no coinciden.');
       return;
     }
   
@@ -77,7 +83,6 @@ export class RegistroComponent implements OnInit {
       response => {
         console.log('Usuario registrado exitosamente', response);
   
-        // Solo después de que el usuario ha sido registrado exitosamente, agregar el rol
         const datosCambioRol: CambioRolModel = {
           Email: this.registroForm.value.Correo,
           NuevoRol: "Client",
@@ -91,17 +96,15 @@ export class RegistroComponent implements OnInit {
         this.miServicio.añadirRolUsuario(datosCambioRol).subscribe(
           response => {
             console.log('Rol añadido exitosamente', response);
+            this.router.navigate(['/login']); // Redirige al login
           },
           error => {
             if (error.status === 400) {
-              console.error('Error de validación al añadir rol', error.error);
-              alert('Error al añadir rol: ' + error.error);
+              this.showError('Error al añadir rol: ' + error.error);
             } else if (error.status === 0) {
-              console.error('No se pudo conectar al servidor al añadir rol.');
-              alert('No se pudo conectar al servidor al añadir rol.');
+              this.showError('No se pudo conectar al servidor al añadir rol.');
             } else {
-              console.error(`Error ${error.status}: ${error.message}`);
-              alert('Error al añadir rol: ' + error.message);
+              this.showError('Error al añadir rol: ' + error.message);
             }
           }
         );
@@ -109,19 +112,21 @@ export class RegistroComponent implements OnInit {
       },
       error => {
         if (error.status === 400) {
-          console.error('Error de validación al registrar usuario', error.error);
-          alert('Error al registrar usuario: ' + error.error);
+          this.showError('Error al registrar usuario: ' + error.error);
         } else if (error.status === 0) {
-          console.error('No se pudo conectar al servidor al registrar usuario.');
-          alert('No se pudo conectar al servidor al registrar usuario.');
+          this.showError('No se pudo conectar al servidor al registrar usuario.');
         } else {
-          console.error(`Error ${error.status}: ${error.message}`);
-          alert('Error al registrar usuario: ' + error.message);
+          this.showError('Error al registrar usuario: ' + error.message);
         }
       }
     );
   }
   
+  showError(message: string) {
+    this.errorMessage = message;
+    this.isErrorVisible = true;
+    setTimeout(() => this.isErrorVisible = false, 3000); // Ocultar el mensaje después de 3 segundos
+  }
 
   private showValidationErrors(): void {
     let errorMessage = 'Por favor corrige los siguientes errores:\n';
@@ -153,6 +158,6 @@ export class RegistroComponent implements OnInit {
       errorMessage = 'Hay errores en el formulario. Por favor, corrígelos antes de enviar.';
     }
 
-    alert(errorMessage);
+    this.showError(errorMessage);
   }
 }

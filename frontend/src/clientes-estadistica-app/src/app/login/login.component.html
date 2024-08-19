@@ -2,7 +2,7 @@
   <div class="min-h-screen flex flex-col items-center justify-center py-6 px-4">
     <div class="max-w-md w-full">
       <a href="javascript:void(0)">
-        <img src="https://readymadeui.com/readymadeui.svg" alt="logo" class="w-40 mb-8 mx-auto block" />
+        <img src="../../assets/summer-removebg-preview.png" alt="logo" class="w-40 mb-8 mx-auto block" />
       </a>
 
       <div class="p-8 rounded-2xl bg-white shadow">
@@ -44,7 +44,7 @@
               Iniciar sesión
             </button>
           </div>
-          <p class="text-gray-800 text-sm !mt-8 text-center">¿No tienes una cuenta? 
+          <p class="text-gray-800 text-sm !mt-8 text-center" (click)="redirectToRegisterPage()">¿No tienes una cuenta? 
             <a href="http://localhost:4200/registro" class="text-blue-600 hover:underline ml-1 whitespace-nowrap font-semibold">
               Regístrate aquí
             </a>
@@ -53,5 +53,13 @@
         </form>
       </div>
     </div>
+
+    <div *ngIf="isErrorVisible" class="fixed top-4 right-4 w-96 p-4 rounded shadow-lg bg-red-500 text-white">
+      <div class="flex justify-between items-center">
+        <span>{{ errorMessage }}</span>
+        <button (click)="isErrorVisible = false" class="ml-4 text-xl font-bold">&times;</button>
+      </div>
+    </div>
+    
   </div>
 </div>
