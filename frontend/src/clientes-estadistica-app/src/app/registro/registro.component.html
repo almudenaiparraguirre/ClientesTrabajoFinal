@@ -1,9 +1,9 @@
 <div class="max-w-4xl mx-auto font-[sans-serif] p-6">
   <div class="text-center mb-16">
     <a href="javascript:void(0)">
-      <img src="https://readymadeui.com/readymadeui.svg" alt="logo" class='w-52 inline-block' />
+      <img src="../../assets/summer-removebg-preview.png" alt="logo" class='w-52 inline-block' />
     </a>
-    <h4 class="text-gray-800 text-base font-semibold mt-6">Sign up into your account</h4>
+    <h4 class="text-gray-800 text-base font-semibold mt-6">¡Registrate ya!</h4>
   </div>
 
   <form [formGroup]="registroForm" (ngSubmit)="onSubmit()">
@@ -14,7 +14,7 @@
 
     <div class="grid sm:grid-cols-2 gap-8">
       <div>
-        <label for="nombre" class="text-gray-800 text-sm mb-2 block">First Name</label>
+        <label for="nombre" class="text-gray-800 text-sm mb-2 block">Nombre</label>
         <input id="nombre" name="name" type="text" formControlName="Nombre" class="bg-gray-100 w-full text-gray-800 text-sm px-4 py-3.5 rounded-md focus:bg-transparent outline-blue-500 transition-all" placeholder="Enter name" />
         <div *ngIf="registroForm.get('Nombre')?.invalid && (registroForm.get('Nombre')?.touched || registroForm.get('Nombre')?.dirty)" class="text-red-500 text-sm">
           <div *ngIf="registroForm.get('Nombre')?.errors?.['required']">First Name is required.</div>
@@ -22,7 +22,7 @@
         </div>
       </div>
       <div>
-        <label for="apellido" class="text-gray-800 text-sm mb-2 block">Last Name</label>
+        <label for="apellido" class="text-gray-800 text-sm mb-2 block">Apellido</label>
         <input id="apellido" name="lname" type="text" formControlName="Apellido" class="bg-gray-100 w-full text-gray-800 text-sm px-4 py-3.5 rounded-md focus:bg-transparent outline-blue-500 transition-all" placeholder="Enter last name" />
         <div *ngIf="registroForm.get('Apellido')?.invalid && (registroForm.get('Apellido')?.touched || registroForm.get('Apellido')?.dirty)" class="text-red-500 text-sm">
           <div *ngIf="registroForm.get('Apellido')?.errors?.['required']">Last Name is required.</div>
@@ -30,7 +30,7 @@
         </div>
       </div>
       <div>
-        <label for="email" class="text-gray-800 text-sm mb-2 block">Email Id</label>
+        <label for="email" class="text-gray-800 text-sm mb-2 block">Correo</label>
         <input id="email" name="email" type="email" formControlName="Correo" class="bg-gray-100 w-full text-gray-800 text-sm px-4 py-3.5 rounded-md focus:bg-transparent outline-blue-500 transition-all" placeholder="Enter email" />
         <div *ngIf="registroForm.get('Correo')?.invalid && (registroForm.get('Correo')?.touched || registroForm.get('Correo')?.dirty)" class="text-red-500 text-sm">
           <div *ngIf="registroForm.get('Correo')?.errors?.['required']">Email is required.</div>
@@ -39,7 +39,7 @@
       </div>
 
       <div>
-        <label for="password" class="text-gray-800 text-sm mb-2 block">Password</label>
+        <label for="password" class="text-gray-800 text-sm mb-2 block">Contraseña</label>
         <input id="password" name="password" type="password" formControlName="Contraseña" class="bg-gray-100 w-full text-gray-800 text-sm px-4 py-3.5 rounded-md focus:bg-transparent outline-blue-500 transition-all" placeholder="Enter password" />
         <div *ngIf="registroForm.get('Contraseña')?.invalid && (registroForm.get('Contraseña')?.touched || registroForm.get('Contraseña')?.dirty)" class="text-red-500 text-sm">
           <div *ngIf="registroForm.get('Contraseña')?.errors?.['required']">Password is required.</div>
@@ -51,7 +51,7 @@
       </div>
 
       <div>
-        <label for="cpassword" class="text-gray-800 text-sm mb-2 block">Confirm Password</label>
+        <label for="cpassword" class="text-gray-800 text-sm mb-2 block">Confirmar Contraseña</label>
         <input id="cpassword" name="cpassword" type="password" formControlName="Contraseña2" class="bg-gray-100 w-full text-gray-800 text-sm px-4 py-3.5 rounded-md focus:bg-transparent outline-blue-500 transition-all" placeholder="Confirm password" />
         <div *ngIf="registroForm.errors?.['mismatch'] && (registroForm.get('Contraseña')?.touched || registroForm.get('Contraseña2')?.touched)" class="text-red-500 text-sm">
           Passwords do not match.
@@ -60,18 +60,18 @@
 
       <!-- Campos adicionales -->
       <div>
-        <label for="pais" class="text-gray-800 text-sm mb-2 block">Country</label>
+        <label for="pais" class="text-gray-800 text-sm mb-2 block">Pais</label>
         <input id="pais" name="pais" type="text" formControlName="PaisNombre" class="bg-gray-100 w-full text-gray-800 text-sm px-4 py-3.5 rounded-md focus:bg-transparent outline-blue-500 transition-all" placeholder="Enter country" />
       </div>
       <div>
-        <label for="empleo" class="text-gray-800 text-sm mb-2 block">Occupation</label>
+        <label for="empleo" class="text-gray-800 text-sm mb-2 block">Ocupación</label>
         <input id="empleo" name="empleo" type="text" formControlName="Empleo" class="bg-gray-100 w-full text-gray-800 text-sm px-4 py-3.5 rounded-md focus:bg-transparent outline-blue-500 transition-all" placeholder="Enter occupation" />
       </div>
       <div>
-        <label for="fecha" class="text-gray-800 text-sm mb-2 block">Date of Birth</label>
+        <label for="fecha" class="text-gray-800 text-sm mb-2 block">Fecha de nacimiento</label>
         <input id="fecha" name="fecha" type="date" formControlName="FechaNac" class="bg-gray-100 w-full text-gray-800 text-sm px-4 py-3.5 rounded-md focus:bg-transparent outline-blue-500 transition-all" placeholder="Enter date of birth" />
         <div *ngIf="registroForm.get('FechaNac')?.invalid && (registroForm.get('FechaNac')?.touched || registroForm.get('FechaNac')?.dirty)" class="text-red-500 text-sm">
-          <div *ngIf="registroForm.get('FechaNac')?.errors?.['required']">Date of Birth is required.</div>
+          <div *ngIf="registroForm.get('FechaNac')?.errors?.['required']">El campo de fecha es obligatoria</div>
         </div>
       </div>
     </div>
@@ -80,7 +80,7 @@
 
     <div class="!mt-12">
       <button type="submit" class="py-3.5 px-7 text-sm font-semibold tracking-wider rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none">
-        Register
+        Registrar
       </button>
     </div>
   </form>
