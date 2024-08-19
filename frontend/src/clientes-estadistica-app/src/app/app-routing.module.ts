@@ -18,6 +18,7 @@ import { AuthGuard } from './auth.guard';
 import { UsersInfoComponent } from './menu/usuarios/users-info/users-info.component';
 import { EstadisticaComponent } from './estadistica/estadistica.component';
 import { HomeComponent } from './home/home.component';
+import { DashboardComponent } from './monitor/dashboard.component';
 
 const routes: Routes = [
   { path: "login", component: LoginComponent},
@@ -27,6 +28,7 @@ const routes: Routes = [
   { path: "registro", component: RegistroComponent },
   { path: "registroAdmin", component: RegistroAdminComponent },
   { path: 'users-info', component: UsersInfoComponent, canActivate: [AuthGuard], },
+  { path: 'dashboard', component: DashboardComponent, canActivate: [AuthGuard], },
   { path: "estadistica", component: EstadisticaComponent},
   { path: "estadisticas", component: EstadisticasComponent,
     children: [

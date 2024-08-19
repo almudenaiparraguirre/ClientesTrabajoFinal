@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100 font-sans leading-normal tracking-normal">
+    <div class="flex flex-col md:flex-row">
+        <!-- Sidebar -->
+        <div class="bg-gray-800 text-gray-100 w-full md:w-64 min-h-screen p-4">
+            <h3 class="text-2xl font-semibold mb-6">Dashboard</h3>
+            <nav class="flex flex-col space-y-4">
+                <a href="#" class="hover:text-gray-400">Dashboard</a>
+                <a href="#" class="hover:text-gray-400">Components</a>
+                <a href="#" class="hover:text-gray-400">Forms</a>
+                <a href="#" class="hover:text-gray-400">Tables</a>
+                <a href="#" class="hover:text-gray-400">Maps</a>
+                <a href="#" class="hover:text-gray-400">Widgets</a>
+                <a href="#" class="hover:text-gray-400">Charts</a>
+                <a href="#" class="hover:text-gray-400">Calendar</a>
+                <a href="#" class="hover:text-gray-400">Pages</a>
+            </nav>
+        </div>
+
+        <!-- Main Content -->
+        <div class="flex-1 p-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+                <!-- Cards -->
+                <div class="bg-white p-4 rounded-lg shadow-lg">
+                    <h5 class="text-gray-600 text-lg font-semibold">Usuarios registrados</h5>
+                    <p id="UsuariosLogueados" class="text-2xl font-bold">150GB</p>
+                </div>
+                <div class="bg-white p-4 rounded-lg shadow-lg">
+                    <h5 class="text-gray-600 text-lg font-semibold">Dinero trasnferido</h5>
+                    <p class="text-2xl font-bold">$1,345</p>
+                </div>
+                <div class="bg-white p-4 rounded-lg shadow-lg">
+                    <h5 class="text-gray-600 text-lg font-semibold">Errores encontrados</h5>
+                    <p class="text-2xl font-bold">23</p>
+                </div>
+                <div class="bg-white p-4 rounded-lg shadow-lg">
+                    <h5 class="text-gray-600 text-lg font-semibold">Transacciónes completadas</h5>
+                    <p class="text-2xl font-bold">+45K</p>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <!-- Charts -->
+                <div class="bg-white p-4 rounded-lg shadow-lg">
+                    <h5 class="text-gray-600 text-lg font-semibold">Financial Statistics</h5>
+                    <canvas id="financialChart"></canvas>
+                </div>
+                <div class="bg-white p-4 rounded-lg shadow-lg">
+                    <h5 class="text-gray-600 text-lg font-semibold">Subscriptions in Last 7 Days</h5>
+                    <canvas id="subscriptionsChart"></canvas>
+                </div>
+            </div>
+
+            <div class="mt-6 bg-white p-4 rounded-lg shadow-lg">
+                <h5 class="text-gray-600 text-lg font-semibold">Global Sales by Top Locations</h5>
+                <div class="h-64 bg-gray-200 rounded-lg">
+                    <!-- Aquí podrías integrar un mapa interactivo usando una biblioteca como Leaflet.js o Google Maps -->
+                    <img src="https://via.placeholder.com/900x300" alt="Map" class="w-full h-full object-cover rounded-lg">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        // Ejemplo de gráfico utilizando Chart.js
+        const ctx1 = document.getElementById('financialChart').getContext('2d');
+        const financialChart = new Chart(ctx1, {
+            type: 'line',
+            data: {
+                labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct'],
+                datasets: [{
+                    label: 'Earnings',
+                    data: [1200, 1500, 1000, 2000, 1500, 1700, 1400, 1800, 2200, 2000],
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                    fill: true
+                }]
+            }
+        });
+
+        const ctx2 = document.getElementById('subscriptionsChart').getContext('2d');
+        const subscriptionsChart = new Chart(ctx2, {
+            type: 'line',
+            data: {
+                labels: ['12pm', '3pm', '6pm', '9pm', '12am', '3am', '6am', '9am'],
+                datasets: [{
+                    label: 'Subscriptions',
+                    data: [169, 180, 172, 181, 190, 178, 169, 162],
+                    borderColor: 'rgba(255, 159, 64, 1)',
+                    backgroundColor: 'rgba(255, 159, 64, 0.2)',
+                    fill: true
+                }]
+            }
+        });
+    </script>
+</body>
+</html>
