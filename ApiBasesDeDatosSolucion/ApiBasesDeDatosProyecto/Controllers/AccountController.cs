@@ -72,9 +72,9 @@ public class AccountController : ControllerBase
         var result = await _userService.DeleteUserAsync(id);
         if (result)
         {
-            return Ok(new { message = "User deleted successfully" });
+            return NoContent(); // Devuelve 204 No Content
         }
-        return NotFound(new { message = "User not found" });
+        return NotFound(new { message = "User not found" }); // Si el usuario no se encuentra, devuelve 404
     }
 
     [HttpGet("users/{email}")]
