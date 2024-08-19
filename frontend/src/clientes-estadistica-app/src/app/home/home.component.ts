@@ -15,8 +15,6 @@ redirectToRegisterPage() {
 }
 
 redirectToLoginPage() {
-  this.router.navigate(['/Login']);
-
+  this.router.navigate(['/login']);
 }
-
 }

@@ -51,10 +51,14 @@ export class LoginComponent implements OnInit {
       .subscribe(response => {
         if (response && response.token) {
           localStorage.setItem('token', response.token);
-          this.route.navigate(['/estadisticas']); // Redirige a la ruta protegida
+          this.route.navigate(['/users-info']); // Redirige a la ruta protegida
         }
       });
   }
+
+  redirectToRegisterPage() {
+    this.route.navigate(['/registro']);
+}
   
   showError(message: string) {
     this.errorMessage = message;
