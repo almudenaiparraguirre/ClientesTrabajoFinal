@@ -257,14 +257,14 @@ public class AccountController : ControllerBase
 
 
 
-    [HttpPut("update/{email}")]
+    [HttpPut("updateUser")]
     public async Task<IActionResult> UpdateUser(string email, [FromBody] EditUserModel model)
     {
-
+        // Buscar el usuario existente por su correo electrónico
         var user = await _userManager.FindByEmailAsync(email);
         if (user == null)
         {
-            return NotFound("Usuario no encontrado");
+            return NotFound(new ErrorResponseDTO("Usuario no encontrado."));
         }
 
         // Usar AutoMapper para mapear el modelo al usuario existente
@@ -277,10 +277,12 @@ public class AccountController : ControllerBase
         var result = await _userManager.UpdateAsync(user);
         if (!result.Succeeded)
         {
-            return BadRequest(result.Errors);
+            var errors = result.Errors.Select(e => e.Description).ToList();
+            return BadRequest(new ErrorResponseDTO("Error al actualizar el usuario.", errors));
         }
 
-        return Ok(new { message = "User edited successfully." });
+        // Devolver NoContent en caso de éxito
+        return NoContent();
     }
 
 }
