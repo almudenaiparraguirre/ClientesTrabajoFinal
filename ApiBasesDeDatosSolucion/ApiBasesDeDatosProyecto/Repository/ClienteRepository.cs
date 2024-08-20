@@ -78,5 +78,11 @@ namespace ApiBasesDeDatosProyecto.Repository
             contexto.Clientes.Update(cliente);
             await contexto.SaveChangesAsync();
         }
+
+        public async Task EliminarClienteAsync(Cliente cliente)
+        {
+            contexto.Clientes.Remove(cliente);
+            await contexto.SaveChangesAsync();
+        }
     }
 }

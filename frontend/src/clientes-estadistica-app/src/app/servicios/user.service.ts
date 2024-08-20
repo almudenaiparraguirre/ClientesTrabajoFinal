@@ -35,7 +35,7 @@ export class UserService {
 
   añadirRolUsuario(usuario: any): Observable<any> {
     console.log(usuario); // Asegúrate de que los campos estén presentes y correctos DEBUG
-    return this.http.post<any>(`${this.URL}Account/cambiarRolPorEmail`, usuario);
+    return this.http.post<any>(`${this.URL}Account/cambiarRolUsuario`, usuario);
   }
 
   obtenerPaisIdPorNombre(nombre: string): Observable<{ id: number }> {

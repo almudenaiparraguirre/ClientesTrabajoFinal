@@ -11,6 +11,7 @@
         Task<Cliente?> ObtenerPorId(int id);
         Task<Cliente?> ObtenerPorEmail(string email);
         Task EditClienteAsync(Cliente cliente);
+        Task EliminarClienteAsync(Cliente cliente);
 
         Task<Cliente?> ObtenerClientesPais(int id);
         Task<List<Cliente>> ObtenerClientesPorPaisId(int paisId);
