@@ -85,13 +85,13 @@ public class AccountController : ControllerBase
     [HttpGet("users/getUser")]
     public async Task<ActionResult<ApplicationUser>> GetUserByEmail([FromQuery] string email)
     {
-        // Busca el usuario por su correo electrónico usando el parámetro de consulta.
-        var user = await _userService.GetUserByEmailAsync(email);
-        if (user == null)
+        var userDto = await _userService.GetUserByEmailAsync(email);
+        if (userDto == null)
         {
-            return NotFound(new { message = "User not found" });
+            var errorResponse = new ErrorResponseDTO("No se ha encontrado el usuario", new List<string> { $"No user found with email: {email}" });
+            return NotFound(errorResponse);
         }
-        return Ok(user);
+        return Ok(userDto);
     }
 
 
@@ -111,12 +111,14 @@ public class AccountController : ControllerBase
             return Ok(new { Token = token });
         }
 
-        return Unauthorized();
+        // Devolver un BadRequest con un mensaje de error
+        var errorResponse = new ErrorResponseDTO("Credenciales no validas.", new List<string> { "The email or password is incorrect." });
+        return BadRequest(errorResponse);
     }
 
 
     [HttpPost("register")]
-    public async Task<IActionResult> Register([FromBody] RegisterViewModel model)
+    public async Task<ActionResult<ApplicationUser>> Register([FromBody] RegisterViewModel model)
     {
         
         string rolPorDefecto = "Admin";
@@ -136,13 +138,12 @@ public class AccountController : ControllerBase
             return BadRequest(result.Errors);
         }
 
-        // Generar el token y devolverlo
-        var token = _tokenService.GenerateJwtToken(user);
-        return Ok(new { Token = token });
+
+        return Ok(user);
     }
 
 
-    [HttpPost("cambiarRolPorEmail")]
+    [HttpPost("cambiarRolUsuario")]
     public async Task<IActionResult> CambiarRolUsuario([FromBody] ChangeRoleViewModel model)
     {
         // Buscar el usuario por su correo electrónico
