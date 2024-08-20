@@ -1,4 +1,5 @@
 ﻿using ApiBasesDeDatosProyecto.Entities;
+using Humanizer;
 
 [Route("api/[controller]")]
 [ApiController]
@@ -9,6 +10,7 @@ public class AccountController : ControllerBase
     private readonly RoleManager<IdentityRole> _roleManager;
     private readonly ITokenService _tokenService;
     private readonly IClienteService _clienteService;
+    private readonly IClienteRepository _clienteRepository;
     private readonly ApiBasesDeDatosProyecto.IDentity.Serivicios.IUserService _userService;
     private readonly IPaisRepository _paisRepository; // Añadido
     private readonly IMapper _mapper;
@@ -19,6 +21,7 @@ public class AccountController : ControllerBase
         RoleManager<IdentityRole> roleManager,
         ITokenService tokenService,
         IClienteService clienteService,
+        IClienteRepository clienteRepository,
         ApiBasesDeDatosProyecto.IDentity.Serivicios.IUserService userService,
         IPaisRepository paisRepository,
         IMapper mapper) // Añadido
@@ -31,6 +34,7 @@ public class AccountController : ControllerBase
         _userService = userService;
         _paisRepository = paisRepository;
         _mapper = mapper; // Añadido
+        _clienteRepository = clienteRepository;
     }
     [HttpGet("users")]
     public async Task<ActionResult<IEnumerable<ApplicationUser>>> GetUsers(string? mail = null)
@@ -102,6 +106,25 @@ public class AccountController : ControllerBase
         return Ok(user);
     }
 
+    [HttpPost("login")]
+    public async Task<IActionResult> Login([FromBody] LoginViewModel model)
+    {
+        var result = await _signInManager.PasswordSignInAsync(
+            model.Email,
+            model.Password,
+            model.RememberMe,
+            lockoutOnFailure: false);
+
+        if (result.Succeeded)
+        {
+            var user = await _userManager.FindByEmailAsync(model.Email);
+            var token = _tokenService.GenerateJwtToken(user);
+            return Ok(new { Token = token });
+        }
+
+        return Unauthorized();
+    }
+
 
     [HttpPost("register")]
     public async Task<IActionResult> Register([FromBody] RegisterViewModel model)
@@ -130,91 +153,119 @@ public class AccountController : ControllerBase
     }
 
 
-    [HttpPost("login")]
-    public async Task<IActionResult> Login([FromBody] LoginViewModel model)
-    {
-        var result = await _signInManager.PasswordSignInAsync(
-            model.Email,
-            model.Password,
-            model.RememberMe,
-            lockoutOnFailure: false);
-
-        if (result.Succeeded)
-        {
-            var user = await _userManager.FindByEmailAsync(model.Email);
-            var token = _tokenService.GenerateJwtToken(user);
-            return Ok(new { Token = token });
-        }
-
-        return Unauthorized();
-    }
-
     [HttpPost("cambiarRolPorEmail")]
     public async Task<IActionResult> CambiarRolUsuario([FromBody] ChangeRoleViewModel model)
     {
+        // Buscar el usuario por su correo electrónico
         var user = await _userManager.FindByEmailAsync(model.Email);
         if (user == null)
         {
-            return NotFound("User not found.");
+            return NotFound(new ErrorResponseDTO("Usuario no encontrado."));
         }
 
+        // Verificar que el rol nuevo existe
         if (!await _roleManager.RoleExistsAsync(model.NuevoRol))
         {
-            return BadRequest("Role does not exist.");
+            return BadRequest(new ErrorResponseDTO("El rol no existe."));
         }
 
-        // Obtener los roles actuales del usuario
-        var currentRoles = await _userManager.GetRolesAsync(user);
-
-        // Eliminar roles antiguos si es necesario
-        foreach (var role in currentRoles)
+        // Cambiar los roles del usuario
+        var result = await CambiarRolesUsuario(user, model.NuevoRol);
+        if (!result.Succeeded)
         {
-            if (await _userManager.IsInRoleAsync(user, role))
+            return BadRequest(new ErrorResponseDTO("Error al cambiar el rol del usuario.", result.Errors.Select(e => e.Description).ToList()));
+        }
+
+        // Si el nuevo rol es "Admin", eliminar al usuario de la tabla de Clientes
+        if (model.NuevoRol == "Admin")
+        {
+            var eliminarClienteResult = await EliminarCliente(model.Email);
+            if (!eliminarClienteResult.Succeeded)
             {
-                var removeResult = await _userManager.RemoveFromRoleAsync(user, role);
-                if (!removeResult.Succeeded)
-                {
-                    return BadRequest("Failed to remove old role.");
-                }
+                return BadRequest(new ErrorResponseDTO("Error al eliminar el cliente.", eliminarClienteResult.Errors.Select(e => e.Description).ToList()));
             }
         }
 
-        // Asignar el nuevo rol al usuario
-        var addResult = await _userManager.AddToRoleAsync(user, model.NuevoRol);
-        if (!addResult.Succeeded)
-        {
-            return BadRequest("Failed to add new role.");
-        }
-
+        // Si el nuevo rol es "Client", registrar al usuario en la tabla de Clientes
         if (model.NuevoRol == "Client")
         {
+            var clienteResult = await RegistrarCliente(model);
+            if (!clienteResult.Succeeded)
+            {
+                return BadRequest(new ErrorResponseDTO("Error al registrar el cliente.", clienteResult.Errors.Select(e => e.Description).ToList()));
+            }
+        }
 
-         // Obtener el ID del país a través del repositorio
+        return NoContent();
+    }
+
+    private async Task<IdentityResult> CambiarRolesUsuario(ApplicationUser user, string nuevoRol)
+    {
+        var currentRoles = await _userManager.GetRolesAsync(user);
+
+        if (currentRoles.Contains(nuevoRol) && currentRoles.Count == 1)
+        {
+            return IdentityResult.Success;
+        }
+
+        var removeResult = await _userManager.RemoveFromRolesAsync(user, currentRoles);
+        if (!removeResult.Succeeded)
+        {
+            return removeResult;
+        }
+
+        var addResult = await _userManager.AddToRoleAsync(user, nuevoRol);
+        if (!addResult.Succeeded)
+        {
+            return addResult;
+        }
+
+        return IdentityResult.Success;
+    }
+
+    // Método para eliminar un cliente basado en su email
+    private async Task<IdentityResult> EliminarCliente(string email)
+    {
+        var cliente = await _clienteRepository.ObtenerPorEmail(email);
+        if (cliente != null)
+        {
+            await _clienteRepository.EliminarClienteAsync(cliente);
+            return IdentityResult.Success;
+        }
+        return IdentityResult.Failed(new IdentityError { Description = "Cliente no encontrado." });
+    }
+
+    private async Task<IdentityResult> RegistrarCliente(ChangeRoleViewModel model)
+    {
+        var clienteExistente = await _clienteRepository.ObtenerPorEmail(model.Email);
+        if (clienteExistente != null)
+        {
+            return IdentityResult.Failed(new IdentityError { Description = "El cliente ya está registrado." });
+        }
+
         var pais = await _paisRepository.ObtenerPorNombre(model.Pais);
         if (pais == null)
         {
-            return BadRequest("Country not found.");
+            return IdentityResult.Failed(new IdentityError { Description = "País no encontrado." });
         }
 
-        DateTime FechaNac = DateTimeOffset.FromUnixTimeMilliseconds(model.FechaNacimiento).UtcDateTime;
-            // Si es un cliente, guardar datos adicionales
-            var cliente = new Cliente
-            {
-                Nombre = model.Nombre,
-                Apellido = model.Apellido,
-                PaisId = pais.Id, // Asignar el ID del país obtenido
-                Empleo = model.Empleo,
-                Email = model.Email,
-                FechaNacimiento = FechaNac,
-                // Asignar el ID del usuario si es necesario
-                //UserId = user.Id
-            };
-            await _clienteService.RegisterClientAsync(cliente);
-        }
+        DateTime fechaNac = DateTimeOffset.FromUnixTimeMilliseconds(model.FechaNacimiento).UtcDateTime;
 
+        var cliente = new Cliente
+        {
+            Nombre = model.Nombre,
+            Apellido = model.Apellido,
+            PaisId = pais.Id,
+            Empleo = model.Empleo,
+            Email = model.Email,
+            FechaNacimiento = fechaNac,
+        };
 
-        return Ok(new { message = "Role changed successfully." });
+        await _clienteService.RegisterClientAsync(cliente);
+        return IdentityResult.Success;
     }
+
+
 
     [HttpPut("update/{email}")]
     public async Task<IActionResult> UpdateUser(string email, [FromBody] EditUserModel model)
