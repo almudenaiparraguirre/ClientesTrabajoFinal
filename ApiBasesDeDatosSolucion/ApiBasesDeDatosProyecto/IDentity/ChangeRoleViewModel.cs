@@ -11,7 +11,7 @@
 
     public string? Empleo { get; set; }
 
-    public long FechaNacimiento { get; set; }
+    public DateTime FechaNacimiento { get; set; }
 
 
 }

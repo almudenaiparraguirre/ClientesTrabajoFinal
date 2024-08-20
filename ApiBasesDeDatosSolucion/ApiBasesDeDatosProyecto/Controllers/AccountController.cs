@@ -1,4 +1,5 @@
 ﻿using ApiBasesDeDatosProyecto.Entities;
+using ApiBasesDeDatosProyecto.Models;
 
 [Route("api/[controller]")]
 [ApiController]
@@ -108,14 +109,14 @@ public class AccountController : ControllerBase
     {
         
         string rolPorDefecto = "Admin";
-        DateTime FechaNac = DateTimeOffset.FromUnixTimeMilliseconds(model.FechaNacimiento).UtcDateTime;
+        //DateTime FechaNac = DateTimeOffset.FromUnixTimeMilliseconds(model.FechaNacimiento).UtcDateTime;
 
         var user = new ApplicationUser
         {
             FullName = model.Nombre + " " + model.Apellido,
             UserName = model.Email,
             Email = model.Email,
-            DateOfBirth = FechaNac,
+            DateOfBirth = model.FechaNacimiento,
         };
 
         var result = await _userManager.CreateAsync(user, model.Password);
@@ -196,7 +197,7 @@ public class AccountController : ControllerBase
             return BadRequest("Country not found.");
         }
 
-        DateTime FechaNac = DateTimeOffset.FromUnixTimeMilliseconds(model.FechaNacimiento).UtcDateTime;
+        //DateTime FechaNac = DateTimeOffset.FromUnixTimeMilliseconds(model.FechaNacimiento).UtcDateTime;
             // Si es un cliente, guardar datos adicionales
             var cliente = new Cliente
             {
@@ -205,7 +206,7 @@ public class AccountController : ControllerBase
                 PaisId = pais.Id, // Asignar el ID del país obtenido
                 Empleo = model.Empleo,
                 Email = model.Email,
-                FechaNacimiento = FechaNac,
+                FechaNacimiento = model.FechaNacimiento,
                 // Asignar el ID del usuario si es necesario
                 //UserId = user.Id
             };
@@ -219,7 +220,7 @@ public class AccountController : ControllerBase
     [HttpPut("update/{email}")]
     public async Task<IActionResult> UpdateUser(string email, [FromBody] EditUserModel model)
     {
-        // Buscar el usuario existente por su ID
+
         var user = await _userManager.FindByEmailAsync(email);
         if (user == null)
         {
@@ -227,7 +228,10 @@ public class AccountController : ControllerBase
         }
 
         // Usar AutoMapper para mapear el modelo al usuario existente
-        _mapper.Map(model, user);
+        DateTime FechaNac = DateTimeOffset.FromUnixTimeMilliseconds(model.FechaNacimiento).UtcDateTime;
+        user.FullName = model.Nombre + " " + model.Apellido;
+        user.DateOfBirth = FechaNac;
+        //_mapper.Map(model, user);
 
         // Actualizar el usuario en la base de datos
         var result = await _userManager.UpdateAsync(user);
@@ -238,5 +242,4 @@ public class AccountController : ControllerBase
 
         return Ok(new { message = "User edited successfully." });
     }
-
 }
