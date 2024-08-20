@@ -45,10 +45,13 @@ export class UserService {
     return this.http.get<{ id: number }>(url);
   }
 
-  editarCliente(cliente: Cliente): Observable<any>{
-    const url = `${this.URL}Cliente/${cliente.email}`;
+  editarCliente(cliente: Cliente): Observable<void> {
+    // Construir la URL con el parámetro de consulta
+    const url = `${this.URL}updateUser?email=${encodeURIComponent(cliente.email)}`;
+    // Convertir fecha de nacimiento a timestamp (milisegundos)
     cliente.fechaNacimiento = new Date(cliente.fechaNacimiento).getTime();
-    return this.http.put(url, cliente);
+    // Enviar la solicitud PUT
+    return this.http.put<void>(url, cliente);
   }
 
   editarUsuario(usuario: Usuario): Observable<any>{
