@@ -56,8 +56,14 @@ export class UserService {
 
   editarUsuario(usuario: Usuario): Observable<any>{
     const url = `${this.URL}Account/update/${usuario.email}`;
+    //console.log(`Fecha de nacimiento del usuario: ${usuario.dateOfBirth}`);
+    //usuario.dateOfBirth += "T11:43:28.685Z"
     usuario.dateOfBirth = new Date(usuario.dateOfBirth).getTime();
     return this.http.put(url, usuario);
+  }
+
+  private formatDateToBackend(date: Date): string {
+    return date.toISOString();
   }
 
   getEnvios(): Observable<any[]> {

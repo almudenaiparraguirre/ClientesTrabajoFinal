@@ -120,7 +120,7 @@ public class AccountController : ControllerBase
     [HttpPost("register")]
     public async Task<ActionResult<ApplicationUser>> Register([FromBody] RegisterViewModel model)
     {
-        
+
         string rolPorDefecto = "Admin";
         DateTime FechaNac = DateTimeOffset.FromUnixTimeMilliseconds(model.FechaNacimiento).UtcDateTime;
 
@@ -239,7 +239,7 @@ public class AccountController : ControllerBase
             return IdentityResult.Failed(new IdentityError { Description = "País no encontrado." });
         }
 
-        DateTime fechaNac = DateTimeOffset.FromUnixTimeMilliseconds(model.FechaNacimiento).UtcDateTime;
+        //DateTime fechaNac = DateTimeOffset.FromUnixTimeMilliseconds(model.FechaNacimiento).UtcDateTime;
 
         var cliente = new Cliente
         {
@@ -248,7 +248,7 @@ public class AccountController : ControllerBase
             PaisId = pais.Id,
             Empleo = model.Empleo,
             Email = model.Email,
-            FechaNacimiento = fechaNac,
+            FechaNacimiento = model.FechaNacimiento,
         };
 
         await _clienteService.RegisterClientAsync(cliente);
@@ -268,7 +268,10 @@ public class AccountController : ControllerBase
         }
 
         // Usar AutoMapper para mapear el modelo al usuario existente
-        _mapper.Map(model, user);
+        DateTime FechaNac = DateTimeOffset.FromUnixTimeMilliseconds(model.FechaNacimiento).UtcDateTime;
+        user.FullName = model.Nombre + " " + model.Apellido;
+        user.DateOfBirth = FechaNac;
+        //_mapper.Map(model, user);
 
         // Actualizar el usuario en la base de datos
         var result = await _userManager.UpdateAsync(user);

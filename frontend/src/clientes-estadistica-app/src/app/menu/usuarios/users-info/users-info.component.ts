@@ -55,7 +55,7 @@ export class UsersInfoComponent implements OnInit, OnDestroy {
             return {
               ...usuario,
               nombre: nombre,
-              apellido: apellido,
+              apellido: apellido
             };
           });
   

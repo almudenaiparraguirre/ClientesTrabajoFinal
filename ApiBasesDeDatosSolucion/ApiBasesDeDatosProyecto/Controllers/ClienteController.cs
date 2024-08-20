@@ -169,7 +169,7 @@ public class ClienteController : ControllerBase
 
         clienteExistente.Nombre = clienteDto.Nombre;
         clienteExistente.Apellido = clienteDto.Apellido;
-        clienteExistente.FechaNacimiento = FechaNac;
+        clienteExistente.FechaNacimiento =  FechaNac;
         clienteExistente.PaisId = clienteDto.PaisId;
         clienteExistente.Empleo = clienteDto.Empleo;
 
