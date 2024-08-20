@@ -1,6 +1,5 @@
 ﻿using ApiBasesDeDatosProyecto.Entities;
 using Humanizer;
-using ApiBasesDeDatosProyecto.Models;
 
 [Route("api/[controller]")]
 [ApiController]
@@ -121,16 +120,16 @@ public class AccountController : ControllerBase
     [HttpPost("register")]
     public async Task<ActionResult<ApplicationUser>> Register([FromBody] RegisterViewModel model)
     {
-        
+
         string rolPorDefecto = "Admin";
-        //DateTime FechaNac = DateTimeOffset.FromUnixTimeMilliseconds(model.FechaNacimiento).UtcDateTime;
+        DateTime FechaNac = DateTimeOffset.FromUnixTimeMilliseconds(model.FechaNacimiento).UtcDateTime;
 
         var user = new ApplicationUser
         {
             FullName = model.Nombre + " " + model.Apellido,
             UserName = model.Email,
             Email = model.Email,
-            DateOfBirth = model.FechaNacimiento,
+            DateOfBirth = FechaNac,
         };
 
         var result = await _userManager.CreateAsync(user, model.Password);
@@ -240,7 +239,7 @@ public class AccountController : ControllerBase
             return IdentityResult.Failed(new IdentityError { Description = "País no encontrado." });
         }
 
-        DateTime fechaNac = DateTimeOffset.FromUnixTimeMilliseconds(model.FechaNacimiento).UtcDateTime;
+        //DateTime fechaNac = DateTimeOffset.FromUnixTimeMilliseconds(model.FechaNacimiento).UtcDateTime;
 
         var cliente = new Cliente
         {
@@ -249,27 +248,12 @@ public class AccountController : ControllerBase
             PaisId = pais.Id,
             Empleo = model.Empleo,
             Email = model.Email,
-            FechaNacimiento = fechaNac,
+            FechaNacimiento = model.FechaNacimiento,
         };
 
         await _clienteService.RegisterClientAsync(cliente);
         return IdentityResult.Success;
     }
-        //DateTime FechaNac = DateTimeOffset.FromUnixTimeMilliseconds(model.FechaNacimiento).UtcDateTime;
-            // Si es un cliente, guardar datos adicionales
-            var cliente = new Cliente
-            {
-                Nombre = model.Nombre,
-                Apellido = model.Apellido,
-                PaisId = pais.Id, // Asignar el ID del país obtenido
-                Empleo = model.Empleo,
-                Email = model.Email,
-                FechaNacimiento = model.FechaNacimiento,
-                // Asignar el ID del usuario si es necesario
-                //UserId = user.Id
-            };
-            await _clienteService.RegisterClientAsync(cliente);
-        }
 
 
 
@@ -298,4 +282,5 @@ public class AccountController : ControllerBase
 
         return Ok(new { message = "User edited successfully." });
     }
+
 }
