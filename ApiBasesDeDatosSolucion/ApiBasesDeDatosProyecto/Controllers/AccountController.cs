@@ -37,24 +37,11 @@ public class AccountController : ControllerBase
         _clienteRepository = clienteRepository;
     }
     [HttpGet("users")]
-    public async Task<ActionResult<IEnumerable<ApplicationUser>>> GetUsers(string? mail = null)
+    public async Task<ActionResult<IEnumerable<ApplicationUser>>> GetUsers()
     {
-        if (string.IsNullOrEmpty(mail))
-        {
-            // Si no se proporciona un mail, devuelve todos los usuarios.
-            var users = await _userService.GetAllUsersAsync();
-            return Ok(users);
-        }
-        else
-        {
-            // Si se proporciona un mail, busca un usuario específico por correo electrónico.
-            var user = await _userService.GetUserByEmailAsync(mail);
-            if (user == null)
-            {
-                return NotFound(new { message = "User not found" });
-            }
-            return Ok(user);
-        }
+        // Obtener todos los usuarios sin filtrar por correo electrónico.
+        var users = await _userService.GetAllUsersAsync();
+        return Ok(users);
     }
 
     [HttpGet("verificarRol")]
@@ -95,9 +82,10 @@ public class AccountController : ControllerBase
         return NotFound(new { message = "User not found" }); // Si el usuario no se encuentra, devuelve 404
     }
 
-    [HttpGet("users/{email}")]
-    public async Task<ActionResult<ApplicationUser>> GetUserByEmail(string email)
+    [HttpGet("users/getUser")]
+    public async Task<ActionResult<ApplicationUser>> GetUserByEmail([FromQuery] string email)
     {
+        // Busca el usuario por su correo electrónico usando el parámetro de consulta.
         var user = await _userService.GetUserByEmailAsync(email);
         if (user == null)
         {
@@ -105,6 +93,7 @@ public class AccountController : ControllerBase
         }
         return Ok(user);
     }
+
 
     [HttpPost("login")]
     public async Task<IActionResult> Login([FromBody] LoginViewModel model)
