@@ -45,6 +45,16 @@ export class UserService {
     return this.http.get<{ id: number }>(url);
   }
 
+  crearCliente(cliente: Cliente): Observable<void> {
+    const url = `${this.URL}Account/register`;
+    return this.http.post<void>(url, cliente);
+  }
+
+  crearUsuario(usuario: Usuario): Observable<void> {
+    const url = `${this.URL}Account/register`;
+    return this.http.post<void>(url, usuario);
+  }
+
   editarCliente(cliente: Cliente): Observable<void> {
     // Construir la URL con el parámetro de consulta
     const url = `${this.URL}updateUser?email=${encodeURIComponent(cliente.email)}`;
