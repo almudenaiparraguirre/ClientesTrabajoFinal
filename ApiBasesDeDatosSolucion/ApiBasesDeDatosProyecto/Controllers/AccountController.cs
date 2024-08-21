@@ -122,14 +122,14 @@ public class AccountController : ControllerBase
     {
 
         string rolPorDefecto = "Admin";
-        DateTime FechaNac = DateTimeOffset.FromUnixTimeMilliseconds(model.FechaNacimiento).UtcDateTime;
+        //DateTime FechaNac = DateTimeOffset.FromUnixTimeMilliseconds(model.FechaNacimiento).UtcDateTime;
 
         var user = new ApplicationUser
         {
             FullName = model.Nombre + " " + model.Apellido,
             UserName = model.Email,
             Email = model.Email,
-            DateOfBirth = FechaNac,
+            DateOfBirth = model.FechaNacimiento,
         };
 
         var result = await _userManager.CreateAsync(user, model.Password);
