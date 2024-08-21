@@ -1,5 +1,6 @@
 import { Component, AfterViewInit } from '@angular/core';
 import { Chart } from 'chart.js/auto';
+import { MonitorDataService, MonitoringData } from 'src/app/servicios/monitor-data.service'; 
 import { UserService } from 'src/app/servicios/user.service'; 
 import { ClienteService } from 'src/app/servicios/cliente.service';
 import { Subscription } from 'rxjs';
@@ -14,13 +15,14 @@ export class DashboardComponent implements AfterViewInit {
 
   usuarios: Usuario[] = [];
 
-  // Variable para almacenar la suscripción
+  transferencias: MonitoringData[] = [];
   private subscription: Subscription = new Subscription();
 
-  constructor(private userService: UserService) { }
+  constructor(private userService: UserService, private monitorDataService: MonitorDataService) { }
 
   ngOnInit(): void {
     this.loadUsuarios();
+    this.loadTransferencias();
   }
 
   
@@ -58,6 +60,39 @@ export class DashboardComponent implements AfterViewInit {
         }]
       }
     }); 
+  }
+
+  loadTransferencias(): void {
+    this.subscription.add(
+      this.monitorDataService.getTransferencias().subscribe(
+        data => {
+          this.transferencias = data;
+          this.updateTransferList();
+        },
+        error => {
+          console.error('Error fetching transferencias', error);
+        }
+      )
+    );
+  }
+
+  updateTransferList(): void {
+    const transferList = document.getElementById('transferList');
+    if (transferList) {
+      transferList.innerHTML = '';  // Limpia la lista actual
+      this.transferencias.forEach((transferencia) => {
+        const li = document.createElement('li');
+        li.className = 'py-2 flex justify-between';
+        li.innerHTML = `
+          <span>${transferencia.name}</span>
+          <span>${transferencia.paisOrigen} -> ${transferencia.paisDestino}</span>
+          <span>${transferencia.clienteOrigen} -> ${transferencia.clienteDestino}</span>
+          <span>$${transferencia.value.toFixed(2)}</span>
+          <span>${new Date(transferencia.timestamp).toLocaleString()}</span>
+        `;
+        transferList.appendChild(li);
+      });
+    }
   }
 
 
