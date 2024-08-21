@@ -107,9 +107,14 @@ public class AccountController : ControllerBase
     public async Task<IActionResult> Register([FromBody] RegisterViewModel model)
     {
         
-        string rolPorDefecto = "Admin";
         DateTime FechaNac = DateTimeOffset.FromUnixTimeMilliseconds(model.FechaNacimiento).UtcDateTime;
 
+        TryValidateModel(model);
+
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState); 
+        }
         var user = new ApplicationUser
         {
             FullName = model.Nombre + " " + model.Apellido,

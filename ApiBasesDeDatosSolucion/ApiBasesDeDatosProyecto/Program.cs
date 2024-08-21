@@ -6,10 +6,27 @@ builder.Services.AddDbContext<Contexto>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
 });
 
+
+// Cargar la configuración de Identity desde appsettings.json
+builder.Services.Configure<IdentitySettings>(builder.Configuration.GetSection("Identity"));
+
+// Obtener la configuración cargada
+var identitySettings = builder.Configuration.GetSection("Identity").Get<IdentitySettings>();
+
 // Configurar Identity
-builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
-    .AddEntityFrameworkStores<Contexto>()
-    .AddDefaultTokenProviders();
+builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
+{
+    options.Password.RequireDigit = identitySettings.Password.RequireDigit;
+    options.Password.RequiredLength = identitySettings.Password.RequiredLength;
+    options.Password.RequireLowercase = identitySettings.Password.RequireLowercase;
+    options.Password.RequireNonAlphanumeric = identitySettings.Password.RequireNonAlphanumeric;
+    options.Password.RequireUppercase = identitySettings.Password.RequireUppercase;
+
+    options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(identitySettings.Lockout.DefaultLockoutMinutes);
+    options.Lockout.MaxFailedAccessAttempts = identitySettings.Lockout.MaxFailedAccessAttempts;
+})
+.AddEntityFrameworkStores<Contexto>()
+.AddDefaultTokenProviders();
 
 // Configurar JWT
 var key = Encoding.ASCII.GetBytes(builder.Configuration["Jwt:Key"]);

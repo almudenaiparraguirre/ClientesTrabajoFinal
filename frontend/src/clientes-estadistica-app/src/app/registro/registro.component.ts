@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { Router } from '@angular/router'; // Importa el Router
+import { Router } from '@angular/router';
 import { UserService } from '../servicios/user.service';
 import { Usuario } from '../interfaces/usuario.interface';
 import { CambioRolModel } from '../interfaces/cambioRol.interface';
@@ -14,12 +14,12 @@ export class RegistroComponent implements OnInit {
 
   registroForm: FormGroup;
   errorMessage: string;
-  isErrorVisible = false; // Propiedad para controlar la visibilidad del mensaje de error
+  isErrorVisible = false;
 
   constructor(
     private fb: FormBuilder, 
     private miServicio: UserService,
-    private router: Router // Inyecta el Router
+    private router: Router
   ) {}
 
   ngOnInit(): void {
@@ -27,7 +27,7 @@ export class RegistroComponent implements OnInit {
       Nombre: ['', [Validators.required, Validators.minLength(3)]],
       Apellido: ['', [Validators.required, Validators.minLength(3)]],
       Correo: ['', [Validators.required, Validators.email]],
-      Contraseña: ['', [Validators.required, Validators.minLength(6)]],
+      Contraseña: ['', [Validators.required, Validators.minLength(6), this.passwordStrengthValidator]],
       Contraseña2: ['', [Validators.required]],
       Rol: ['Client', Validators.required],
       PaisNombre: ['', Validators.required],
@@ -55,17 +55,26 @@ export class RegistroComponent implements OnInit {
     };
   }
 
+  passwordStrengthValidator(control: any) {
+    const value = control.value || '';
+    if (!/[A-Z]/.test(value)) {
+      return { passwordStrength: 'La contraseña debe tener al menos una letra mayúscula.' };
+    }
+    if (!/[a-z]/.test(value)) {
+      return { passwordStrength: 'La contraseña debe tener al menos una letra minúscula.' };
+    }
+    if (!/[0-9]/.test(value)) {
+      return { passwordStrength: 'La contraseña debe tener al menos un número.' };
+    }
+    return null;
+  }
+
   onSubmit(): void {
     if (this.registroForm.invalid) {
       this.showValidationErrors();
       return;
     }
-  
-    if (this.registroForm.value.Contraseña !== this.registroForm.value.Contraseña2) {
-      this.showError('Las contraseñas no coinciden.');
-      return;
-    }
-  
+
     const fechaNacTimestamp = new Date(this.registroForm.value.FechaNac).getTime();
   
     const usuario: Usuario = {
@@ -77,12 +86,10 @@ export class RegistroComponent implements OnInit {
       PaisNombre: this.registroForm.value.PaisNombre,
       FechaNacimiento: fechaNacTimestamp
     };
-  
+
     // Registrar usuario
     this.miServicio.registrarUsuario(usuario).subscribe(
       response => {
-        console.log('Usuario registrado exitosamente', response);
-  
         const datosCambioRol: CambioRolModel = {
           Email: this.registroForm.value.Correo,
           NuevoRol: "Client",
@@ -92,40 +99,36 @@ export class RegistroComponent implements OnInit {
           Empleo: this.registroForm.value.Empleo,
           FechaNacimiento: fechaNacTimestamp
         };
-  
+
         this.miServicio.añadirRolUsuario(datosCambioRol).subscribe(
           response => {
-            console.log('Rol añadido exitosamente', response);
-            this.router.navigate(['/login']); // Redirige al login
+            this.router.navigate(['/login']);
           },
           error => {
-            if (error.status === 400) {
-              this.showError('Error al añadir rol: ' + error.error);
-            } else if (error.status === 0) {
-              this.showError('No se pudo conectar al servidor al añadir rol.');
-            } else {
-              this.showError('Error al añadir rol: ' + error.message);
-            }
+            this.handleError(error, 'Error al añadir rol');
           }
         );
-  
       },
       error => {
-        if (error.status === 400) {
-          this.showError('Error al registrar usuario: ' + error.error);
-        } else if (error.status === 0) {
-          this.showError('No se pudo conectar al servidor al registrar usuario.');
-        } else {
-          this.showError('Error al registrar usuario: ' + error.message);
-        }
+        this.handleError(error, 'Error al registrar usuario');
       }
     );
   }
-  
+
+  handleError(error: any, prefix: string) {
+    if (error.status === 400) {
+      this.showError(`${prefix}: ${error.error}`);
+    } else if (error.status === 0) {
+      this.showError('No se pudo conectar al servidor.');
+    } else {
+      this.showError(`${prefix}: ${error.message}`);
+    }
+  }
+
   showError(message: string) {
     this.errorMessage = message;
     this.isErrorVisible = true;
-    setTimeout(() => this.isErrorVisible = false, 3000); // Ocultar el mensaje después de 3 segundos
+    setTimeout(() => this.isErrorVisible = false, 3000);
   }
 
   private showValidationErrors(): void {
@@ -149,13 +152,12 @@ export class RegistroComponent implements OnInit {
             if (control.errors['passwordMismatch']) {
               errorMessage += `- Las contraseñas no coinciden.\n`;
             }
+            if (control.errors['passwordStrength']) {
+              errorMessage += `- ${control.errors['passwordStrength']}\n`;
+            }
           }
         }
       }
-    }
-
-    if (errorMessage === 'Por favor corrige los siguientes errores:\n') {
-      errorMessage = 'Hay errores en el formulario. Por favor, corrígelos antes de enviar.';
     }
 
     this.showError(errorMessage);
