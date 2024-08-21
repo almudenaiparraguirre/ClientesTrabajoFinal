@@ -1,7 +1,7 @@
 ﻿namespace ApiBasesDeDatosProyecto.Entities
 {
     [Table("Clientes")]
-    public class Cliente : IValidatableObject
+    public class Cliente 
     {
         [Key]
         public int Id { get; set; }
@@ -34,23 +34,6 @@
 
         public string Email { get; set; }
 
-        public IEnumerable<System.ComponentModel.DataAnnotations.ValidationResult> Validate(ValidationContext validationContext)
-        {
-            if (FechaNacimiento > DateTime.Now)
-            {
-                yield return new System.ComponentModel.DataAnnotations.ValidationResult(
-                    "La fecha de nacimiento no puede ser en el futuro.",
-                    new[] { nameof(FechaNacimiento) }
-                );
-            }
-
-            if (Nombre.Equals(Apellido, StringComparison.OrdinalIgnoreCase))
-            {
-                yield return new System.ComponentModel.DataAnnotations.ValidationResult(
-                    "El nombre y el apellido no pueden ser iguales.",
-                    new[] { nameof(Nombre), nameof(Apellido) }
-                );
-            }
-        }
+        
     }
 }

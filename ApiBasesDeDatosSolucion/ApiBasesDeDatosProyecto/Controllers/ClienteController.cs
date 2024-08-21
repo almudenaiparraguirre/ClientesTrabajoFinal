@@ -1,4 +1,5 @@
 ﻿using ApiBasesDeDatosProyecto.Helpers;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace ApiBasesDeDatosProyecto.Controllers;
 
@@ -51,61 +52,40 @@ public class ClienteController : ControllerBase
         if (cliente == null)
         {
             _logger.LogWarning($"Cliente con ID {id} no encontrado.");
-            return NotFound();
+            return NotFound(new ErrorResponseDTO($"No se encontraron clientes con id {id}."));
         }
         return Ok(_mapper.Map<ClienteDto>(cliente));
     }
 
-    // GET api/cliente/paisNombre/{nombre}
-    [HttpGet("paisNombre/{nombre}")]
-    public async Task<ActionResult<List<ClienteDto>>> GetClientesPorNombrePais(string nombre)
+    [HttpGet("GetClientesPorNombrePais")]
+    public async Task<ActionResult<List<ClienteDto>>> GetClientesPorNombrePais([FromQuery] string nombre)
     {
         _logger.LogInformation($"Obteniendo clientes para el país con nombre {nombre}.");
+
         var pais = await _paisRepository.ObtenerPorNombre(nombre);
         if (pais == null)
         {
             _logger.LogWarning($"País con nombre {nombre} no encontrado.");
-            return NotFound();
+            return NotFound(new ErrorResponseDTO($"País con nombre {nombre} no encontrado."));
         }
 
         var clientes = await _clienteRepository.ObtenerClientesPorPaisId(pais.Id);
         if (clientes == null || clientes.Count == 0)
         {
             _logger.LogWarning($"No se encontraron clientes para el país con nombre {nombre}.");
-            return NotFound();
+            return NotFound(new ErrorResponseDTO($"No se encontraron clientes para el país con nombre {nombre}."));
         }
 
         return Ok(_mapper.Map<List<ClienteDto>>(clientes));
     }
 
-    [HttpGet("generados")]
+    [HttpGet("GetClientesGenerados")]
     public ActionResult<List<Cliente>> GetClientesGenerados(int count = 10)
     {
         var clientes = _clienteService.GetClientes(count);
         return Ok(clientes);
     }
 
-    [HttpGet("ClientesFake")]
-    public ActionResult<List<ClienteDto>> GetClientesFake(int count)
-    {
-        /*var clientesRepositorio = new ClienteRepository(_contexto);
-        var cliente = new ClienteFaker().Generate();
-        _contexto.Clientes.Add(cliente);
-        _contexto.SaveChanges();
-
-        var clienteRecuperado = await clientesRepositorio.ObtenerPorId(cliente.Id);
-
-        clienteRecuperado.Should().BeEquivalentTo(cliente, options => options.
-        ComparingByMembers<Cliente>());*/
-
-        var clientesFaker = new ClienteFaker().Generate(count);
-        _contexto.Clientes.AddRange(clientesFaker);
-        _contexto.SaveChanges();
-
-        var clienteDtos = _mapper.Map<List<Cliente>>(clientesFaker);
-        return Ok(clienteDtos);
-    
-}
 
     // POST api/cliente
     [HttpPost]
