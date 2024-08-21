@@ -18,10 +18,9 @@ namespace ApiBasesDeDatosProyecto.Repository
 
         public void Agregar(Usuario usuario)
         {
-            if (usuario.Email.ComprobarEmail())
-            {
+         
                 _contexto.Usuarios.Add(usuario);
-            }
+            
         }
 
         public void Eliminar(Usuario usuario)

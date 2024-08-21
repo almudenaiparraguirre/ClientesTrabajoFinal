@@ -15,7 +15,7 @@ export class UserService {
   private readonly url_estadistica = environment.apiUrl;
 
   //URL AMIN
-  private readonly URL = "https://localhost:7107/api/";
+  private readonly URL = "https://localhost:44339/api/";
 
   constructor(private http: HttpClient) { }
 
@@ -43,6 +43,16 @@ export class UserService {
     const url = `${this.URL}Paises/nombre/${nombre}`;
     // Hacer la solicitud GET
     return this.http.get<{ id: number }>(url);
+  }
+
+  crearCliente(cliente: Cliente): Observable<void> {
+    const url = `${this.URL}Account/register`;
+    return this.http.post<void>(url, cliente);
+  }
+
+  crearUsuario(usuario: Usuario): Observable<void> {
+    const url = `${this.URL}Account/register`;
+    return this.http.post<void>(url, usuario);
   }
 
   editarCliente(cliente: Cliente): Observable<void> {

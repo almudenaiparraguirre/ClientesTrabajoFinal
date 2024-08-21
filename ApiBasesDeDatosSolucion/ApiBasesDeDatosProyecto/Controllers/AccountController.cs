@@ -88,8 +88,36 @@ public class AccountController : ControllerBase
         var userDto = await _userService.GetUserByEmailAsync(email);
         if (userDto == null)
         {
-            var errorResponse = new ErrorResponseDTO("No se ha encontrado el usuario", new List<string> { $"No user found with email: {email}" });
-            return NotFound(errorResponse);
+            return NotFound(new { message = "User not found" });
+        }
+        return Ok(user);
+    }
+
+
+    [HttpPost("register")]
+    public async Task<IActionResult> Register([FromBody] RegisterViewModel model)
+    {
+        
+        DateTime FechaNac = DateTimeOffset.FromUnixTimeMilliseconds(model.FechaNacimiento).UtcDateTime;
+
+        TryValidateModel(model);
+
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState); 
+        }
+        var user = new ApplicationUser
+        {
+            FullName = model.Nombre + " " + model.Apellido,
+            UserName = model.Email,
+            Email = model.Email,
+            DateOfBirth = FechaNac,
+        };
+
+        var result = await _userManager.CreateAsync(user, model.Password);
+        if (!result.Succeeded)
+        {
+            return BadRequest(result.Errors);
         }
         return Ok(userDto);
     }

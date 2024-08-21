@@ -10,11 +10,13 @@ import { Cliente } from 'src/app/clases/cliente';
   templateUrl: './users-info.component.html',
 })
 export class UsersInfoComponent implements OnInit, OnDestroy {
+  isAddModalOpen = false;
   // Variables para almacenar el usuario o cliente seleccionado y el estado del modal
   selectedCliente: Cliente | null = null;
   selectedUsuario: Usuario | null = null;
   isModalOpen = false;
   editMode: 'user' | 'client' = 'user';
+  selectedItem: Usuario | Cliente;
 
   usuarios: Usuario[] = [];
   filteredUsuarios: Usuario[] = [];
@@ -41,6 +43,16 @@ export class UsersInfoComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.loadUsuarios();
     this.loadClientes();
+  }
+
+  openAddModal(mode: 'user' | 'client') {
+    this.isAddModalOpen = true;
+    this.editMode = mode;
+    this.selectedItem = mode === 'user' ? new Usuario() : new Cliente();
+  }
+
+  closeAddModal() {
+    this.isAddModalOpen = false;
   }
 
   loadUsuarios(): void {
@@ -102,6 +114,14 @@ export class UsersInfoComponent implements OnInit, OnDestroy {
     this.page = 1; 
   }
 
+  addAdmin(): void{
+    console.log("Agregando admin");
+  }
+
+  createCliente(cliente: Cliente): void{
+
+  }
+
   editUsuario(usuario: Usuario): void {
     this.selectedUsuario = { ...usuario };
     this.editMode = 'user';
@@ -145,6 +165,15 @@ export class UsersInfoComponent implements OnInit, OnDestroy {
       );
     }
     this.closeModal();
+  }
+
+  onAdd() {
+    if (this.editMode === 'user') {
+      console.log('Actualizando usuario:', this.selectedItem);
+    } else {
+      console.log('Actualizando cliente:', this.selectedItem);
+    }
+    this.closeAddModal();
   }
   
 

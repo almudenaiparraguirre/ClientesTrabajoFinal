@@ -15,6 +15,85 @@
     </div>
   </header>
 
+<!-- Modal para añadir usuarios y clientes -->
+<div *ngIf="isAddModalOpen" class="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50 z-50" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+  <div class="bg-white rounded-lg shadow-lg w-full max-w-md mx-4 sm:mx-6">
+    <div class="p-4 border-b">
+      <h2 id="modal-title" class="text-lg font-semibold text-gray-900">Añadir {{ editMode === 'user' ? 'administrador' : 'cliente' }}</h2>
+    </div>
+    <div class="p-6">
+      <form (ngSubmit)="onAdd()" #editForm="ngForm">
+        <!-- Campos del formulario basados en el tipo de edición -->
+        <div *ngIf="editMode === 'user'">
+          <!-- Campos de admin -->
+          <div class="mb-4">
+            <label class="block text-sm font-medium text-gray-700">Email</label>
+            <input type="email" [(ngModel)]="selectedUsuario.email" name="email" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50" />
+          </div>
+          <div class="mb-4">
+            <label class="block text-sm font-medium text-gray-700">Contraseña</label>
+            <input type="password" [(ngModel)]="selectedUsuario.contrasena" name="contrasena" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50" />
+          </div>
+          <div class="mb-4">
+            <label class="block text-sm font-medium text-gray-700">Nombre</label>
+            <input type="text" [(ngModel)]="selectedUsuario.nombre" name="nombre" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50" />
+          </div>
+          <div class="mb-4">
+            <label class="block text-sm font-medium text-gray-700">Apellido</label>
+            <input type="text" [(ngModel)]="selectedUsuario.apellido" name="apellido" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50" />
+          </div>
+          <div class="mb-4">
+            <label class="block text-sm font-medium text-gray-700">Empleo</label>
+            <input type="text" [(ngModel)]="selectedUsuario.empleo" name="empleo" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50" />
+          </div>
+          <div class="mb-4">
+            <label class="block text-sm font-medium text-gray-700">Fecha de Nacimiento</label>
+            <input type="date" [(ngModel)]="selectedUsuario.dateOfBirth" name="fechaNacimiento" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50" />
+          </div>
+          <div class="mb-4">
+            <label class="block text-sm font-medium text-gray-700">Nombre del país</label>
+            <input type="text" [(ngModel)]="selectedUsuario.nombrePais" name="nombrePais" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50" />
+          </div>
+        </div>
+        
+        <div *ngIf="editMode === 'client'">
+          <!-- Campos de cliente -->
+          <div class="mb-4">
+            <label class="block text-sm font-medium text-gray-700">Email</label>
+            <input type="text" [(ngModel)]="selectedCliente.email" name="email" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50" />
+          </div>
+          <div class="mb-4">
+            <label class="block text-sm font-medium text-gray-700">Nombre</label>
+            <input type="text" [(ngModel)]="selectedCliente.nombre" name="nombre" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50" />
+          </div>
+          <div class="mb-4">
+            <label class="block text-sm font-medium text-gray-700">Apellido</label>
+            <input type="text" [(ngModel)]="selectedCliente.apellido" name="apellido" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50" />
+          </div>
+          <div class="mb-4">
+            <label class="block text-sm font-medium text-gray-700">Fecha de Nacimiento</label>
+            <input type="date" [(ngModel)]="selectedCliente.fechaNacimiento" name="fechaNacimiento" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50" />
+          </div>
+          <div class="mb-4">
+            <label class="block text-sm font-medium text-gray-700">Empleo</label>
+            <input type="text" [(ngModel)]="selectedCliente.empleo" name="empleo" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50" />
+          </div>
+          <div class="mb-4">
+            <label class="block text-sm font-medium text-gray-700">Nombre del país</label>
+            <input type="text" [(ngModel)]="selectedCliente.nombrePais" name="nombrePais" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50" />
+          </div>
+        </div>
+
+        <div class="flex justify-end gap-2 mt-6">
+          <button type="button" (click)="closeAddModal()" class="bg-gray-300 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500">Cancelar</button>
+          <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500">Guardar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+
   <!-- Modal de Edición -->
 <div *ngIf="isModalOpen" class="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50 z-50" aria-labelledby="modal-title" role="dialog" aria-modal="true">
   <div class="bg-white rounded-lg shadow-lg w-full max-w-md mx-4 sm:mx-6">
@@ -98,7 +177,7 @@
     <!-- Tabla 1 (Usuarios) -->
     <div *ngIf="activeTab === 'table1'" class="overflow-x-auto mt-4">
       <div class="flex mb-6 mt-4">
-        <button
+        <button (click)="openAddModal('user')"
           class="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 mr-4">
           Añadir administrador
         </button>
@@ -153,7 +232,7 @@
     <!-- Tabla 2 (Clientes) -->
     <div *ngIf="activeTab === 'table2'" class="overflow-x-auto mt-4">
       <div class="flex mb-6 mt-4">
-        <button
+        <button (click)="openAddModal('client')"
           class="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 mr-4">
           Añadir cliente
         </button>

@@ -3,7 +3,7 @@
     <a href="javascript:void(0)">
       <img src="../../assets/summer-removebg-preview.png" alt="logo" class='w-52 inline-block' />
     </a>
-    <h4 class="text-gray-800 text-base font-semibold mt-6">¡Registrate ya!</h4>
+    <h4 class="text-gray-800 text-base font-semibold mt-6">¡Regístrate ya!</h4>
   </div>
 
   <form [formGroup]="registroForm" (ngSubmit)="onSubmit()">
@@ -48,6 +48,9 @@
           <div *ngIf="registroForm.get('Contraseña')?.errors?.['passwordRequiresLower']">Password must contain at least one lowercase letter.</div>
           <div *ngIf="registroForm.get('Contraseña')?.errors?.['passwordRequiresUpper']">Password must contain at least one uppercase letter.</div>
         </div>
+
+        <!-- Panel de requisitos de la contraseña -->
+        
       </div>
 
       <div>
@@ -75,7 +78,18 @@
         </div>
       </div>
     </div>
+  
 
+    <div class="mt-2 p-4 bg-gray-100 rounded-md text-sm text-gray-600">
+      <p class="font-semibold">La contraseña debe cumplir con los siguientes requisitos:</p>
+      <ul class="list-disc ml-5">
+        <li>Al menos 6 caracteres de longitud.</li>
+        <li>Al menos una letra mayúscula.</li>
+        <li>Al menos una letra minúscula.</li>
+        <li>Al menos un número.</li>
+        <li>Al menos un carácter no alfanumérico (ejemplo: #, $, etc.).</li>
+      </ul>
+    </div>
     <input type="hidden" formControlName="Rol" value="Client">
 
     <div class="!mt-12">

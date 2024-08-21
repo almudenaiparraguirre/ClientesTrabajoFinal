@@ -3,7 +3,8 @@ export class Cliente {
   nombre: string;
   apellido: string;
   fechaNacimiento: number;
+  nombrePais: string;
   empleo?: string;
   paisId: number;
-  email: any;
+  email: string;
 }
