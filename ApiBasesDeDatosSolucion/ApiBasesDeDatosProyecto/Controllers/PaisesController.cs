@@ -42,8 +42,9 @@ public class PaisesController : ControllerBase
         return Ok(_mapper.Map<PaisDto>(pais));
     }
 
-    [HttpGet("nombre/{nombre}")]
-    public async Task<IActionResult> ObtenerPorNombre(string nombre)
+    // GET api/pais/nombre
+    [HttpGet("nombre")]
+    public async Task<IActionResult> ObtenerPorNombre([FromQuery] string nombre)
     {
         var pais = await _paisRepository.ObtenerPorNombre(nombre);
         if (pais == null)
@@ -52,6 +53,7 @@ public class PaisesController : ControllerBase
         }
         return Ok(new { Id = pais.Id });
     }
+
 
     [HttpGet("GenerarPaisesFake")]
     [AllowAnonymous]

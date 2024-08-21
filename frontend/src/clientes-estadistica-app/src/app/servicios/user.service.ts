@@ -35,7 +35,7 @@ export class UserService {
 
   añadirRolUsuario(usuario: any): Observable<any> {
     console.log(usuario); // Asegúrate de que los campos estén presentes y correctos DEBUG
-    return this.http.post<any>(`${this.URL}Account/cambiarRolPorEmail`, usuario);
+    return this.http.post<any>(`${this.URL}Account/cambiarRolUsuario`, usuario);
   }
 
   obtenerPaisIdPorNombre(nombre: string): Observable<{ id: number }> {
@@ -45,16 +45,23 @@ export class UserService {
     return this.http.get<{ id: number }>(url);
   }
 
-  editarCliente(cliente: Cliente): Observable<any>{
-    const url = `${this.URL}Cliente/${cliente.email}`;
+  editarCliente(cliente: Cliente): Observable<void> {
+    // Construir la URL con el parámetro de consulta
+    const url = `${this.URL}updateUser?email=${encodeURIComponent(cliente.email)}`;
+    // Convertir fecha de nacimiento a timestamp (milisegundos)
     cliente.fechaNacimiento = new Date(cliente.fechaNacimiento).getTime();
-    return this.http.put(url, cliente);
+    // Enviar la solicitud PUT
+    return this.http.put<void>(url, cliente);
   }
 
   editarUsuario(usuario: Usuario): Observable<any>{
     const url = `${this.URL}Account/update/${usuario.email}`;
     usuario.dateOfBirth = new Date(usuario.dateOfBirth).getTime();
     return this.http.put(url, usuario);
+  }
+
+  private formatDateToBackend(date: Date): string {
+    return date.toISOString();
   }
 
   getEnvios(): Observable<any[]> {
