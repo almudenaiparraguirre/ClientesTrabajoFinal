@@ -101,7 +101,7 @@ public class AccountController : ControllerBase
     public async Task<IActionResult> Register([FromBody] RegisterViewModel model)
     {
 
-        DateTime FechaNac = DateTimeOffset.FromUnixTimeMilliseconds(model.FechaNacimiento).UtcDateTime;
+        //DateTime FechaNac = DateTimeOffset.FromUnixTimeMilliseconds(model.FechaNacimiento).UtcDateTime;
 
         TryValidateModel(model);
 
@@ -114,7 +114,7 @@ public class AccountController : ControllerBase
             FullName = model.Nombre + " " + model.Apellido,
             UserName = model.Email,
             Email = model.Email,
-            DateOfBirth = FechaNac,
+            DateOfBirth = model.FechaNacimiento,
         };
 
         var result = await _userManager.CreateAsync(user, model.Password);
@@ -146,9 +146,6 @@ public class AccountController : ControllerBase
         var errorResponse = new ErrorResponseDTO("Credenciales no validas.", new List<string> { "The email or password is incorrect." });
         return BadRequest(errorResponse);
     }
-
-
-
 
     [HttpPost("cambiarRolUsuario")]
     public async Task<IActionResult> CambiarRolUsuario([FromBody] ChangeRoleViewModel model)
@@ -273,9 +270,9 @@ public class AccountController : ControllerBase
         }
 
         // Usar AutoMapper para mapear el modelo al usuario existente
-        DateTime FechaNac = DateTimeOffset.FromUnixTimeMilliseconds(model.FechaNacimiento).UtcDateTime;
+        //DateTime FechaNac = DateTimeOffset.FromUnixTimeMilliseconds(model.FechaNacimiento).UtcDateTime;
         user.FullName = model.Nombre + " " + model.Apellido;
-        user.DateOfBirth = FechaNac;
+        user.DateOfBirth = model.FechaNacimiento;
         //_mapper.Map(model, user);
 
         // Actualizar el usuario en la base de datos
