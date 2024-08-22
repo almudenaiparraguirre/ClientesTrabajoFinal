@@ -94,7 +94,7 @@ public class AccountController : ControllerBase
         {
             return NotFound(new { message = "User not found" });
         }
-        return Ok();
+        return Ok(userDto);
     }
 
     /*[HttpPost("register")]
@@ -122,8 +122,8 @@ public class AccountController : ControllerBase
         {
             return BadRequest(result.Errors);
         }
-        return Ok(userDto);
-    }*/
+        return Ok(user);
+    }
 
 
     [HttpPost("login")]
@@ -148,30 +148,6 @@ public class AccountController : ControllerBase
     }
 
 
-    [HttpPost("register")]
-    public async Task<ActionResult<ApplicationUser>> Register([FromBody] RegisterViewModel model)
-    {
-
-        string rolPorDefecto = "Admin";
-        DateTime FechaNac = DateTimeOffset.FromUnixTimeMilliseconds(model.FechaNacimiento).UtcDateTime;
-
-        var user = new ApplicationUser
-        {
-            FullName = model.Nombre + " " + model.Apellido,
-            UserName = model.Email,
-            Email = model.Email,
-            DateOfBirth = FechaNac,
-        };
-
-        var result = await _userManager.CreateAsync(user, model.Password);
-        if (!result.Succeeded)
-        {
-            return BadRequest(result.Errors);
-        }
-
-
-        return Ok(user);
-    }
 
 
     [HttpPost("cambiarRolUsuario")]
@@ -312,22 +288,6 @@ public class AccountController : ControllerBase
 
         // Devolver NoContent en caso de éxito
         return NoContent();
-    }
-
-    [HttpDelete("users/{email}")]
-    public async Task<IActionResult> DeleteUsuario(string email)
-    {
-        var usuario = await _context.Users.SingleOrDefaultAsync(u => u.Email == email);
-        if (usuario == null)
-        {
-            return NotFound("Usuario no encontrado");
-        }
-
-        // Marcar como eliminado lógico
-        usuario.IsDeleted = true;
-        await _context.SaveChangesAsync();
-
-        return Ok();
     }
 
 }

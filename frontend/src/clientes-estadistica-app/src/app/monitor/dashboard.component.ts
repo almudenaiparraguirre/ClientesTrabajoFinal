@@ -1,5 +1,6 @@
 import { Component, AfterViewInit } from '@angular/core';
 import { Chart } from 'chart.js/auto';
+import { MonitorDataService, MonitoringData } from 'src/app/servicios/monitor-data.service'; 
 import { UserService } from 'src/app/servicios/user.service'; 
 import { ClienteService } from 'src/app/servicios/cliente.service';
 import { Subscription } from 'rxjs';
@@ -14,13 +15,14 @@ export class DashboardComponent implements AfterViewInit {
 
   usuarios: Usuario[] = [];
 
-  // Variable para almacenar la suscripción
+  transferencias: MonitoringData[] = [];
   private subscription: Subscription = new Subscription();
 
-  constructor(private userService: UserService) { }
+  constructor(private userService: UserService, private monitorDataService: MonitorDataService) { }
 
   ngOnInit(): void {
     this.loadUsuarios();
+    this.loadTransferencias();
   }
 
   
@@ -58,6 +60,42 @@ export class DashboardComponent implements AfterViewInit {
         }]
       }
     }); 
+  }
+
+  loadTransferencias(): void {
+    this.subscription.add(
+      this.monitorDataService.getTransferencias().subscribe(
+        data => {
+          this.transferencias = data;
+          this.updateTransferTable();
+        },
+        error => {
+          console.error('Error fetching transferencias', error);
+        }
+      )
+    );
+  }
+
+  updateTransferTable(): void {
+    const tableBody = document.getElementById('transferTableBody');
+    if (tableBody) {
+      tableBody.innerHTML = '';  // Limpia la tabla actual
+      this.transferencias.forEach((transferencia) => {
+        const row = document.createElement('tr');
+        row.className = 'border-b';
+
+        row.innerHTML = `
+          <td class="px-4 py-2">${transferencia.name}</td>
+          <td class="px-4 py-2">${transferencia.paisOrigen}</td>
+          <td class="px-4 py-2">${transferencia.paisDestino}</td>
+          <td class="px-4 py-2">${transferencia.clienteOrigen}</td>
+          <td class="px-4 py-2">${transferencia.clienteDestino}</td>
+          <td class="px-4 py-2">$${transferencia.value.toFixed(2)}</td>
+          <td class="px-4 py-2">${new Date(transferencia.timestamp).toLocaleString()}</td>
+        `;
+        tableBody.appendChild(row);
+      });
+    }
   }
 
 
