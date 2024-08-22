@@ -10,11 +10,13 @@ import { Cliente } from 'src/app/clases/cliente';
   templateUrl: './users-info.component.html',
 })
 export class UsersInfoComponent implements OnInit, OnDestroy {
+  isAddModalOpen = false;
   // Variables para almacenar el usuario o cliente seleccionado y el estado del modal
   selectedCliente: Cliente | null = null;
   selectedUsuario: Usuario | null = null;
   isModalOpen = false;
   editMode: 'user' | 'client' = 'user';
+  selectedItem: Usuario | Cliente;
 
   usuarios: Usuario[] = [];
   filteredUsuarios: Usuario[] = [];
@@ -43,6 +45,16 @@ export class UsersInfoComponent implements OnInit, OnDestroy {
     this.loadClientes();
   }
 
+  openAddModal(mode: 'user' | 'client') {
+    this.isAddModalOpen = true;
+    this.editMode = mode;
+    this.selectedItem = mode === 'user' ? new Usuario() : new Cliente();
+  }
+
+  closeAddModal() {
+    this.isAddModalOpen = false;
+  }
+
   loadUsuarios(): void {
     this.subscription.add(
       this.userService.getUsuarios().subscribe(
@@ -51,6 +63,7 @@ export class UsersInfoComponent implements OnInit, OnDestroy {
           this.usuarios = data.map(usuario => {
             const [nombre, ...resto] = usuario.fullName.split(' ');
             const apellido = resto.join(' ');
+            console.log(nombre + apellido);
   
             return {
               ...usuario,
@@ -114,6 +127,38 @@ export class UsersInfoComponent implements OnInit, OnDestroy {
     this.isModalOpen = true;
   }
 
+  deleteUsuario(usuario: Usuario){
+    this.selectedUsuario = { ...usuario };
+    const confirmacion = confirm(`¿Estás seguro de que deseas eliminar al usuario ${usuario.nombre} ${usuario.apellido}?`);
+    if (confirmacion) {
+        this.userService.eliminarUsuario(usuario.email).subscribe(
+            response => {
+                console.log('Usuario eliminado correctamente');
+                this.loadUsuarios();
+            },
+            error => {
+                console.error('Error al eliminar el usuario', error);
+            }
+        );
+    }
+}
+
+  deleteCliente(cliente: Cliente){
+    /*this.selectedCliente = { ...cliente };
+    const confirmacion = confirm(`¿Estás seguro de que deseas eliminar al usuario ${cliente.nombre} ${cliente.apellido}?`);
+    if (confirmacion) {
+        this.clienteService.eliminarCliente(cliente.email).subscribe(
+            () => {
+                console.log('Usuario eliminado correctamente');
+                this.loadClientes();
+            },
+            error => {
+                console.error('Error al eliminar el usuario', error);
+            }
+        );
+    }*/
+  }
+
   closeModal(): void {
     this.isModalOpen = false;
     this.selectedUsuario = null;
@@ -145,6 +190,32 @@ export class UsersInfoComponent implements OnInit, OnDestroy {
       );
     }
     this.closeModal();
+  }
+
+  onAdd() {
+    if (this.editMode === 'user' && this.selectedUsuario) {
+      /*this.userService.registrarUsuario(this.selectedUsuario).subscribe(
+        response => {
+          console.log('Usuario actualizado correctamente', response);
+          this.loadUsuarios();
+        },
+        error => {
+          console.error('Error al actualizar el usuario', error);
+        }
+      )*/
+    } else {
+      console.log('Actualizando cliente:', this.selectedItem);
+      this.clienteService.registrarCliente(this.selectedCliente).subscribe(
+        response => {
+          console.log('Cliente registrado correctamente', response);
+          this.loadClientes();
+        },
+        error => {
+          console.error('Error al actualizar el cliente', error);
+        }
+      );
+    }
+    this.closeAddModal();
   }
   
 
