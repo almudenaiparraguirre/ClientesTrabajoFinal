@@ -9,7 +9,7 @@ import { environment } from '../../environments/environment';
 })
 export class ClienteService {
 
-  private readonly URL = "https://localhost:7107/api/cliente";
+  private readonly URL = "https://localhost:7107/api/Cliente";
 
   constructor(private http: HttpClient) { }
 
@@ -17,5 +17,12 @@ export class ClienteService {
     return this.http.get<Cliente[]>(this.URL);
   }
 
-  // Otros métodos relacionados con clientes
+  registrarCliente(cliente: Cliente): Observable<any>{
+    console.log(cliente);
+    return this.http.post<any>(`${this.URL}Account/register`, cliente);
+  }
+
+  eliminarCliente(email: string): Observable<any> {
+    return this.http.delete(`${this.URL}/${email}`);
+  }
 }
