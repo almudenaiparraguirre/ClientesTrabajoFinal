@@ -97,7 +97,7 @@ public class AccountController : ControllerBase
         return Ok(userDto);
     }
 
-    /*[HttpPost("register")]
+    [HttpPost("register")]
     public async Task<IActionResult> Register([FromBody] RegisterViewModel model)
     {
 
@@ -290,4 +290,19 @@ public class AccountController : ControllerBase
         return NoContent();
     }
 
+    [HttpDelete("users/{email}")]
+    public async Task<IActionResult> DeleteUsuario(string email)
+    {
+        var usuario = await _context.Users.SingleOrDefaultAsync(u => u.Email == email);
+        if (usuario == null)
+        {
+            return NotFound("Usuario no encontrado");
+        }
+
+        // Marcar como eliminado lógico
+        usuario.IsDeleted = true;
+        await _context.SaveChangesAsync();
+
+        return Ok();
+    }
 }
