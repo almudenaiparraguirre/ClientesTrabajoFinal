@@ -67,7 +67,7 @@ export class DashboardComponent implements AfterViewInit {
       this.monitorDataService.getTransferencias().subscribe(
         data => {
           this.transferencias = data;
-          this.updateTransferList();
+          this.updateTransferTable();
         },
         error => {
           console.error('Error fetching transferencias', error);
@@ -76,21 +76,24 @@ export class DashboardComponent implements AfterViewInit {
     );
   }
 
-  updateTransferList(): void {
-    const transferList = document.getElementById('transferList');
-    if (transferList) {
-      transferList.innerHTML = '';  // Limpia la lista actual
+  updateTransferTable(): void {
+    const tableBody = document.getElementById('transferTableBody');
+    if (tableBody) {
+      tableBody.innerHTML = '';  // Limpia la tabla actual
       this.transferencias.forEach((transferencia) => {
-        const li = document.createElement('li');
-        li.className = 'py-2 flex justify-between';
-        li.innerHTML = `
-          <span>${transferencia.name}</span>
-          <span>${transferencia.paisOrigen} -> ${transferencia.paisDestino}</span>
-          <span>${transferencia.clienteOrigen} -> ${transferencia.clienteDestino}</span>
-          <span>$${transferencia.value.toFixed(2)}</span>
-          <span>${new Date(transferencia.timestamp).toLocaleString()}</span>
+        const row = document.createElement('tr');
+        row.className = 'border-b';
+
+        row.innerHTML = `
+          <td class="px-4 py-2">${transferencia.name}</td>
+          <td class="px-4 py-2">${transferencia.paisOrigen}</td>
+          <td class="px-4 py-2">${transferencia.paisDestino}</td>
+          <td class="px-4 py-2">${transferencia.clienteOrigen}</td>
+          <td class="px-4 py-2">${transferencia.clienteDestino}</td>
+          <td class="px-4 py-2">$${transferencia.value.toFixed(2)}</td>
+          <td class="px-4 py-2">${new Date(transferencia.timestamp).toLocaleString()}</td>
         `;
-        transferList.appendChild(li);
+        tableBody.appendChild(row);
       });
     }
   }

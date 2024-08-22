@@ -60,10 +60,26 @@
 
             <div class="mt-6 bg-white p-4 rounded-lg shadow-lg">
                 <h5 class="text-gray-600 text-lg font-semibold">Transferencias</h5>
-                <ul class="divide-y divide-gray-200" id="transferList">
-                    <!-- Aquí se insertarán dinámicamente las transferencias -->
-                </ul>
+                <div class="overflow-x-auto">
+                    <table class="min-w-full bg-white">
+                        <thead>
+                            <tr>
+                                <th class="px-4 py-2 border">Nombre</th>
+                                <th class="px-4 py-2 border">País Origen</th>
+                                <th class="px-4 py-2 border">País Destino</th>
+                                <th class="px-4 py-2 border">Cliente Origen</th>
+                                <th class="px-4 py-2 border">Cliente Destino</th>
+                                <th class="px-4 py-2 border">Valor</th>
+                                <th class="px-4 py-2 border">Fecha y Hora</th>
+                            </tr>
+                        </thead>
+                        <tbody id="transferTableBody">
+                            <!-- Aquí se insertarán dinámicamente las filas de las transferencias -->
+                        </tbody>
+                    </table>
+                </div>
             </div>
+            
             
         </div>
     </div>
