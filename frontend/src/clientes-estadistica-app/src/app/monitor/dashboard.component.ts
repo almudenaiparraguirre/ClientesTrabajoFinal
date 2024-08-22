@@ -22,6 +22,8 @@ export class DashboardComponent implements AfterViewInit, OnDestroy {
   private receivingCountryData: number[] = [];
   private sendingCountryLabels: string[] = [];
   private sendingCountryData: number[] = [];
+  totalMoneyTransferred: number = 0;
+  totalTransfersCompleted: number = 0;
 
   constructor(private userService: UserService, private monitorDataService: MonitorDataService) { }
 
@@ -136,6 +138,7 @@ export class DashboardComponent implements AfterViewInit, OnDestroy {
           this.updateTransferTable();
           this.updateFinancialChart();
           this.updateCountriesComparisonChart();
+          this.calculateTotals();
         },
         error => {
           console.error('Error fetching transferencias', error);
@@ -194,6 +197,11 @@ export class DashboardComponent implements AfterViewInit, OnDestroy {
     this.countriesComparisonChart.data.datasets[0].data = this.receivingCountryData;
     this.countriesComparisonChart.data.datasets[1].data = this.sendingCountryData;
     this.countriesComparisonChart.update();
+  }
+
+  private calculateTotals(): void {
+    this.totalMoneyTransferred = this.transferencias.reduce((acc, t) => acc + t.value, 0);
+    this.totalTransfersCompleted = this.transferencias.length;
   }
 
   private loadUsuarios(): void {
