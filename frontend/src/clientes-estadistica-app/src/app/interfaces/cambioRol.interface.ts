@@ -5,6 +5,6 @@ export interface CambioRolModel {
     Apellido?: string;
     Pais?: string;
     Empleo?: string;
-    FechaNacimiento: number;
+    FechaNacimiento: string;
   }
   

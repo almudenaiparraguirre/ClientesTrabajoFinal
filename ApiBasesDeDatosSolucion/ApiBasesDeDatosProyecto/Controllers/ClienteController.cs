@@ -166,14 +166,14 @@ public class ClienteController : ControllerBase
     }
 
     // DELETE api/cliente/5
-    [HttpDelete("{id}")]
-    public async Task<ActionResult> Delete(int id)
+    [HttpDelete("{email}")]
+    public async Task<ActionResult> Delete(string email)
     {
-        _logger.LogInformation($"Eliminando cliente con ID {id}.");
-        var cliente = await _clienteRepository.ObtenerPorId(id);
+        _logger.LogInformation($"Eliminando cliente con ID {email}.");
+        var cliente = await _clienteRepository.ObtenerPorEmail(email);
         if (cliente == null)
         {
-            _logger.LogWarning($"Cliente con ID {id} no encontrado para eliminar.");
+            _logger.LogWarning($"Cliente con ID {email} no encontrado para eliminar.");
             return NotFound();
         }
 
@@ -181,11 +181,11 @@ public class ClienteController : ControllerBase
 
         if (await _clienteRepository.GuardarCambios())
         {
-            _logger.LogInformation($"Cliente con ID {id} eliminado correctamente.");
+            _logger.LogInformation($"Cliente con ID {email} eliminado correctamente.");
             return NoContent();
         }
 
-        _logger.LogError($"No se pudo eliminar el cliente con ID {id}.");
+        _logger.LogError($"No se pudo eliminar el cliente con ID {email}.");
         return BadRequest($"No se pudo eliminar el cliente.");
     }
 

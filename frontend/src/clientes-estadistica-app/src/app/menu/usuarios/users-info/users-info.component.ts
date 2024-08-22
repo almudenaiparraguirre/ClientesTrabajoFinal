@@ -63,6 +63,7 @@ export class UsersInfoComponent implements OnInit, OnDestroy {
           this.usuarios = data.map(usuario => {
             const [nombre, ...resto] = usuario.fullName.split(' ');
             const apellido = resto.join(' ');
+            console.log(nombre + apellido);
   
             return {
               ...usuario,
@@ -114,14 +115,6 @@ export class UsersInfoComponent implements OnInit, OnDestroy {
     this.page = 1; 
   }
 
-  addAdmin(): void{
-    console.log("Agregando admin");
-  }
-
-  createCliente(cliente: Cliente): void{
-
-  }
-
   editUsuario(usuario: Usuario): void {
     this.selectedUsuario = { ...usuario };
     this.editMode = 'user';
@@ -132,6 +125,38 @@ export class UsersInfoComponent implements OnInit, OnDestroy {
     this.selectedCliente = { ...cliente };
     this.editMode = 'client';
     this.isModalOpen = true;
+  }
+
+  deleteUsuario(usuario: Usuario){
+    this.selectedUsuario = { ...usuario };
+    const confirmacion = confirm(`¿Estás seguro de que deseas eliminar al usuario ${usuario.nombre} ${usuario.apellido}?`);
+    if (confirmacion) {
+        this.userService.eliminarUsuario(usuario.email).subscribe(
+            response => {
+                console.log('Usuario eliminado correctamente');
+                this.loadUsuarios();
+            },
+            error => {
+                console.error('Error al eliminar el usuario', error);
+            }
+        );
+    }
+}
+
+  deleteCliente(cliente: Cliente){
+    /*this.selectedCliente = { ...cliente };
+    const confirmacion = confirm(`¿Estás seguro de que deseas eliminar al usuario ${cliente.nombre} ${cliente.apellido}?`);
+    if (confirmacion) {
+        this.clienteService.eliminarCliente(cliente.email).subscribe(
+            () => {
+                console.log('Usuario eliminado correctamente');
+                this.loadClientes();
+            },
+            error => {
+                console.error('Error al eliminar el usuario', error);
+            }
+        );
+    }*/
   }
 
   closeModal(): void {
@@ -168,10 +193,27 @@ export class UsersInfoComponent implements OnInit, OnDestroy {
   }
 
   onAdd() {
-    if (this.editMode === 'user') {
-      console.log('Actualizando usuario:', this.selectedItem);
+    if (this.editMode === 'user' && this.selectedUsuario) {
+      /*this.userService.registrarUsuario(this.selectedUsuario).subscribe(
+        response => {
+          console.log('Usuario actualizado correctamente', response);
+          this.loadUsuarios();
+        },
+        error => {
+          console.error('Error al actualizar el usuario', error);
+        }
+      )*/
     } else {
       console.log('Actualizando cliente:', this.selectedItem);
+      this.clienteService.registrarCliente(this.selectedCliente).subscribe(
+        response => {
+          console.log('Cliente registrado correctamente', response);
+          this.loadClientes();
+        },
+        error => {
+          console.error('Error al actualizar el cliente', error);
+        }
+      );
     }
     this.closeAddModal();
   }

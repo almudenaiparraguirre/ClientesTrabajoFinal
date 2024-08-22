@@ -15,7 +15,8 @@ export class UserService {
   private readonly url_estadistica = environment.apiUrl;
 
   //URL AMIN
-  private readonly URL = "https://localhost:44339/api/";
+  //private readonly URL = "https://localhost:44339/api/";
+  private readonly URL = "https://localhost:7107/api/";
 
   constructor(private http: HttpClient) { }
 
@@ -45,16 +46,6 @@ export class UserService {
     return this.http.get<{ id: number }>(url);
   }
 
-  crearCliente(cliente: Cliente): Observable<void> {
-    const url = `${this.URL}Account/register`;
-    return this.http.post<void>(url, cliente);
-  }
-
-  crearUsuario(usuario: Usuario): Observable<void> {
-    const url = `${this.URL}Account/register`;
-    return this.http.post<void>(url, usuario);
-  }
-
   editarCliente(cliente: Cliente): Observable<void> {
     // Construir la URL con el parámetro de consulta
     const url = `${this.URL}updateUser?email=${encodeURIComponent(cliente.email)}`;
@@ -68,6 +59,10 @@ export class UserService {
     const url = `${this.URL}Account/update/${usuario.email}`;
     usuario.dateOfBirth = new Date(usuario.dateOfBirth).getTime();
     return this.http.put(url, usuario);
+  }
+
+  eliminarUsuario(email: string): Observable<any> {
+    return this.http.delete(`${this.URL}Account/users/${email}`);
   }
 
   private formatDateToBackend(date: Date): string {

@@ -93,7 +93,6 @@
   </div>
 </div>
 
-
   <!-- Modal de Edición -->
 <div *ngIf="isModalOpen" class="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50 z-50" aria-labelledby="modal-title" role="dialog" aria-modal="true">
   <div class="bg-white rounded-lg shadow-lg w-full max-w-md mx-4 sm:mx-6">
@@ -217,7 +216,7 @@
                           </svg>
                         </a>
                         <!-- Botón Eliminar -->
-                        <a x-data="{ tooltip: 'Eliminar' }">
+                        <a x-data="{ tooltip: 'Eliminar' }" (click)="deleteUsuario(usuario)">
                           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-6 w-6" x-tooltip="tooltip">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M6 6L18 18M6 18L18 6" />
                           </svg>
@@ -262,7 +261,7 @@
                   </svg>
                 </a>
                 <!-- Botón Eliminar -->
-                <a  x-data="{ tooltip: 'Eliminar' }">
+                <a (click)="deleteCliente(cliente)"  x-data="{ tooltip: 'Eliminar' }">
                   <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-6 w-6" x-tooltip="tooltip">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M6 6L18 18M6 18L18 6" />
                   </svg>

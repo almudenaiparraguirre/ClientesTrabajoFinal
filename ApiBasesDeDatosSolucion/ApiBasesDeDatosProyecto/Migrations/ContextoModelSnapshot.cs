@@ -75,7 +75,7 @@ namespace ApiBasesDeDatosProyecto.Migrations
                         {
                             Id = 2,
                             Apellido = "Lopez",
-                            Email = "amin1@gmail.com",
+                            Email = "amin2@gmail.com",
                             Empleo = "Profesor",
                             FechaNacimiento = new DateTime(1985, 5, 23, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Nombre = "Maria",
@@ -85,7 +85,7 @@ namespace ApiBasesDeDatosProyecto.Migrations
                         {
                             Id = 3,
                             Apellido = "Gomez",
-                            Email = "amin1@gmail.com",
+                            Email = "amin3@gmail.com",
                             Empleo = "Abogado",
                             FechaNacimiento = new DateTime(1978, 11, 12, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Nombre = "Carlos",
@@ -140,7 +140,14 @@ namespace ApiBasesDeDatosProyecto.Migrations
                             Id = 3,
                             Divisa = "USD",
                             Iso3 = "ITA",
-                            Nombre = "Italia"
+                            Nombre = "italia"
+                        },
+                        new
+                        {
+                            Id = 4,
+                            Divisa = "USDd",
+                            Iso3 = "ALB",
+                            Nombre = "Albania"
                         });
                 });
 

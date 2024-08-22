@@ -14,6 +14,7 @@ public class AccountController : ControllerBase
     private readonly ApiBasesDeDatosProyecto.IDentity.Serivicios.IUserService _userService;
     private readonly IPaisRepository _paisRepository; // Añadido
     private readonly IMapper _mapper;
+    private readonly Contexto _context;
 
     public AccountController(
         UserManager<ApplicationUser> userManager,
@@ -24,7 +25,8 @@ public class AccountController : ControllerBase
         IClienteRepository clienteRepository,
         ApiBasesDeDatosProyecto.IDentity.Serivicios.IUserService userService,
         IPaisRepository paisRepository,
-        IMapper mapper) // Añadido
+        IMapper mapper,
+        Contexto context) // Añadido
     {
         _userManager = userManager;
         _signInManager = signInManager;
@@ -35,7 +37,9 @@ public class AccountController : ControllerBase
         _paisRepository = paisRepository;
         _mapper = mapper; // Añadido
         _clienteRepository = clienteRepository;
+        _context = context;
     }
+
     [HttpGet("users")]
     public async Task<ActionResult<IEnumerable<ApplicationUser>>> GetUsers()
     {
@@ -71,7 +75,7 @@ public class AccountController : ControllerBase
     }
 
 
-    [HttpDelete("users/{id}")]
+    /*[HttpDelete("users/{id}")]
     public async Task<IActionResult> DeleteUser(string id)
     {
         var result = await _userService.DeleteUserAsync(id);
@@ -80,7 +84,7 @@ public class AccountController : ControllerBase
             return NoContent(); // Devuelve 204 No Content
         }
         return NotFound(new { message = "User not found" }); // Si el usuario no se encuentra, devuelve 404
-    }
+    }*/
 
     [HttpGet("users/getUser")]
     public async Task<ActionResult<ApplicationUser>> GetUserByEmail([FromQuery] string email)
@@ -91,36 +95,39 @@ public class AccountController : ControllerBase
             return NotFound(new { message = "User not found" });
         }
         return Ok(userDto);
+        return Ok(userDto);
     }
-
 
     [HttpPost("register")]
     public async Task<IActionResult> Register([FromBody] RegisterViewModel model)
     {
-        
-        DateTime FechaNac = DateTimeOffset.FromUnixTimeMilliseconds(model.FechaNacimiento).UtcDateTime;
-
+        // Validar el modelo antes de procesar
         TryValidateModel(model);
-
         if (!ModelState.IsValid)
         {
-            return BadRequest(ModelState); 
+            return BadRequest(ModelState);
+            return BadRequest(ModelState);
         }
+
+        // Aquí model.FechaNacimiento ya es un DateTime, así que se puede usar directamente
         var user = new ApplicationUser
         {
-            FullName = model.Nombre + " " + model.Apellido,
+            FullName = $"{model.Nombre} {model.Apellido}",
             UserName = model.Email,
             Email = model.Email,
-            DateOfBirth = FechaNac,
+            DateOfBirth = model.FechaNacimiento,
         };
 
+        // Crear el usuario
         var result = await _userManager.CreateAsync(user, model.Password);
         if (!result.Succeeded)
         {
             return BadRequest(result.Errors);
         }
+
         return Ok(user);
     }
+
 
 
     [HttpPost("login")]
@@ -145,7 +152,7 @@ public class AccountController : ControllerBase
     }
 
 
-
+    
 
     [HttpPost("cambiarRolUsuario")]
     public async Task<IActionResult> CambiarRolUsuario([FromBody] ChangeRoleViewModel model)
@@ -259,8 +266,6 @@ public class AccountController : ControllerBase
         return IdentityResult.Success;
     }
 
-
-
     [HttpPut("updateUser")]
     public async Task<IActionResult> UpdateUser(string email, [FromBody] EditUserModel model)
     {
@@ -289,4 +294,19 @@ public class AccountController : ControllerBase
         return NoContent();
     }
 
+    [HttpDelete("users/{email}")]
+    public async Task<IActionResult> DeleteUsuario(string email)
+    {
+        var usuario = await _context.Users.SingleOrDefaultAsync(u => u.Email == email);
+        if (usuario == null)
+        {
+            return NotFound("Usuario no encontrado");
+        }
+
+        // Marcar como eliminado lógico
+        usuario.IsDeleted = true;
+        await _context.SaveChangesAsync();
+
+        return Ok();
+    }
 }
