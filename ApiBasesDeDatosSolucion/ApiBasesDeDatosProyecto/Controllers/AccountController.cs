@@ -95,35 +95,42 @@ public class AccountController : ControllerBase
             return NotFound(new { message = "User not found" });
         }
         return Ok(userDto);
+        return Ok(userDto);
     }
 
     [HttpPost("register")]
     public async Task<IActionResult> Register([FromBody] RegisterViewModel model)
     {
+        // Validar el modelo antes de procesar
 
         //DateTime FechaNac = DateTimeOffset.FromUnixTimeMilliseconds(model.FechaNacimiento).UtcDateTime;
 
         TryValidateModel(model);
-
         if (!ModelState.IsValid)
         {
             return BadRequest(ModelState);
+            return BadRequest(ModelState);
         }
+
+        // Aquí model.FechaNacimiento ya es un DateTime, así que se puede usar directamente
         var user = new ApplicationUser
         {
-            FullName = model.Nombre + " " + model.Apellido,
+            FullName = $"{model.Nombre} {model.Apellido}",
             UserName = model.Email,
             Email = model.Email,
             DateOfBirth = model.FechaNacimiento,
         };
 
+        // Crear el usuario
         var result = await _userManager.CreateAsync(user, model.Password);
         if (!result.Succeeded)
         {
             return BadRequest(result.Errors);
         }
+
         return Ok(user);
     }
+
 
 
     [HttpPost("login")]

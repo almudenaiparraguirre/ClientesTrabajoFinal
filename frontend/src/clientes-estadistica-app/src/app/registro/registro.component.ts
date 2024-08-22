@@ -4,6 +4,7 @@ import { Router } from '@angular/router';
 import { UserService } from '../servicios/user.service';
 import { Usuario } from '../interfaces/usuario.interface';
 import { CambioRolModel } from '../interfaces/cambioRol.interface';
+import { HttpClient } from '@angular/common/http';
 
 @Component({
   selector: 'app-registro',
@@ -15,11 +16,15 @@ export class RegistroComponent implements OnInit {
   registroForm: FormGroup;
   errorMessage: string;
   isErrorVisible = false;
+  countries: any[] = [];
+  selectedCountry: any = null; 
+  showDropdown = false;
 
   constructor(
     private fb: FormBuilder, 
     private miServicio: UserService,
-    private router: Router
+    private router: Router,
+    private http: HttpClient 
   ) {}
 
   ngOnInit(): void {
@@ -36,8 +41,32 @@ export class RegistroComponent implements OnInit {
     }, {
       validator: this.passwordMatchValidator('Contraseña', 'Contraseña2')
     });
+
+    this.loadCountries();
+
   }
 
+   // Método para cargar los países desde el archivo JSON
+   loadCountries() {
+    this.http.get<any[]>('/assets/banderas.json').subscribe(
+      data => {
+        this.countries = data;
+      },
+      error => {
+        console.error('Error loading countries data:', error);
+      }
+    );
+  }
+
+  selectCountry(country: any) {
+    this.selectedCountry = country;
+    this.registroForm.patchValue({ PaisNombre: country.country });
+    this.showDropdown = false;
+  }
+
+  toggleDropdown() {
+    this.showDropdown = !this.showDropdown;
+  } 
   passwordMatchValidator(password: string, confirmPassword: string) {
     return (formGroup: FormGroup) => {
       const passwordControl = formGroup.get(password);
@@ -75,7 +104,7 @@ export class RegistroComponent implements OnInit {
       return;
     }
 
-    const fechaNacTimestamp = new Date(this.registroForm.value.FechaNac).getTime();
+    const fechaNacISO = new Date(this.registroForm.value.FechaNac).toISOString();
   
     const usuario: Usuario = {
       Email: this.registroForm.value.Correo,
@@ -84,7 +113,7 @@ export class RegistroComponent implements OnInit {
       Nombre: this.registroForm.value.Nombre,
       Apellido: this.registroForm.value.Apellido,
       PaisNombre: this.registroForm.value.PaisNombre,
-      FechaNacimiento: fechaNacTimestamp
+      FechaNacimiento: fechaNacISO
     };
 
     // Registrar usuario
@@ -97,7 +126,7 @@ export class RegistroComponent implements OnInit {
           Apellido: this.registroForm.value.Apellido,
           Pais: this.registroForm.value.PaisNombre,
           Empleo: this.registroForm.value.Empleo,
-          FechaNacimiento: fechaNacTimestamp
+          FechaNacimiento: fechaNacISO
         };
 
         this.miServicio.añadirRolUsuario(datosCambioRol).subscribe(
@@ -117,13 +146,23 @@ export class RegistroComponent implements OnInit {
 
   handleError(error: any, prefix: string) {
     if (error.status === 400) {
-      this.showError(`${prefix}: ${error.error}`);
+        // Manejar error de usuario duplicado
+        if (error.error && Array.isArray(error.error)) {
+            const duplicateError = error.error.find((err: any) => err.code === 'DuplicateUserName');
+            if (duplicateError) {
+                this.showError(`Error: El usuario ya esta registrado`);
+                return;
+            }
+        }
+        // Manejar otros errores de validación
+        this.showError(`${prefix}: ${error.error}`);
     } else if (error.status === 0) {
-      this.showError('No se pudo conectar al servidor.');
+        this.showError('No se pudo conectar al servidor.');
     } else {
-      this.showError(`${prefix}: ${error.message}`);
+        this.showError(`${prefix}: ${error.message}`);
     }
-  }
+}
+
 
   showError(message: string) {
     this.errorMessage = message;

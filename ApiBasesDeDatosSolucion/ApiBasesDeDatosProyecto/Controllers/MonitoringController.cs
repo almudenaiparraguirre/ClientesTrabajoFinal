@@ -17,7 +17,10 @@ namespace ApiBasesDeDatosProyecto.Controllers
             string[] paises = { "México", "Estados Unidos", "Canadá", "Brasil", "Argentina" };
             string[] clientes = { "Cliente A", "Cliente B", "Cliente C", "Cliente D", "Cliente E" };
 
-            for (int i = 0; i < 10; i++)
+            // Genera un número aleatorio entre 10 y 20 para el total de transferencias
+            int numberOfTransfers = random.Next(10, 21);
+
+            for (int i = 0; i < numberOfTransfers; i++)
             {
                 data.Add(new MonitoringData
                 {

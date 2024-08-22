@@ -48,7 +48,8 @@ public class RegisterViewModel : IValidatableObject
             errors.AddRange(Nombre.ValidateNombre());
         }
 
-        //errors.AddRange(FechaNacimiento.ValidateFechaNacimiento());
+        // TO DO
+        errors.AddRange(FechaNacimiento.ValidateFechaNacimiento());
         errors.AddRange(PaisNombre.ValidatePaisNombre());
 
         return errors;

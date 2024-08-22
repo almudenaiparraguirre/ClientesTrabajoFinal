@@ -8,6 +8,7 @@ namespace ApiBasesDeDatosProyecto.Context
         public DbSet<Cliente> Clientes { get; set; }
         public DbSet<Pais> Paises { get; set; }
         public DbSet<Usuario> Usuarios { get; set; }
+        public DbSet<VistaClientesPaises> VistaClientesPaises { get; set; } // Agregar la vista
 
         public Contexto(DbContextOptions<Contexto> options) : base(options) { }
 
@@ -28,7 +29,9 @@ namespace ApiBasesDeDatosProyecto.Context
             modelBuilder.Entity<Pais>().HasData(
                 new Pais { Id = 1, Nombre = "España", Divisa = "USD", Iso3 = "ESP" },
                 new Pais { Id = 2, Nombre = "Francia", Divisa = "EUR", Iso3 = "FRA" },
-                new Pais { Id = 3, Nombre = "Italia", Divisa = "USD", Iso3 = "ITA" }
+                new Pais { Id = 3, Nombre = "italia", Divisa = "USD", Iso3 = "ITA" },
+                new Pais { Id = 4, Nombre = "Albania", Divisa = "USD", Iso3 = "ALB" }
+
             );
 
             modelBuilder.Entity<Usuario>().HasData(
@@ -76,6 +79,13 @@ namespace ApiBasesDeDatosProyecto.Context
             .HasOne(c => c.Pais)
             .WithMany(p => p.Clientes)
             .HasForeignKey(c => c.PaisId);
+
+            // Configurar la vista
+            modelBuilder.Entity<VistaClientesPaises>(entity =>
+            {
+                entity.HasNoKey();
+                entity.ToView("VistaClientesPaises");
+            });
         }
     }
 }
