@@ -62,10 +62,40 @@
       </div>
 
       <!-- Campos adicionales -->
+
       <div>
-        <label for="pais" class="text-gray-800 text-sm mb-2 block">Pais</label>
-        <input id="pais" name="pais" type="text" formControlName="PaisNombre" class="bg-gray-100 w-full text-gray-800 text-sm px-4 py-3.5 rounded-md focus:bg-transparent outline-blue-500 transition-all" placeholder="Enter country" />
+        <label for="pais" class="text-gray-800 text-sm mb-2 block">País</label>
+        <div class="relative">
+          <!-- Componente personalizado de selección -->
+          <div class="bg-gray-100 w-full text-gray-800 text-sm px-4 py-3.5 rounded-md border border-gray-300 cursor-pointer"
+               (click)="toggleDropdown()">
+            <div class="flex items-center">
+              <span *ngIf="selectedCountry" 
+                    class="w-6 h-4 inline-block bg-cover mr-2" 
+                    [ngStyle]="{'background-image': 'url(' + selectedCountry.flag + ')'}"></span>
+              <span *ngIf="selectedCountry">{{ selectedCountry.country }}</span>
+              <span *ngIf="!selectedCountry" class="text-gray-500">Selecciona un país</span>
+              <svg class="w-4 h-4 ml-auto text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" 
+                   xmlns="http://www.w3.org/2000/svg">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+              </svg>
+            </div>
+          </div>
+      
+          <!-- Opciones desplegables -->
+          <div class="absolute z-10 mt-2 w-full bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-y-auto" 
+               *ngIf="showDropdown">
+            <div *ngFor="let country of countries" 
+                 (click)="selectCountry(country)" 
+                 class="flex items-center px-4 py-2 hover:bg-gray-100 cursor-pointer">
+              <span class="w-6 h-4 inline-block bg-cover mr-2" 
+                    [ngStyle]="{'background-image': 'url(' + country.flag + ')'}"></span>
+              <span>{{ country.country }}</span>
+            </div>
+          </div>
+        </div>
       </div>
+      
       <div>
         <label for="empleo" class="text-gray-800 text-sm mb-2 block">Ocupación</label>
         <input id="empleo" name="empleo" type="text" formControlName="Empleo" class="bg-gray-100 w-full text-gray-800 text-sm px-4 py-3.5 rounded-md focus:bg-transparent outline-blue-500 transition-all" placeholder="Enter occupation" />

@@ -60,11 +60,10 @@ namespace ApiBasesDeDatosProyecto.Utilidades
             }
         }
 
-        public static IEnumerable<System.ComponentModel.DataAnnotations.ValidationResult> ValidateFechaNacimiento(this long fechaNacimiento)
+        public static IEnumerable<System.ComponentModel.DataAnnotations.ValidationResult> ValidateFechaNacimiento(this DateTime fechaNacimiento)
         {
-            var dateTime = DateTimeOffset.FromUnixTimeMilliseconds(fechaNacimiento).DateTime;
 
-            if (dateTime > DateTime.Now)
+            if (fechaNacimiento > DateTime.Now)
             {
                 yield return new System.ComponentModel.DataAnnotations.ValidationResult("La fecha de nacimiento no puede ser en el futuro.");
             }

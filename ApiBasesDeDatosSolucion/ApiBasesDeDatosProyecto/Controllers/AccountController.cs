@@ -90,37 +90,39 @@ public class AccountController : ControllerBase
         {
             return NotFound(new { message = "User not found" });
         }
-        return Ok(user);
+        return Ok(userDto);
     }
 
 
     [HttpPost("register")]
     public async Task<IActionResult> Register([FromBody] RegisterViewModel model)
     {
-        
-        DateTime FechaNac = DateTimeOffset.FromUnixTimeMilliseconds(model.FechaNacimiento).UtcDateTime;
-
+        // Validar el modelo antes de procesar
         TryValidateModel(model);
-
         if (!ModelState.IsValid)
         {
-            return BadRequest(ModelState); 
+            return BadRequest(ModelState);
         }
+
+        // Aquí model.FechaNacimiento ya es un DateTime, así que se puede usar directamente
         var user = new ApplicationUser
         {
-            FullName = model.Nombre + " " + model.Apellido,
+            FullName = $"{model.Nombre} {model.Apellido}",
             UserName = model.Email,
             Email = model.Email,
-            DateOfBirth = FechaNac,
+            DateOfBirth = model.FechaNacimiento,
         };
 
+        // Crear el usuario
         var result = await _userManager.CreateAsync(user, model.Password);
         if (!result.Succeeded)
         {
             return BadRequest(result.Errors);
         }
-        return Ok(userDto);
+
+        return Ok(user);
     }
+
 
 
     [HttpPost("login")]
@@ -145,31 +147,7 @@ public class AccountController : ControllerBase
     }
 
 
-    [HttpPost("register")]
-    public async Task<ActionResult<ApplicationUser>> Register([FromBody] RegisterViewModel model)
-    {
-
-        string rolPorDefecto = "Admin";
-        //DateTime FechaNac = DateTimeOffset.FromUnixTimeMilliseconds(model.FechaNacimiento).UtcDateTime;
-
-        var user = new ApplicationUser
-        {
-            FullName = model.Nombre + " " + model.Apellido,
-            UserName = model.Email,
-            Email = model.Email,
-            DateOfBirth = model.FechaNacimiento,
-        };
-
-        var result = await _userManager.CreateAsync(user, model.Password);
-        if (!result.Succeeded)
-        {
-            return BadRequest(result.Errors);
-        }
-
-
-        return Ok(user);
-    }
-
+    
 
     [HttpPost("cambiarRolUsuario")]
     public async Task<IActionResult> CambiarRolUsuario([FromBody] ChangeRoleViewModel model)

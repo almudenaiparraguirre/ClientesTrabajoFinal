@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace ApiBasesDeDatosProyecto.Migrations
 {
     /// <inheritdoc />
-    public partial class AñadidoMailCliente : Migration
+    public partial class paisNuevo : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -223,7 +223,8 @@ namespace ApiBasesDeDatosProyecto.Migrations
                 {
                     { 1, "USD", "ESP", "España" },
                     { 2, "EUR", "FRA", "Francia" },
-                    { 3, "USD", "ITA", "Italia" }
+                    { 3, "USD", "ITA", "italia" },
+                    { 4, "USD", "ALB", "Albania" }
                 });
 
             migrationBuilder.InsertData(
@@ -242,8 +243,8 @@ namespace ApiBasesDeDatosProyecto.Migrations
                 values: new object[,]
                 {
                     { 1, "Perez", "amin1@gmail.com", "Delincuente", new DateTime(1990, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Juan", 1 },
-                    { 2, "Lopez", "amin1@gmail.com", "Profesor", new DateTime(1985, 5, 23, 0, 0, 0, 0, DateTimeKind.Unspecified), "Maria", 2 },
-                    { 3, "Gomez", "amin1@gmail.com", "Abogado", new DateTime(1978, 11, 12, 0, 0, 0, 0, DateTimeKind.Unspecified), "Carlos", 3 }
+                    { 2, "Lopez", "amin2@gmail.com", "Profesor", new DateTime(1985, 5, 23, 0, 0, 0, 0, DateTimeKind.Unspecified), "Maria", 2 },
+                    { 3, "Gomez", "amin3@gmail.com", "Abogado", new DateTime(1978, 11, 12, 0, 0, 0, 0, DateTimeKind.Unspecified), "Carlos", 3 }
                 });
 
             migrationBuilder.CreateIndex(
