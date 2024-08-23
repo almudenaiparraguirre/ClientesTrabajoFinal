@@ -17,10 +17,10 @@ global using System.Text;
 global using Microsoft.AspNetCore.Authentication.JwtBearer;
 global using ApiBasesDeDatosProyecto;
 global using Bogus;
-
+global using Xunit;
 global using ApiBasesDeDatosProyecto.Repository;
 global using ApiBasesDeDatosProyecto.IDentity.Serivicios;
 global using ApiBasesDeDatosProyecto.Helpers;
-
+global using FluentAssertions;
 global using Serilog;
 global using Microsoft.AspNetCore.Authorization;
