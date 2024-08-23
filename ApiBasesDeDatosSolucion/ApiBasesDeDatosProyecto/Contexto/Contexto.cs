@@ -10,6 +10,8 @@ namespace ApiBasesDeDatosProyecto.Context
         public DbSet<Usuario> Usuarios { get; set; }
         public DbSet<VistaClientesPaises> VistaClientesPaises { get; set; } // Agregar la vista
 
+        public DbSet<ProAlmClientePorPaisDto> ProAlmClientePorPaisDtos { get; set; }
+
         public Contexto(DbContextOptions<Contexto> options) : base(options) { }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)

@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ApiBasesDeDatosProyecto.Migrations
 {
     [DbContext(typeof(Contexto))]
-    [Migration("20240822082946_paisNuevo")]
-    partial class paisNuevo
+    [Migration("20240822120930_procedimientoAlmacenado")]
+    partial class procedimientoAlmacenado
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -195,6 +195,50 @@ namespace ApiBasesDeDatosProyecto.Migrations
                             Email = "dadsdsds@gmail.com",
                             UserName = "PEPE3"
                         });
+                });
+
+            modelBuilder.Entity("ApiBasesDeDatosProyecto.Entities.VistaClientesPaises", b =>
+                {
+                    b.Property<string>("ClienteApellido")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("ClienteId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ClienteNombre")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Divisa")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Empleo")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("FechaNacimiento")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Iso3")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("PaisId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("PaisNombre")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.ToTable((string)null);
+
+                    b.ToView("VistaClientesPaises", (string)null);
                 });
 
             modelBuilder.Entity("ApiBasesDeDatosProyecto.Models.ApplicationUser", b =>
