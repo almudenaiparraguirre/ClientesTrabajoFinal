@@ -16,6 +16,7 @@ export class UsersInfoComponent implements OnInit, OnDestroy {
   selectedUsuario: Usuario | null = null;
   isModalOpen = false;
   editMode: 'user' | 'client' = 'user';
+  addMode: 'user' | 'client' = 'user';
   selectedItem: Usuario | Cliente;
 
   usuarios: Usuario[] = [];
@@ -47,9 +48,21 @@ export class UsersInfoComponent implements OnInit, OnDestroy {
 
   openAddModal(mode: 'user' | 'client') {
     this.isAddModalOpen = true;
-    this.editMode = mode;
+    this.addMode = mode;  // Asegúrate de actualizar el addMode aquí
     this.selectedItem = mode === 'user' ? new Usuario() : new Cliente();
+  
+    // Si estás añadiendo un usuario
+    if (mode === 'user') {
+      this.selectedUsuario = new Usuario();
+      this.selectedCliente = null;
+    } 
+    // Si estás añadiendo un cliente
+    else if (mode === 'client') {
+      this.selectedCliente = new Cliente();
+      this.selectedUsuario = null;
+    }
   }
+  
 
   closeAddModal() {
     this.isAddModalOpen = false;
@@ -193,30 +206,45 @@ export class UsersInfoComponent implements OnInit, OnDestroy {
   }
 
   onAdd() {
-    if (this.editMode === 'user' && this.selectedUsuario) {
-      /*this.userService.registrarUsuario(this.selectedUsuario).subscribe(
+    if (this.addMode === 'user' && this.selectedUsuario) {    
+      console.log('Usuario añadido correctamente');
+      this.userService.registrarUsuario(this.selectedUsuario).subscribe(
         response => {
-          console.log('Usuario actualizado correctamente', response);
-          this.loadUsuarios();
+          console.log('Usuario añadido correctamente', response);
+          this.loadUsuarios();  // Recargar la lista de usuarios
+          this.closeAddModal();
         },
         error => {
-          console.error('Error al actualizar el usuario', error);
+        console.error('Error al añadir el usuario', error);
         }
-      )*/
-    } else {
-      console.log('Actualizando cliente:', this.selectedItem);
+      );
+    } 
+    else if (this.addMode === 'client' && this.selectedCliente){
       this.clienteService.registrarCliente(this.selectedCliente).subscribe(
         response => {
-          console.log('Cliente registrado correctamente', response);
-          this.loadClientes();
+          console.log('Cliente añadido correctamente', response);
+          this.loadClientes();  // Recargar la lista de clientes
+          this.closeAddModal();
         },
         error => {
-          console.error('Error al actualizar el cliente', error);
+          console.error('Error al añadir el cliente', error);
         }
       );
     }
+    else {
     this.closeAddModal();
   }
+}
+
+toTimestamp(dateString: string): number {
+  return new Date(dateString).getTime();
+}
+
+// Convertir timestamp a fecha ISO para mostrarla en el campo
+toDateString(timestamp: number): string {
+  return new Date(timestamp).toISOString().split('T')[0];
+}
+
   
 
   ngOnDestroy(): void {
