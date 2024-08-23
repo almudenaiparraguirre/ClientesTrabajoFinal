@@ -58,7 +58,7 @@ public class ClienteController : ControllerBase
     }
 
     [HttpGet("GetClientesPorNombrePais")]
-    public async Task<ActionResult<List<ClienteDto>>> GetClientesPorNombrePais([FromQuery] string nombre)
+    public async Task<ActionResult<List<ProAlmClientePorPaisDto>>> GetClientesPorNombrePais([FromQuery] string nombre)
     {
         _logger.LogInformation($"Obteniendo clientes para el país con nombre {nombre}.");
 
@@ -69,14 +69,27 @@ public class ClienteController : ControllerBase
             return NotFound(new ErrorResponseDTO($"País con nombre {nombre} no encontrado."));
         }
 
-        var clientes = await _clienteRepository.ObtenerClientesPorPaisId(pais.Id);
+        var clientes = await _clienteRepository.ObtenerClientesPorPaisAsync(pais.Id);
         if (clientes == null || clientes.Count == 0)
         {
             _logger.LogWarning($"No se encontraron clientes para el país con nombre {nombre}.");
             return NotFound(new ErrorResponseDTO($"No se encontraron clientes para el país con nombre {nombre}."));
         }
 
-        return Ok(_mapper.Map<List<ClienteDto>>(clientes));
+        return Ok(_mapper.Map<List<ProAlmClientePorPaisDto>>(clientes));
+    }
+
+    [HttpGet("ObtenerClientesPorPais/{paisId}")]
+    public async Task<ActionResult<List<Cliente>>> ObtenerClientesPorPais(int paisId)
+    {
+        var clientes = await _clienteRepository.ObtenerClientesPorPaisAsync(paisId);
+
+        if (clientes == null || clientes.Count == 0)
+        {
+            return NotFound();
+        }
+
+        return Ok(clientes);
     }
 
     [HttpGet("GetClientesGenerados")]
@@ -144,12 +157,12 @@ public class ClienteController : ControllerBase
         }
 
         // Mapear las propiedades del DTO al cliente existente
-        DateTime FechaNac = DateTimeOffset.FromUnixTimeMilliseconds(clienteDto.FechaNacimiento).UtcDateTime;
+        //DateTime FechaNac = DateTimeOffset.FromUnixTimeMilliseconds(clienteDto.FechaNacimiento).UtcDateTime;
         //_mapper.Map(clienteDto, clienteExistente);
 
         clienteExistente.Nombre = clienteDto.Nombre;
         clienteExistente.Apellido = clienteDto.Apellido;
-        clienteExistente.FechaNacimiento =  FechaNac;
+        clienteExistente.FechaNacimiento = clienteDto.FechaNacimiento;
         clienteExistente.PaisId = clienteDto.PaisId;
         clienteExistente.Empleo = clienteDto.Empleo;
 

@@ -8,6 +8,9 @@ namespace ApiBasesDeDatosProyecto.Context
         public DbSet<Cliente> Clientes { get; set; }
         public DbSet<Pais> Paises { get; set; }
         public DbSet<Usuario> Usuarios { get; set; }
+        public DbSet<VistaClientesPaises> VistaClientesPaises { get; set; } // Agregar la vista
+
+        public DbSet<ProAlmClientePorPaisDto> ProAlmClientePorPaisDtos { get; set; }
 
         public Contexto(DbContextOptions<Contexto> options) : base(options) { }
 
@@ -78,6 +81,13 @@ namespace ApiBasesDeDatosProyecto.Context
             .HasOne(c => c.Pais)
             .WithMany(p => p.Clientes)
             .HasForeignKey(c => c.PaisId);
+
+            // Configurar la vista
+            modelBuilder.Entity<VistaClientesPaises>(entity =>
+            {
+                entity.HasNoKey();
+                entity.ToView("VistaClientesPaises");
+            });
         }
     }
 }

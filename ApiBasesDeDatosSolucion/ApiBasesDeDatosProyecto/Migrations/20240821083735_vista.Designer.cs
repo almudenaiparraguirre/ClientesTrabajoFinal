@@ -4,6 +4,7 @@ using ApiBasesDeDatosProyecto.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ApiBasesDeDatosProyecto.Migrations
 {
     [DbContext(typeof(Contexto))]
-    partial class ContextoModelSnapshot : ModelSnapshot
+    [Migration("20240821083735_vista")]
+    partial class vista
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -140,14 +143,7 @@ namespace ApiBasesDeDatosProyecto.Migrations
                             Id = 3,
                             Divisa = "USD",
                             Iso3 = "ITA",
-                            Nombre = "italia"
-                        },
-                        new
-                        {
-                            Id = 4,
-                            Divisa = "USD",
-                            Iso3 = "ALB",
-                            Nombre = "Albania"
+                            Nombre = "Italia"
                         });
                 });
 
@@ -192,50 +188,6 @@ namespace ApiBasesDeDatosProyecto.Migrations
                             Email = "dadsdsds@gmail.com",
                             UserName = "PEPE3"
                         });
-                });
-
-            modelBuilder.Entity("ApiBasesDeDatosProyecto.Entities.VistaClientesPaises", b =>
-                {
-                    b.Property<string>("ClienteApellido")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("ClienteId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("ClienteNombre")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Divisa")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Email")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Empleo")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("FechaNacimiento")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Iso3")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("PaisId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("PaisNombre")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.ToTable((string)null);
-
-                    b.ToView("VistaClientesPaises", (string)null);
                 });
 
             modelBuilder.Entity("ApiBasesDeDatosProyecto.Models.ApplicationUser", b =>

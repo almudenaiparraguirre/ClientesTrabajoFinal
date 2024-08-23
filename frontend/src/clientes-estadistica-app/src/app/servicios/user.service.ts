@@ -31,6 +31,9 @@ export class UserService {
 
   registrarUsuario(usuario: any): Observable<any> {
     console.log(usuario); // Asegúrate de que los campos estén presentes y correctos DEBUG
+    const timestamp = 1712275200000; // Ejemplo de timestamp en milisegundos
+    const date = new Date(timestamp);
+    const formattedDate = date.toISOString().split('T')[0];
     return this.http.post<any>(`${this.URL}Account/register`, usuario);
   }
 

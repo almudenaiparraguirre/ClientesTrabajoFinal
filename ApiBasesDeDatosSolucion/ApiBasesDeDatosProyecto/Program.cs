@@ -89,6 +89,7 @@ builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<IClienteService, ClienteService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddTransient<ClienteService>();
+builder.Services.AddScoped<IVistaClientesPaisesRepository, VistaClientesPaisesRepository>();
 
 
 // Configurar MediatR
