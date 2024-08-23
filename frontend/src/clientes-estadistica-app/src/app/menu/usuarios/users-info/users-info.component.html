@@ -32,7 +32,11 @@
           </div>
           <div class="mb-4">
             <label class="block text-sm font-medium text-gray-700">Contraseña</label>
-            <input type="password" [(ngModel)]="selectedUsuario.contrasena" name="contrasena" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50" />
+            <input type="password" [(ngModel)]="selectedUsuario.password" name="contrasena" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50" />
+          </div>
+          <div class="mb-4">
+            <label class="block text-sm font-medium text-gray-700">Confirmar contraseña</label>
+            <input type="password" [(ngModel)]="selectedUsuario.confirmPassword" name="contrasena" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50" />
           </div>
           <div class="mb-4">
             <label class="block text-sm font-medium text-gray-700">Nombre</label>
@@ -48,11 +52,11 @@
           </div>
           <div class="mb-4">
             <label class="block text-sm font-medium text-gray-700">Fecha de Nacimiento</label>
-            <input type="date" [(ngModel)]="selectedUsuario.dateOfBirth" name="fechaNacimiento" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50" />
+            <input type="date" [(ngModel)]="selectedUsuario.dateOfBirth" (ngModelChange)="selectedUsuario.dateOfBirth = toTimestamp($event)" name="fechaNacimiento" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50" />
           </div>
           <div class="mb-4">
             <label class="block text-sm font-medium text-gray-700">Nombre del país</label>
-            <input type="text" [(ngModel)]="selectedUsuario.nombrePais" name="nombrePais" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50" />
+            <input type="text" [(ngModel)]="selectedUsuario.paisNombre" name="nombrePais" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50" />
           </div>
         </div>
         
