@@ -20,6 +20,8 @@ public class PaisesController : ControllerBase
     [HttpGet]
     public async Task<ActionResult<List<PaisDto>>> Get()
     {
+        _logger.LogInformation($"Usuario autenticado: {User.Identity.IsAuthenticated}");
+        _logger.LogInformation($"Nombre de usuario: {User.Identity.Name}");
         _logger.LogInformation("Obteniendo todos los países.");
         List<Pais> lista = await _paisRepository.ObtenerTodos();
         _logger.LogInformation($"Se obtuvieron {lista.Count} países.");

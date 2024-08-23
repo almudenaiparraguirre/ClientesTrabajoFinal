@@ -95,7 +95,6 @@ public class AccountController : ControllerBase
             return NotFound(new { message = "User not found" });
         }
         return Ok(userDto);
-        return Ok(userDto);
     }
 
     [HttpPost("register")]
@@ -105,7 +104,6 @@ public class AccountController : ControllerBase
         TryValidateModel(model);
         if (!ModelState.IsValid)
         {
-            return BadRequest(ModelState);
             return BadRequest(ModelState);
         }
 
