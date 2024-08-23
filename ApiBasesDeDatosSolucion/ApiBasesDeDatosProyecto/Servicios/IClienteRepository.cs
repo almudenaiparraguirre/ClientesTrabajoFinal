@@ -14,8 +14,8 @@
         Task EliminarClienteAsync(Cliente cliente);
 
         Task<Cliente?> ObtenerClientesPais(int id);
-        Task<List<Cliente>> ObtenerClientesPorPaisId(int paisId);
 
         Task<List<Cliente>> ObtenerTodos();
+        Task<List<ProAlmClientePorPaisDto>> ObtenerClientesPorPaisAsync(int paisId);
     }
 }

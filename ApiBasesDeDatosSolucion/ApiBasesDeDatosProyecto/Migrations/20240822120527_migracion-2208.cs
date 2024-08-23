@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace ApiBasesDeDatosProyecto.Migrations
 {
     /// <inheritdoc />
-    public partial class paisNuevo : Migration
+    public partial class migracion2208 : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
