@@ -5,6 +5,7 @@ export interface MonitoringData {
     paisDestino: string;
     clienteOrigen: string;
     clienteDestino: string;
-    value: number;
+    valorOrigen: number;
+    valorDestino: number;
     timestamp: Date;
   }

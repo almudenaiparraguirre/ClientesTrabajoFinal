@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace ApiBasesDeDatosProyecto.Migrations
 {
     /// <inheritdoc />
-    public partial class migracion2208 : Migration
+    public partial class migracionGeneral : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -58,6 +58,26 @@ namespace ApiBasesDeDatosProyecto.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "MonitoringDatas",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    PaisOrigen = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    PaisDestino = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ClienteOrigen = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ClienteDestino = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ValorOrigen = table.Column<double>(type: "float", nullable: false),
+                    ValorDestino = table.Column<double>(type: "float", nullable: false),
+                    Timestamp = table.Column<DateTime>(type: "datetime2", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_MonitoringDatas", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Paises",
                 columns: table => new
                 {
@@ -70,6 +90,27 @@ namespace ApiBasesDeDatosProyecto.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Paises", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "ProAlmClientePorPaisDtos",
+                columns: table => new
+                {
+                    ClienteId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    ClienteNombre = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ClienteApellido = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    FechaNacimiento = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Empleo = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Email = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    PaisId = table.Column<int>(type: "int", nullable: false),
+                    PaisNombre = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Divisa = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Iso3 = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ProAlmClientePorPaisDtos", x => x.ClienteId);
                 });
 
             migrationBuilder.CreateTable(
@@ -223,7 +264,7 @@ namespace ApiBasesDeDatosProyecto.Migrations
                 {
                     { 1, "USD", "ESP", "España" },
                     { 2, "EUR", "FRA", "Francia" },
-                    { 3, "USD", "ITA", "italia" },
+                    { 3, "USD", "ITA", "Italia" },
                     { 4, "USD", "ALB", "Albania" }
                 });
 
@@ -312,6 +353,12 @@ namespace ApiBasesDeDatosProyecto.Migrations
 
             migrationBuilder.DropTable(
                 name: "Clientes");
+
+            migrationBuilder.DropTable(
+                name: "MonitoringDatas");
+
+            migrationBuilder.DropTable(
+                name: "ProAlmClientePorPaisDtos");
 
             migrationBuilder.DropTable(
                 name: "Usuarios");

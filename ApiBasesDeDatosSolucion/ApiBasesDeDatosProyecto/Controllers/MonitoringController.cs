@@ -30,7 +30,8 @@ namespace ApiBasesDeDatosProyecto.Controllers
                     PaisDestino = paises[random.Next(paises.Length)],
                     ClienteOrigen = clientes[random.Next(clientes.Length)],
                     ClienteDestino = clientes[random.Next(clientes.Length)],
-                    Value = random.NextDouble() * 10000,  // Asumiendo que el valor es una cantidad monetaria o métrica similar
+                    ValorOrigen = random.NextDouble() * 10000,
+                    ValorDestino = random.NextDouble() * 10000,// Asumiendo que el valor es una cantidad monetaria o métrica similar
                     Timestamp = DateTime.Now.AddSeconds(-random.Next(0, 60))
                 });
             }

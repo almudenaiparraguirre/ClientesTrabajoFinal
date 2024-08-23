@@ -160,7 +160,8 @@ export class DashboardComponent implements AfterViewInit, OnDestroy {
           <td class="px-4 py-2">${transferencia.paisDestino}</td>
           <td class="px-4 py-2">${transferencia.clienteOrigen}</td>
           <td class="px-4 py-2">${transferencia.clienteDestino}</td>
-          <td class="px-4 py-2">$${transferencia.value.toFixed(2)}</td>
+          <td class="px-4 py-2">$${transferencia.valorOrigen.toFixed(2)}</td>
+          <td class="px-4 py-2">$${transferencia.valorDestino.toFixed(2)}</td>
           <td class="px-4 py-2">${new Date(transferencia.timestamp).toLocaleString()}</td>
         `;
         tableBody.appendChild(row);
@@ -170,7 +171,7 @@ export class DashboardComponent implements AfterViewInit, OnDestroy {
 
   private updateFinancialChart() {
     this.labels = this.transferencias.map(t => new Date(t.timestamp).toLocaleTimeString());
-    this.data = this.transferencias.map(t => t.value);
+    this.data = this.transferencias.map(t => t.valorDestino);
 
     this.financialChart.data.labels = this.labels;
     this.financialChart.data.datasets[0].data = this.data;
@@ -200,7 +201,7 @@ export class DashboardComponent implements AfterViewInit, OnDestroy {
   }
 
   private calculateTotals(): void {
-    this.totalMoneyTransferred = this.transferencias.reduce((acc, t) => acc + t.value, 0);
+    this.totalMoneyTransferred = this.transferencias.reduce((acc, t) => acc + t.valorDestino, 0);
     this.totalTransfersCompleted = this.transferencias.length;
   }
 

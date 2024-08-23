@@ -90,6 +90,8 @@ builder.Services.AddScoped<IClienteService, ClienteService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddTransient<ClienteService>();
 builder.Services.AddScoped<IVistaClientesPaisesRepository, VistaClientesPaisesRepository>();
+builder.Services.AddTransient<IMonitoringDataRepository, MonitoringDataRepository>();
+
 
 
 // Configurar MediatR
@@ -130,11 +132,12 @@ builder.Services.AddSwaggerGen(options =>
 });
 
 
-// Register the SignalR client service with the URL of the simulator's hub
 builder.Services.AddSingleton<SignalRClientService>(provider =>
-    new SignalRClientService("https://localhost:7040/simuladorHub"));
-builder.Services.AddSingleton<SignalRClientService>(provider =>
-    new SignalRClientService("https://localhost:7050/simuladorHub"));
+    new SignalRClientService("https://localhost:7040/simuladorHub",
+        provider.GetRequiredService<IServiceScopeFactory>()));
+
+//builder.Services.AddSingleton<SignalRClientService>(provider =>
+//  new SignalRClientService("https://localhost:7050/simuladorHub"));
 
 
 

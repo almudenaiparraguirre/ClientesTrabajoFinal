@@ -1,4 +1,4 @@
-﻿namespace ApiBasesDeDatosProyecto.Models
+namespace SimuladorServicio
 {
     public class MonitoringData
     {
@@ -12,5 +12,4 @@
         public double ValorDestino { get; set; }
         public DateTime Timestamp { get; set; }
     }
-
 }

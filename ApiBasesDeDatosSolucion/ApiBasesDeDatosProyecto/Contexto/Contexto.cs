@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using ApiBasesDeDatosProyecto.Models; // Asegúrate de agregar este using
 
 namespace ApiBasesDeDatosProyecto.Context
 {
@@ -8,32 +9,26 @@ namespace ApiBasesDeDatosProyecto.Context
         public DbSet<Cliente> Clientes { get; set; }
         public DbSet<Pais> Paises { get; set; }
         public DbSet<Usuario> Usuarios { get; set; }
-        public DbSet<VistaClientesPaises> VistaClientesPaises { get; set; } // Agregar la vista
-
+        public DbSet<VistaClientesPaises> VistaClientesPaises { get; set; }
         public DbSet<ProAlmClientePorPaisDto> ProAlmClientePorPaisDtos { get; set; }
+        public DbSet<MonitoringData> MonitoringDatas { get; set; }  // Agregar esta línea
 
         public Contexto(DbContextOptions<Contexto> options) : base(options) { }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            // Para activar el seguimiento de consultas,
-            // se debe establecer el nivel de seguimiento en Debug
-            // en el archivo de configuración de la aplicación (appsettings.json)
-            // y se debe agregar el siguiente código 
             optionsBuilder.UseLoggerFactory(LoggerFactory.Create(builder => builder.AddDebug()));
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            base.OnModelCreating(modelBuilder); // Necesario para Identity
+            base.OnModelCreating(modelBuilder);
 
-            // Agregar tres paises por defecto a la base de datos
             modelBuilder.Entity<Pais>().HasData(
                 new Pais { Id = 1, Nombre = "España", Divisa = "USD", Iso3 = "ESP" },
                 new Pais { Id = 2, Nombre = "Francia", Divisa = "EUR", Iso3 = "FRA" },
-                new Pais { Id = 3, Nombre = "italia", Divisa = "USD", Iso3 = "ITA" },
+                new Pais { Id = 3, Nombre = "Italia", Divisa = "USD", Iso3 = "ITA" },
                 new Pais { Id = 4, Nombre = "Albania", Divisa = "USD", Iso3 = "ALB" }
-
             );
 
             modelBuilder.Entity<Usuario>().HasData(
@@ -62,7 +57,6 @@ namespace ApiBasesDeDatosProyecto.Context
                     PaisId = 2,
                     Empleo = "Profesor",
                     Email = "amin2@gmail.com"
-
                 },
                 new Cliente
                 {
@@ -73,16 +67,14 @@ namespace ApiBasesDeDatosProyecto.Context
                     PaisId = 3,
                     Empleo = "Abogado",
                     Email = "amin3@gmail.com"
-
                 }
             );
 
             modelBuilder.Entity<Cliente>()
-            .HasOne(c => c.Pais)
-            .WithMany(p => p.Clientes)
-            .HasForeignKey(c => c.PaisId);
+                .HasOne(c => c.Pais)
+                .WithMany(p => p.Clientes)
+                .HasForeignKey(c => c.PaisId);
 
-            // Configurar la vista
             modelBuilder.Entity<VistaClientesPaises>(entity =>
             {
                 entity.HasNoKey();
