@@ -2,5 +2,5 @@
 {
     public string? Nombre { get; set; }
     public string? Apellido { get; set; }
-    public long FechaNacimiento { get; set; }
+    public DateTime FechaNacimiento { get; set; }
 }

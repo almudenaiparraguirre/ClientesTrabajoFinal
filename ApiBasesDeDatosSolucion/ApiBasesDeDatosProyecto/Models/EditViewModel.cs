@@ -10,7 +10,7 @@
         // Campos adicionales para clientes
         public string? Nombre { get; set; }
         public string? Apellido { get; set; }
-        public long FechaNacimiento { get; set; }
+        public  DateTime FechaNacimiento { get; set; }
         public int PaisId { get; set; }
     }
 }

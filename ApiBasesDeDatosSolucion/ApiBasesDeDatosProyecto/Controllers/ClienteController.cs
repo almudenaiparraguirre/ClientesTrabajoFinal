@@ -157,12 +157,12 @@ public class ClienteController : ControllerBase
         }
 
         // Mapear las propiedades del DTO al cliente existente
-        DateTime FechaNac = DateTimeOffset.FromUnixTimeMilliseconds(clienteDto.FechaNacimiento).UtcDateTime;
+        //DateTime FechaNac = DateTimeOffset.FromUnixTimeMilliseconds(clienteDto.FechaNacimiento).UtcDateTime;
         //_mapper.Map(clienteDto, clienteExistente);
 
         clienteExistente.Nombre = clienteDto.Nombre;
         clienteExistente.Apellido = clienteDto.Apellido;
-        clienteExistente.FechaNacimiento =  FechaNac;
+        clienteExistente.FechaNacimiento = clienteDto.FechaNacimiento;
         clienteExistente.PaisId = clienteDto.PaisId;
         clienteExistente.Empleo = clienteDto.Empleo;
 
