@@ -108,23 +108,23 @@ export class UsersInfoComponent implements OnInit, OnDestroy {
     );
   }
 
-  filterResults(): void {
+  filterResults() {
     if (this.activeTab === 'table1') {
       this.filteredUsuarios = this.usuarios.filter(usuario => 
-        usuario.userName.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
-        usuario.email.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
-        usuario.rol.toLowerCase().includes(this.searchTerm.toLowerCase())
+        !usuario.isDeleted && 
+        (usuario.userName.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
+         usuario.fullName.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
+         usuario.email.toLowerCase().includes(this.searchTerm.toLowerCase()))
       );
-      this.totalUsuarios = this.filteredUsuarios.length;
     } else if (this.activeTab === 'table2') {
-      this.filteredClientes = this.clientes.filter(cliente => 
-        cliente.nombre.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
-        cliente.email.toLowerCase().includes(this.searchTerm.toLowerCase())
+      this.filteredClientes = this.clientes.filter(cliente =>
+        (cliente.nombre.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
+         cliente.apellido.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
+         cliente.email.toLowerCase().includes(this.searchTerm.toLowerCase()))
       );
-      this.totalClientes = this.filteredClientes.length;
     }
-    this.page = 1; 
   }
+  
 
   editUsuario(usuario: Usuario): void {
     this.selectedUsuario = { ...usuario };

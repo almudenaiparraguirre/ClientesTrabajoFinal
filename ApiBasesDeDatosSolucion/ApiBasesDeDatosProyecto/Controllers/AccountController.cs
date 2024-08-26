@@ -48,6 +48,13 @@ public class AccountController : ControllerBase
         return Ok(users);
     }
 
+    [HttpGet("activeUsers")]
+    public IActionResult GetActiveUsers()
+    {
+        var activeUsers = _context.Users.Where(u => u.IsDeleted == false).ToList();
+        return Ok(activeUsers);
+    }
+
     [HttpGet("verificarRol")]
     public async Task<IActionResult> VerificarRol(string email)
     {
