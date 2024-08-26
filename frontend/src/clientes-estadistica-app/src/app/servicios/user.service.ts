@@ -48,22 +48,21 @@ export class UserService {
     // Hacer la solicitud GET
     return this.http.get<{ id: number }>(url);
   }
-
-  editarCliente(cliente: Cliente): Observable<void> {
+  
+  editarCliente(cliente: Cliente): Observable<void>{
     // Construir la URL con el parámetro de consulta
-    const url = `${this.URL}updateUser?email=${encodeURIComponent(cliente.email)}`;
-    // Convertir fecha de nacimiento a string en formato "YYYY-MM-DD"
-    cliente.fechaNacimiento = this.formatDateToBackend(new Date(cliente.fechaNacimiento));
+    const url = `${this.URL}Cliente/${cliente.email}`;
+    // Convertir fecha de nacimiento a timestamp (milisegundos)
+    //cliente.fechaNacimiento = new Date(cliente.fechaNacimiento).getTime();
     // Enviar la solicitud PUT
     return this.http.put<void>(url, cliente);
   }
-  
-  editarUsuario(usuario: Usuario): Observable<any> {
-    const url = `${this.URL}Account/update/${usuario.email}`;
-    // Convertir la fecha de nacimiento a string en formato "YYYY-MM-DD"
-    usuario.dateOfBirth = this.formatDateToBackend(new Date(usuario.dateOfBirth));
+
+  editarUsuario(usuario: Usuario): Observable<any>{
+    const url = `${this.URL}Account/updateUser?email=${usuario.email}`;
+    usuario.dateOfBirth = new Date(usuario.dateOfBirth).getTime();
     return this.http.put(url, usuario);
-  }  
+  }
 
   eliminarUsuario(email: string): Observable<any> {
     return this.http.delete(`${this.URL}Account/users/${email}`);

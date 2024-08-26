@@ -52,7 +52,7 @@
           </div>
           <div class="mb-4">
             <label class="block text-sm font-medium text-gray-700">Fecha de Nacimiento</label>
-            <input type="date" [(ngModel)]="selectedUsuario.dateOfBirth" name="fechaNacimiento" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50" />
+<input type="date" [(ngModel)]="selectedUsuario.dateOfBirth" name="fechaNacimiento" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50" />
           </div>
           <div class="mb-4">
             <label class="block text-sm font-medium text-gray-700">Nombre del país</label>
@@ -210,7 +210,7 @@
                       <div class="font-medium text-gray-700">{{ usuario.fullName }}</div>
                     </td>
                     <td class="px-6 py-4">{{ usuario.email }}</td>
-                    <td class="px-6 py-4">{{ usuario.dateOfBirth}}</td>
+                    <td class="px-6 py-4">{{ usuario.dateOfBirth | date:'yyyy-MM-dd' }}</td>
                     <td class="px-6 py-4">
                       <div class="flex justify-center gap-4">
                         <!-- Botón Editar -->
@@ -254,7 +254,7 @@
           <tr *ngFor="let cliente of filteredClientes | paginate: { itemsPerPage: pageSize, currentPage: page }" class="hover:bg-gray-50">
             <td class="px-6 py-4">{{ cliente.nombre }}</td>
             <td class="px-6 py-4">{{ cliente.apellido }}</td>
-            <td class="px-6 py-4">{{ cliente.fechaNacimiento}}</td>
+            <td class="px-6 py-4">{{ cliente.fechaNacimiento | date:'yyyy-MM-dd' }}</td>
             <td class="px-6 py-4">{{ cliente.empleo }}</td>
             <td class="px-6 py-4">
               <div class="flex justify-center gap-4">

@@ -53,11 +53,11 @@ export class UsersInfoComponent implements OnInit, OnDestroy {
   
     if (mode === 'user') {
       this.selectedUsuario = new Usuario();
-      this.selectedUsuario.dateOfBirth = '';  // Inicializar como cadena vacía
+      //this.selectedUsuario.dateOfBirth = '';  // Inicializar como cadena vacía
       this.selectedCliente = null;
     } else if (mode === 'client') {
       this.selectedCliente = new Cliente();
-      this.selectedCliente.fechaNacimiento = '';  // Inicializar como cadena vacía
+      //this.selectedCliente.fechaNacimiento = '';  // Inicializar como cadena vacía
       this.selectedUsuario = null;
     }
   }
@@ -206,13 +206,13 @@ export class UsersInfoComponent implements OnInit, OnDestroy {
   onAdd() {
     if (this.addMode === 'user' && this.selectedUsuario) {
       // Verificar si dateOfBirth tiene un valor válido antes de convertir
-      if (this.selectedUsuario.dateOfBirth) {
+     /* if (this.selectedUsuario.dateOfBirth) {
         this.selectedUsuario.dateOfBirth = new Date(this.selectedUsuario.dateOfBirth).toISOString();
       } else {
         // Si no hay una fecha, puedes optar por no enviar este campo o manejarlo según tu lógica
         this.selectedUsuario.dateOfBirth = ''; // O manejar un valor por defecto
       }
-  
+  */
       this.userService.registrarUsuario(this.selectedUsuario).subscribe(
         response => {
           console.log('Usuario añadido correctamente', response);

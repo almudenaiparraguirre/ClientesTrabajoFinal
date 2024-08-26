@@ -2,7 +2,7 @@ export class Cliente {
   id: number;
   nombre: string;
   apellido: string;
-  fechaNacimiento: string;
+  fechaNacimiento: number;
   nombrePais: string;
   empleo?: string;
   paisId: number;

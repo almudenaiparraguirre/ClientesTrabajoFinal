@@ -81,7 +81,6 @@ public class AccountController : ControllerBase
         return Ok(userRoleDto);
     }
 
-
     /*[HttpDelete("users/{id}")]
     public async Task<IActionResult> DeleteUser(string id)
     {
