@@ -11,7 +11,7 @@ public class AccountController : ControllerBase
     private readonly ITokenService _tokenService;
     private readonly IClienteService _clienteService;
     private readonly IClienteRepository _clienteRepository;
-    private readonly ApiBasesDeDatosProyecto.IDentity.Serivicios.IUserService _userService;
+    private readonly IUserService _userService;
     private readonly IPaisRepository _paisRepository; // Añadido
     private readonly IMapper _mapper;
     private readonly Contexto _context;
@@ -23,7 +23,7 @@ public class AccountController : ControllerBase
         ITokenService tokenService,
         IClienteService clienteService,
         IClienteRepository clienteRepository,
-        ApiBasesDeDatosProyecto.IDentity.Serivicios.IUserService userService,
+        IUserService userService,
         IPaisRepository paisRepository,
         IMapper mapper,
         Contexto context) // Añadido
@@ -128,8 +128,6 @@ public class AccountController : ControllerBase
 
         return Ok(user);
     }
-
-
 
     [HttpPost("login")]
     public async Task<IActionResult> Login([FromBody] LoginViewModel model)
