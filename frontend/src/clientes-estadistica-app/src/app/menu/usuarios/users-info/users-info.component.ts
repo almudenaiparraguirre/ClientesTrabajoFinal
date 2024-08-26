@@ -48,21 +48,19 @@ export class UsersInfoComponent implements OnInit, OnDestroy {
 
   openAddModal(mode: 'user' | 'client') {
     this.isAddModalOpen = true;
-    this.addMode = mode;  // Asegúrate de actualizar el addMode aquí
+    this.addMode = mode; 
     this.selectedItem = mode === 'user' ? new Usuario() : new Cliente();
   
-    // Si estás añadiendo un usuario
     if (mode === 'user') {
       this.selectedUsuario = new Usuario();
+      this.selectedUsuario.dateOfBirth = '';  // Inicializar como cadena vacía
       this.selectedCliente = null;
-    } 
-    // Si estás añadiendo un cliente
-    else if (mode === 'client') {
+    } else if (mode === 'client') {
       this.selectedCliente = new Cliente();
+      this.selectedCliente.fechaNacimiento = '';  // Inicializar como cadena vacía
       this.selectedUsuario = null;
     }
   }
-  
 
   closeAddModal() {
     this.isAddModalOpen = false;
@@ -206,8 +204,15 @@ export class UsersInfoComponent implements OnInit, OnDestroy {
   }
 
   onAdd() {
-    if (this.addMode === 'user' && this.selectedUsuario) {    
-      console.log('Usuario añadido correctamente');
+    if (this.addMode === 'user' && this.selectedUsuario) {
+      // Verificar si dateOfBirth tiene un valor válido antes de convertir
+      if (this.selectedUsuario.dateOfBirth) {
+        this.selectedUsuario.dateOfBirth = new Date(this.selectedUsuario.dateOfBirth).toISOString();
+      } else {
+        // Si no hay una fecha, puedes optar por no enviar este campo o manejarlo según tu lógica
+        this.selectedUsuario.dateOfBirth = ''; // O manejar un valor por defecto
+      }
+  
       this.userService.registrarUsuario(this.selectedUsuario).subscribe(
         response => {
           console.log('Usuario añadido correctamente', response);
@@ -215,7 +220,7 @@ export class UsersInfoComponent implements OnInit, OnDestroy {
           this.closeAddModal();
         },
         error => {
-        console.error('Error al añadir el usuario', error);
+          console.error('Error al añadir el usuario', error);
         }
       );
     } 
@@ -232,9 +237,9 @@ export class UsersInfoComponent implements OnInit, OnDestroy {
       );
     }
     else {
-    this.closeAddModal();
-  }
-}
+      this.closeAddModal();
+    }
+  }  
 
 toTimestamp(dateString: string): number {
   return new Date(dateString).getTime();
