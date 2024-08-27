@@ -1,8 +1,10 @@
+using System.ComponentModel.DataAnnotations;
+
 namespace SimuladorServicio
 {
     public class MonitoringData
     {
-        public int Id { get; set; }
+        [Key]
         public string Name { get; set; }
         public string PaisOrigen { get; set; }
         public string PaisDestino { get; set; }

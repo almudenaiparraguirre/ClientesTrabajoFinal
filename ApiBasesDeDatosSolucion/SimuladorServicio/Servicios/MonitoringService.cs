@@ -14,8 +14,7 @@ public class MonitoringService
     {
         return new MonitoringData
         {
-            Id = id,
-            Name = $"Transacción {id + 1}",
+            Name = $"Transacción {Random.Next(10000)}",
             PaisOrigen = Paises[Random.Next(Paises.Length)],
             PaisDestino = Paises[Random.Next(Paises.Length)],
             ClienteOrigen = Clientes[Random.Next(Clientes.Length)],
@@ -35,17 +34,18 @@ public class MonitoringService
 
     public async Task SendRandomMessages()
     {
-        var numberOfTransfers = Random.Next(10, 21); // Número de transferencias entre 10 y 20
         var data = new List<MonitoringData>();
 
-        for (int i = 0; i < numberOfTransfers; i++)
+        // Generar solo 2 transacciones aleatorias
+        for (int i = 0; i < 1; i++)
         {
             data.Add(GenerateRandomMonitoringData(i));
         }
 
-        // Enviar los datos generados a todos los clientes conectados
+        // Enviar los dos datos generados a todos los clientes conectados
         foreach (var item in data)
         {
+            Console.WriteLine(item.ToString());  // Corregido para imprimir el objeto item, no la lista completa
             await _hubContext.Clients.All.SendAsync("ReceiveMessage", item);
         }
     }

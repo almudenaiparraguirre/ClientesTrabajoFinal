@@ -24,7 +24,6 @@ public class SignalRClientService
         _hubConnection.On<MonitoringData>("ReceiveMessage", async (data) =>
         {
             Console.WriteLine($"Mensaje recibido del simulador:");
-            Console.WriteLine($"Id: {data.Id}");
             Console.WriteLine($"Name: {data.Name}");
             Console.WriteLine($"PaisOrigen: {data.PaisOrigen}");
             Console.WriteLine($"PaisDestino: {data.PaisDestino}");

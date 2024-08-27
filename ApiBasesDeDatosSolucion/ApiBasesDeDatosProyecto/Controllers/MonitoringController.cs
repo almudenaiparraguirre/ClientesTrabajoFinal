@@ -1,6 +1,10 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
+using ApiBasesDeDatosProyecto.Repository;
+using ApiBasesDeDatosProyecto.Models; // Asegúrate de importar el namespace donde está MonitoringData
 
 namespace ApiBasesDeDatosProyecto.Controllers
 {
@@ -8,35 +12,61 @@ namespace ApiBasesDeDatosProyecto.Controllers
     [ApiController]
     public class MonitoringController : ControllerBase
     {
-        [HttpGet]
-        public ActionResult<IEnumerable<MonitoringData>> GetMonitoringData()
+        private readonly IMonitoringDataRepository _repository;
+        private static readonly ConcurrentBag<TaskCompletionSource<IEnumerable<MonitoringData>>> _pendingRequests = new ConcurrentBag<TaskCompletionSource<IEnumerable<MonitoringData>>>();
+
+        // Inyección de dependencia del repositorio
+        public MonitoringController(IMonitoringDataRepository repository)
         {
-            var random = new Random();
-            var data = new List<MonitoringData>();
+            _repository = repository;
+        }
 
-            string[] paises = { "México", "Estados Unidos", "Canadá", "Brasil", "Argentina" };
-            string[] clientes = { "Cliente A", "Cliente B", "Cliente C", "Cliente D", "Cliente E" };
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<MonitoringData>>> GetMigrationData()
+        {
+            // Uso del método GetAllAsync del repositorio para obtener los datos
+            var data = await _repository.GetAllAsync();
 
-            // Genera un número aleatorio entre 10 y 20 para el total de transferencias
-            int numberOfTransfers = random.Next(10, 21);
+            // Devuelve los datos obtenidos
+            return Ok(data);
+        }
 
-            for (int i = 0; i < numberOfTransfers; i++)
+        [HttpGet("subscribe")]
+        public async Task<IActionResult> Subscribe()
+        {
+            var tcs = new TaskCompletionSource<IEnumerable<MonitoringData>>();
+            _pendingRequests.Add(tcs);
+
+            // Espera hasta que se complete la tarea o se cancele
+            var timeoutCancellationTokenSource = new CancellationTokenSource();
+            var timeout = Task.Delay(90000, timeoutCancellationTokenSource.Token); // Timeout de 30 segundos
+
+            var completedTask = await Task.WhenAny(tcs.Task, timeout);
+
+            // Cancela el timeout si la tarea se completó
+            timeoutCancellationTokenSource.Cancel();
+
+            if (completedTask == timeout)
             {
-                data.Add(new MonitoringData
-                {
-                    Id = i,
-                    Name = $"Transacción {i + 1}",
-                    PaisOrigen = paises[random.Next(paises.Length)],
-                    PaisDestino = paises[random.Next(paises.Length)],
-                    ClienteOrigen = clientes[random.Next(clientes.Length)],
-                    ClienteDestino = clientes[random.Next(clientes.Length)],
-                    ValorOrigen = random.NextDouble() * 10000,
-                    ValorDestino = random.NextDouble() * 10000,// Asumiendo que el valor es una cantidad monetaria o métrica similar
-                    Timestamp = DateTime.Now.AddSeconds(-random.Next(0, 60))
-                });
+                // Timeout alcanzado sin datos nuevos
+                return StatusCode(204); // No Content
             }
 
-            return Ok(data);
+            // Envía la respuesta cuando los datos están listos
+            return Ok(await tcs.Task);
+        }
+
+        // Método para simular la notificación de datos
+        [HttpPost("notify")]
+        public async Task<IActionResult> Notify()
+        {
+            var data = await _repository.GetAllAsync();
+            foreach (var tcs in _pendingRequests)
+            {
+                tcs.TrySetResult(data);
+            }
+            _pendingRequests.Clear();
+            return Ok();
         }
     }
 }

@@ -1,19 +1,20 @@
-import { Component, AfterViewInit, OnDestroy } from '@angular/core';
-import { Chart } from 'chart.js/auto';
-import { MonitorDataService, MonitoringData } from 'src/app/servicios/monitor-data.service';
-import { UserService } from 'src/app/servicios/user.service';
+import { Component, OnInit, OnDestroy } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
 import { Subscription } from 'rxjs';
-import { Usuario } from '../clases/usuario';
+import { Chart } from 'chart.js/auto'; // Asegúrate de que 'chart.js/auto' esté instalado
 
 @Component({
   selector: 'app-dashboard',
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.css']
 })
-export class DashboardComponent implements AfterViewInit, OnDestroy {
-  usuarios: Usuario[] = [];
-  transferencias: MonitoringData[] = [];
-  private subscription: Subscription = new Subscription();
+export class DashboardComponent implements OnInit, OnDestroy {
+  transferencias: any[] = [];
+  private pollingSubscription: Subscription;
+  private readonly POLLING_INTERVAL = 5000; // Intervalo de sondeo en milisegundos (5 segundos)
+  private readonly API_URL = 'https://localhost:7107/api/monitoring/subscribe';
+
+  // Gráficos
   private financialChart: Chart<'line', any, any>;
   private countriesComparisonChart: Chart<'bar', any, any>;
   private labels: string[] = [];
@@ -25,25 +26,71 @@ export class DashboardComponent implements AfterViewInit, OnDestroy {
   totalMoneyTransferred: number = 0;
   totalTransfersCompleted: number = 0;
 
-  constructor(private userService: UserService, private monitorDataService: MonitorDataService) { }
+  constructor(private http: HttpClient) { }
 
   ngOnInit(): void {
-    this.loadUsuarios();
-    this.loadTransferencias(); // Carga inicial de datos
-  }
-
-  ngAfterViewInit(): void {
-    this.initFinancialChart(); // Inicializa el gráfico después de que la vista esté cargada
+    this.startLongPolling();
+    this.initFinancialChart();
     this.initCountriesComparisonChart();
   }
 
   ngOnDestroy(): void {
-    this.subscription.unsubscribe();
+    if (this.pollingSubscription) {
+      this.pollingSubscription.unsubscribe();
+    }
     if (this.financialChart) {
       this.financialChart.destroy();
     }
     if (this.countriesComparisonChart) {
       this.countriesComparisonChart.destroy();
+    }
+  }
+
+  private startLongPolling(): void {
+    const poll = () => {
+      this.http.get<any[]>(this.API_URL).subscribe(
+        data => {
+          if (data) {
+            this.transferencias = data;
+            this.updateTransferTable();
+            this.updateFinancialChart();
+            this.updateCountriesComparisonChart();
+            this.calculateTotals();
+            // Continue polling after receiving data
+            poll();
+          }
+        },
+        error => {
+          console.error('Error fetching transferencias', error);
+          // Retry after a delay in case of error
+          setTimeout(poll, this.POLLING_INTERVAL);
+        }
+      );
+    };
+
+    // Start polling
+    poll();
+  }
+
+  private updateTransferTable(): void {
+    const tableBody = document.getElementById('transferTableBody');
+    if (tableBody) {
+      tableBody.innerHTML = ''; // Limpia la tabla actual
+      this.transferencias.forEach((transferencia) => {
+        const row = document.createElement('tr');
+        row.className = 'border-b';
+        row.innerHTML = `
+          <td class="px-4 py-2">${transferencia.name}</td>
+          <td class="px-4 py-2">${transferencia.paisOrigen}</td>
+          <td class="px-4 py-2">${transferencia.paisDestino}</td>
+          <td class="px-4 py-2">${transferencia.clienteOrigen}</td>
+          <td class="px-4 py-2">${transferencia.clienteDestino}</td>
+          <td class="px-4 py-2">$${transferencia.valorOrigen.toFixed(2)}</td>
+          <td class="px-4 py-2">$${transferencia.valorDestino.toFixed(2)}</td>
+          <td class="px-4 py-2">${new Date(transferencia.timestamp).toLocaleString()}</td>
+        `;
+        tableBody.appendChild(row);
+      });
     }
   }
 
@@ -130,45 +177,6 @@ export class DashboardComponent implements AfterViewInit, OnDestroy {
     });
   }
 
-  private loadTransferencias(): void {
-    this.subscription.add(
-      this.monitorDataService.getTransferencias().subscribe(
-        data => {
-          this.transferencias = data;
-          this.updateTransferTable();
-          this.updateFinancialChart();
-          this.updateCountriesComparisonChart();
-          this.calculateTotals();
-        },
-        error => {
-          console.error('Error fetching transferencias', error);
-        }
-      )
-    );
-  }
-
-  private updateTransferTable(): void {
-    const tableBody = document.getElementById('transferTableBody');
-    if (tableBody) {
-      tableBody.innerHTML = ''; // Limpia la tabla actual
-      this.transferencias.forEach((transferencia) => {
-        const row = document.createElement('tr');
-        row.className = 'border-b';
-        row.innerHTML = `
-          <td class="px-4 py-2">${transferencia.name}</td>
-          <td class="px-4 py-2">${transferencia.paisOrigen}</td>
-          <td class="px-4 py-2">${transferencia.paisDestino}</td>
-          <td class="px-4 py-2">${transferencia.clienteOrigen}</td>
-          <td class="px-4 py-2">${transferencia.clienteDestino}</td>
-          <td class="px-4 py-2">$${transferencia.valorOrigen.toFixed(2)}</td>
-          <td class="px-4 py-2">$${transferencia.valorDestino.toFixed(2)}</td>
-          <td class="px-4 py-2">${new Date(transferencia.timestamp).toLocaleString()}</td>
-        `;
-        tableBody.appendChild(row);
-      });
-    }
-  }
-
   private updateFinancialChart() {
     this.labels = this.transferencias.map(t => new Date(t.timestamp).toLocaleTimeString());
     this.data = this.transferencias.map(t => t.valorDestino);
@@ -203,19 +211,5 @@ export class DashboardComponent implements AfterViewInit, OnDestroy {
   private calculateTotals(): void {
     this.totalMoneyTransferred = this.transferencias.reduce((acc, t) => acc + t.valorDestino, 0);
     this.totalTransfersCompleted = this.transferencias.length;
-  }
-
-  private loadUsuarios(): void {
-    this.subscription.add(
-      this.userService.getUsuarios().subscribe(
-        data => {
-          this.usuarios = data;
-          document.getElementById('UsuariosLogueados').innerHTML = data.length.toString();
-        },
-        error => {
-          console.error('Error fetching users', error);
-        }
-      )
-    );
   }
 }
