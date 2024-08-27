@@ -37,18 +37,17 @@ public class ClienteController : ControllerBase
     public async Task<ActionResult<List<ClienteDto>>> Get()
     {
         _logger.LogInformation($"Obteniendo todos los clientes.");
-        List<Cliente> lista = await _clienteRepository.ObtenerTodos();
+        List<Cliente> lista = await _clienteRepository. ObtenerTodosAsync();
         _logger.LogInformation($"Se obtuvieron {lista.Count} clientes.");
         return Ok(_mapper.Map<List<ClienteDto>>(lista));
     }
-
 
     // GET api/cliente/5
     [HttpGet("{id}")]
     public async Task<ActionResult<ClienteDto>> Get(int id)
     {
         _logger.LogInformation($"Obteniendo cliente con ID {id}.");
-        var cliente = await _clienteRepository.ObtenerPorId(id);
+        var cliente = await _clienteRepository.ObtenerPorIdAsync(id);
         if (cliente == null)
         {
             _logger.LogWarning($"Cliente con ID {id} no encontrado.");
@@ -118,9 +117,9 @@ public class ClienteController : ControllerBase
         }
 
         var cliente = _mapper.Map<Cliente>(clienteDto);
-        _clienteRepository.Agregar(cliente);
+        _clienteRepository.AgregarAsync(cliente);
 
-        if (await _clienteRepository.GuardarCambios())
+        if (await _clienteRepository.GuardarCambiosAsync())
         {
             _logger.LogInformation($"Cliente con ID {cliente.Id} creado correctamente.");
             return CreatedAtAction(nameof(Get), new { id = cliente.Id }, clienteDto);
@@ -166,10 +165,10 @@ public class ClienteController : ControllerBase
         clienteExistente.PaisId = clienteDto.PaisId;
         clienteExistente.Empleo = clienteDto.Empleo;
 
-        await _clienteRepository.EditClienteAsync(clienteExistente);
+        await _clienteRepository.ActualizarAsync(clienteExistente);
 
         // Intentar guardar los cambios en la base de datos
-        if (await _clienteRepository.GuardarCambios())
+        if (await _clienteRepository.GuardarCambiosAsync())
         {
             _logger.LogInformation($"Cliente con email {email} actualizado correctamente.");
             return NoContent();
@@ -190,9 +189,9 @@ public class ClienteController : ControllerBase
             return NotFound();
         }
 
-        _clienteRepository.Eliminar(cliente);
+        _clienteRepository.EliminarAsync(cliente);
 
-        if (await _clienteRepository.GuardarCambios())
+        if (await _clienteRepository.GuardarCambiosAsync())
         {
             _logger.LogInformation($"Cliente con ID {email} eliminado correctamente.");
             return NoContent();

@@ -4,6 +4,7 @@ using ApiBasesDeDatosProyecto.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ApiBasesDeDatosProyecto.Migrations
 {
     [DbContext(typeof(Contexto))]
-    partial class ContextoModelSnapshot : ModelSnapshot
+    [Migration("20240826105542_actualizacion")]
+    partial class actualizacion
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -172,6 +175,26 @@ namespace ApiBasesDeDatosProyecto.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Usuarios");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Email = "das@gmail.com",
+                            UserName = "PEPE1"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Email = "daaaaaaas@gmail.com",
+                            UserName = "PEPE2"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            Email = "dadsdsds@gmail.com",
+                            UserName = "PEPE3"
+                        });
                 });
 
             modelBuilder.Entity("ApiBasesDeDatosProyecto.Entities.VistaClientesPaises", b =>

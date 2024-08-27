@@ -1,7 +1,4 @@
-﻿using Microsoft.AspNetCore.Identity;
-using System.Threading.Tasks;
-
-public class IdentityInitializer
+﻿public class IdentityInitializer
 {
     private readonly UserManager<ApplicationUser> _userManagerIdentity;
     private readonly RoleManager<IdentityRole> _roleManager;

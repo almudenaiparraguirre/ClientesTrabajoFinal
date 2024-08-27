@@ -8,7 +8,6 @@ namespace ApiBasesDeDatosProyecto.Context
     {
         public DbSet<Cliente> Clientes { get; set; }
         public DbSet<Pais> Paises { get; set; }
-        public DbSet<Usuario> Usuarios { get; set; }
         public DbSet<VistaClientesPaises> VistaClientesPaises { get; set; }
         public DbSet<ProAlmClientePorPaisDto> ProAlmClientePorPaisDtos { get; set; }
         public DbSet<MonitoringData> MonitoringDatas { get; set; }  // Agregar esta línea
@@ -29,12 +28,6 @@ namespace ApiBasesDeDatosProyecto.Context
                 new Pais { Id = 2, Nombre = "Francia", Divisa = "EUR", Iso3 = "FRA" },
                 new Pais { Id = 3, Nombre = "Italia", Divisa = "USD", Iso3 = "ITA" },
                 new Pais { Id = 4, Nombre = "Albania", Divisa = "USD", Iso3 = "ALB" }
-            );
-
-            modelBuilder.Entity<Usuario>().HasData(
-                new Usuario { Id = 1, Email = "das@gmail.com", UserName = "PEPE1" },
-                new Usuario { Id = 2, Email = "daaaaaaas@gmail.com", UserName = "PEPE2" },
-                new Usuario { Id = 3, Email = "dadsdsds@gmail.com", UserName = "PEPE3" }
             );
 
             modelBuilder.Entity<Cliente>().HasData(
