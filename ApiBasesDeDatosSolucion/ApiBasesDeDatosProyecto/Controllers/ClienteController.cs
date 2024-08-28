@@ -1,9 +1,11 @@
 ﻿using ApiBasesDeDatosProyecto.Helpers;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace ApiBasesDeDatosProyecto.Controllers
@@ -40,6 +42,7 @@ namespace ApiBasesDeDatosProyecto.Controllers
 
         // GET: api/cliente
         [HttpGet]
+        [Authorize(Roles = "SuperAdmin,Admin")]
         public async Task<ActionResult<List<ClienteDto>>> Get()
         {
             _logger.LogInformation($"Obteniendo todos los clientes.");
@@ -50,6 +53,7 @@ namespace ApiBasesDeDatosProyecto.Controllers
 
         // GET api/cliente/5
         [HttpGet("{id}")]
+        [Authorize(Roles = "SuperAdmin,Admin,Client")]
         public async Task<ActionResult<ClienteDto>> Get(int id)
         {
             _logger.LogInformation($"Obteniendo cliente con ID {id}.");
@@ -59,10 +63,18 @@ namespace ApiBasesDeDatosProyecto.Controllers
                 _logger.LogWarning($"Cliente con ID {id} no encontrado.");
                 return NotFound(new ErrorResponseDTO($"No se encontraron clientes con id {id}."));
             }
+            
+            // Authorize the Client role to view only their own data
+            if (User.IsInRole("Client") && cliente.Email != User.Identity.Name)
+            {
+                return Forbid("No tienes permiso para ver los datos de otro cliente.");
+            }
+
             return Ok(_mapper.Map<ClienteDto>(cliente));
         }
 
         [HttpGet("GetClientesPorNombrePais")]
+        [Authorize(Roles = "SuperAdmin,Admin")]
         public async Task<ActionResult<List<ProAlmClientePorPaisDto>>> GetClientesPorNombrePais([FromQuery] string nombre)
         {
             _logger.LogInformation($"Obteniendo clientes para el país con nombre {nombre}.");
@@ -85,6 +97,7 @@ namespace ApiBasesDeDatosProyecto.Controllers
         }
 
         [HttpGet("ObtenerClientesPorPais/{paisId}")]
+        [Authorize(Roles = "SuperAdmin,Admin")]
         public async Task<ActionResult<List<Cliente>>> ObtenerClientesPorPais(int paisId)
         {
             var clientes = await _clienteRepository.ObtenerClientesPorPaisAsync(paisId);
@@ -98,6 +111,7 @@ namespace ApiBasesDeDatosProyecto.Controllers
         }
 
         [HttpGet("GetClientesGenerados")]
+        [Authorize(Roles = "SuperAdmin")]
         public ActionResult<List<Cliente>> GetClientesGenerados(int count = 10)
         {
             var clientes = _clienteService.GetClientes(count);
@@ -106,6 +120,7 @@ namespace ApiBasesDeDatosProyecto.Controllers
 
         // POST api/cliente
         [HttpPost]
+        [Authorize(Roles = "SuperAdmin,Admin")]
         public async Task<ActionResult> Post([FromBody] ClienteDto clienteDto)
         {
             _logger.LogInformation($"Creando un nuevo cliente.");
@@ -136,6 +151,7 @@ namespace ApiBasesDeDatosProyecto.Controllers
 
         // PUT api/cliente/5
         [HttpPut("{email}")]
+        [Authorize(Roles = "SuperAdmin,Admin")]
         public async Task<ActionResult> Put(string email, [FromBody] EditViewModel clienteDto)
         {
             _logger.LogInformation($"Actualizando cliente con email {email}.");
@@ -160,6 +176,12 @@ namespace ApiBasesDeDatosProyecto.Controllers
                 return NotFound("Cliente no encontrado.");
             }
 
+            // Authorize Admin to edit other clients, but not their own data
+            if (User.IsInRole("Client") && email != User.Identity.Name)
+            {
+                return Forbid("No tienes permiso para editar los datos de otro cliente.");
+            }
+
             // Mapear las propiedades del DTO al cliente existente
             clienteExistente.Nombre = clienteDto.Nombre;
             clienteExistente.Apellido = clienteDto.Apellido;
@@ -181,6 +203,7 @@ namespace ApiBasesDeDatosProyecto.Controllers
 
         // DELETE api/cliente/5
         [HttpDelete("{email}")]
+        [Authorize(Roles = "SuperAdmin,Admin")]
         public async Task<ActionResult> Delete(string email)
         {
             _logger.LogInformation($"Eliminando cliente con ID {email}.");
@@ -189,6 +212,12 @@ namespace ApiBasesDeDatosProyecto.Controllers
             {
                 _logger.LogWarning($"Cliente con ID {email} no encontrado para eliminar.");
                 return NotFound();
+            }
+
+            // Authorize Admin to delete other clients, but not their own data
+            if (User.IsInRole("Client") && email != User.Identity.Name)
+            {
+                return Forbid("No tienes permiso para eliminar los datos de otro cliente.");
             }
 
             _clienteRepository.Eliminar(cliente);
@@ -217,7 +246,8 @@ namespace ApiBasesDeDatosProyecto.Controllers
 
             var cliente = await _contexto.Clientes
                 .Include(c => c.Pais)
-                .FirstOrDefaultAsync(c => c.Email == email);
+                .FirstOrDefaultAsync(c => c.Email == email
+
 
             if (cliente == null)
             {
@@ -228,6 +258,7 @@ namespace ApiBasesDeDatosProyecto.Controllers
         }
 
         // Método para obtener un cliente por email
+        [Authorize(Roles = "SuperAdmin,Admin")]
         [HttpGet("GetClientePorEmail")]
         public async Task<IActionResult> GetClientePorEmail(string email)
         {
