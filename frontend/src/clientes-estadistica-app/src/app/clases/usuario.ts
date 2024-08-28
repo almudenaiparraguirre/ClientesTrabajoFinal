@@ -14,6 +14,7 @@ export class Usuario {
   passwordHash: string;
   securityStamp: string;
   concurrencyStamp: string;
-  paisId:number
+  paisId:number;
+  isDeleted: boolean;
   }
   

@@ -15,6 +15,9 @@ export class MonitorDataService {
   getTransferencias(): Observable<MonitoringData[]> {
     return this.http.get<MonitoringData[]>(this.apiUrl);
   }
+
+  getLastTransferencia(): Observable<MonitoringData> {
+    return this.http.get<MonitoringData>(`${this.apiUrl}/last`);
+  }
 }
 export { MonitoringData };
-

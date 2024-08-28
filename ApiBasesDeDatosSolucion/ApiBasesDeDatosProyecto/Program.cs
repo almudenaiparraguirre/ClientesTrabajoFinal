@@ -1,3 +1,4 @@
+
 using Microsoft.OpenApi.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
@@ -9,13 +10,13 @@ using System.Security.Claims;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// 1. Agregar servicios a la aplicación
+// 1. Agregar servicios a la aplicaciï¿½n
 builder.Services.AddDbContext<Contexto>(options =>
 {
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
 });
 
-// Cargar la configuración de Identity desde appsettings.json
+// Cargar la configuraciï¿½n de Identity desde appsettings.json
 builder.Services.Configure<IdentitySettings>(builder.Configuration.GetSection("Identity"));
 var identitySettings = builder.Configuration.GetSection("Identity").Get<IdentitySettings>();
 
@@ -70,14 +71,14 @@ builder.Services.AddCors(options =>
         });
 });
 
-// Configurar políticas de autorización
+// Configurar polï¿½ticas de autorizaciï¿½n
 builder.Services.AddAuthorization(options =>
 {
-    // Define la política para el permiso ManageAll
+    // Define la polï¿½tica para el permiso ManageAll
     options.AddPolicy("ManageAllPolicy", policy =>
         policy.RequireClaim("Permissions", "ManageAll"));
 
-    // Puedes definir más políticas aquí según sea necesario
+    // Puedes definir mï¿½s polï¿½ticas aquï¿½ segï¿½n sea necesario
     options.AddPolicy("ManageAdminsPolicy", policy =>
         policy.RequireClaim("Permissions", "ManageAdmins"));
 
@@ -85,7 +86,7 @@ builder.Services.AddAuthorization(options =>
         policy.RequireClaim("Permissions", "ManageClients"));
 });
 
-// Configuración de Serilog
+// Configuraciï¿½n de Serilog
 Log.Logger = new LoggerConfiguration()
     .MinimumLevel.Information()
     .Filter.ByExcluding(logEvent => logEvent.Level == Serilog.Events.LogEventLevel.Debug)
@@ -100,13 +101,15 @@ builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
 // Registrar repositorios
 builder.Services.AddScoped<IPaisRepository, PaisRepository>();
-builder.Services.AddScoped<IUsuarioRepository, UsuarioRepository>();
 builder.Services.AddScoped<IClienteRepository, ClienteRepository>();
 builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<IClienteService, ClienteService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddTransient<ClienteService>();
 builder.Services.AddScoped<IVistaClientesPaisesRepository, VistaClientesPaisesRepository>();
+builder.Services.AddTransient<IMonitoringDataRepository, MonitoringDataRepository>();
+
+
 
 // Configurar MediatR
 builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(Program).Assembly));
@@ -145,16 +148,17 @@ builder.Services.AddSwaggerGen(options =>
     });
 });
 
-// Register the SignalR client service with the URL of the simulator's hub
 builder.Services.AddSingleton<SignalRClientService>(provider =>
-    new SignalRClientService("https://localhost:7040/simuladorHub"));
-builder.Services.AddSingleton<SignalRClientService>(provider =>
-    new SignalRClientService("https://localhost:7050/simuladorHub"));
+    new SignalRClientService("https://localhost:7040/simuladorHub",
+        provider.GetRequiredService<IServiceScopeFactory>()));
+
+//builder.Services.AddSingleton<SignalRClientService>(provider =>
+//  new SignalRClientService("https://localhost:7050/simuladorHub"));
 
 // Paso intermedio entre el 1 y el 2 (Construye la app)
 var app = builder.Build();
 
-// Llamar a la inicialización de datos (SeedData)
+// Llamar a la inicializaciï¿½n de datos (SeedData)
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
@@ -187,7 +191,7 @@ app.UseHttpsRedirection();
 // Usar CORS
 app.UseCors("AllowSpecificOrigins");
 
-app.UseAuthentication(); // Agregar autenticación
+app.UseAuthentication(); // Agregar autenticaciï¿½n
 app.UseAuthorization();
 
 app.MapHub<NotificationHub>("/notificationHub");
@@ -201,5 +205,5 @@ var listeningTasks = signalRClientServices.Select(service => service.StartListen
 
 await Task.WhenAll(listeningTasks);
 
-// Ejecutar la aplicación
+// Ejecutar la aplicaciï¿½n
 app.Run();

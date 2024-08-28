@@ -136,14 +136,14 @@ namespace ApiBasesDeDatosProyecto.Controllers
                 return BadRequest(ModelState);
             }
 
-            var cliente = _mapper.Map<Cliente>(clienteDto);
-            _clienteRepository.Agregar(cliente);
+        var cliente = _mapper.Map<Cliente>(clienteDto);
+        _clienteRepository.AgregarAsync(cliente);
 
-            if (await _clienteRepository.GuardarCambios())
-            {
-                _logger.LogInformation($"Cliente con ID {cliente.Id} creado correctamente.");
-                return CreatedAtAction(nameof(Get), new { id = cliente.Id }, clienteDto);
-            }
+        if (await _clienteRepository.GuardarCambiosAsync())
+        {
+            _logger.LogInformation($"Cliente con ID {cliente.Id} creado correctamente.");
+            return CreatedAtAction(nameof(Get), new { id = cliente.Id }, clienteDto);
+        }
 
             _logger.LogError($"No se pudo agregar el cliente.");
             return BadRequest($"No se pudo agregar el cliente.");
@@ -189,14 +189,14 @@ namespace ApiBasesDeDatosProyecto.Controllers
             clienteExistente.PaisId = clienteDto.PaisId;
             clienteExistente.Empleo = clienteDto.Empleo;
 
-            await _clienteRepository.EditClienteAsync(clienteExistente);
+        await _clienteRepository.ActualizarAsync(clienteExistente);
 
-            // Intentar guardar los cambios en la base de datos
-            if (await _clienteRepository.GuardarCambios())
-            {
-                _logger.LogInformation($"Cliente con email {email} actualizado correctamente.");
-                return NoContent();
-            }
+        // Intentar guardar los cambios en la base de datos
+        if (await _clienteRepository.GuardarCambiosAsync())
+        {
+            _logger.LogInformation($"Cliente con email {email} actualizado correctamente.");
+            return NoContent();
+        }
 
             return Ok(new { message = "Client edited successfully." });
         }
@@ -220,13 +220,13 @@ namespace ApiBasesDeDatosProyecto.Controllers
                 return Forbid("No tienes permiso para eliminar los datos de otro cliente.");
             }
 
-            _clienteRepository.Eliminar(cliente);
+        _clienteRepository.EliminarAsync(cliente);
 
-            if (await _clienteRepository.GuardarCambios())
-            {
-                _logger.LogInformation($"Cliente con ID {email} eliminado correctamente.");
-                return NoContent();
-            }
+        if (await _clienteRepository.GuardarCambiosAsync())
+        {
+            _logger.LogInformation($"Cliente con ID {email} eliminado correctamente.");
+            return NoContent();
+        }
 
             _logger.LogError($"No se pudo eliminar el cliente con ID {email}.");
             return BadRequest($"No se pudo eliminar el cliente.");

@@ -8,22 +8,6 @@
 </head>
 <body class="bg-gray-100 font-sans leading-normal tracking-normal">
     <div class="flex flex-col md:flex-row">
-        <!-- Sidebar -->
-        <div class="bg-gray-800 text-gray-100 w-full md:w-64 min-h-screen p-4">
-            <h3 class="text-2xl font-semibold mb-6">Dashboard</h3>
-            <nav class="flex flex-col space-y-4">
-                <a href="#" class="hover:text-gray-400">Dashboard</a>
-                <a href="#" class="hover:text-gray-400">Components</a>
-                <a href="#" class="hover:text-gray-400">Forms</a>
-                <a href="#" class="hover:text-gray-400">Tables</a>
-                <a href="#" class="hover:text-gray-400">Maps</a>
-                <a href="#" class="hover:text-gray-400">Widgets</a>
-                <a href="#" class="hover:text-gray-400">Charts</a>
-                <a href="#" class="hover:text-gray-400">Calendar</a>
-                <a href="#" class="hover:text-gray-400">Pages</a>
-            </nav>
-        </div>
-
         <!-- Main Content -->
         <div class="flex-1 p-6">
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
@@ -33,7 +17,7 @@
                     <p id="UsuariosLogueados" class="text-2xl font-bold">150GB</p>
                 </div>
                 <div class="bg-white p-4 rounded-lg shadow-lg">
-                    <h5 class="text-gray-600 text-lg font-semibold">Dinero trasnferido</h5>
+                    <h5 class="text-gray-600 text-lg font-semibold">Dinero transferido</h5>
                     <p class="text-2xl font-bold">${{ totalMoneyTransferred.toFixed(2) }}</p>
                 </div>
                 <div class="bg-white p-4 rounded-lg shadow-lg">
@@ -41,10 +25,20 @@
                     <p class="text-2xl font-bold">23</p>
                 </div>
                 <div class="bg-white p-4 rounded-lg shadow-lg">
-                    <h5 class="text-gray-600 text-lg font-semibold">Transacciónes completadas</h5>
+                    <h5 class="text-gray-600 text-lg font-semibold">Transacciones completadas</h5>
                     <p class="text-2xl font-bold">{{ totalTransfersCompleted }}</p>
                 </div>
             </div>
+
+            <!-- Botones de control -->
+            <div class="flex mt-4 space-x-4 mb-4">
+                <button (click)="pauseReceiving()" class="px-4 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-600">Interrumpir Recepción</button>
+                <button (click)="resumeReceiving()" class="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600">Reanudar Recepción</button>
+                <button (click)="clearTransfers()" class="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600">Reiniciar Lista</button>
+            </div>
+            
+            
+            
 
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <!-- Charts -->
@@ -69,7 +63,8 @@
                                 <th class="px-4 py-2 border">País Destino</th>
                                 <th class="px-4 py-2 border">Cliente Origen</th>
                                 <th class="px-4 py-2 border">Cliente Destino</th>
-                                <th class="px-4 py-2 border">Valor</th>
+                                <th class="px-4 py-2 border">Valor Origen</th>
+                                <th class="px-4 py-2 border">Valor Destino</th>
                                 <th class="px-4 py-2 border">Fecha y Hora</th>
                             </tr>
                         </thead>
@@ -78,13 +73,17 @@
                         </tbody>
                     </table>
                 </div>
+
+                
+
+                <!-- Botones de paginación -->
+                <div class="flex justify-between mt-4">
+                    <button (click)="onPrevPage()" [disabled]="currentPage === 1" class="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400">Anterior</button>
+                    <span class="text-lg font-semibold">Página {{currentPage}} de {{totalPages}}</span>
+                    <button (click)="onNextPage()" [disabled]="currentPage === totalPages" class="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400">Siguiente</button>
+                </div>
             </div>
-            
-            
         </div>
     </div>
-
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    
 </body>
 </html>

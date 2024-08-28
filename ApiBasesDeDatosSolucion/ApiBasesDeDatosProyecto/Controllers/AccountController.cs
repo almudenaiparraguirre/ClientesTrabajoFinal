@@ -16,8 +16,8 @@ public class AccountController : ControllerBase
     private readonly ITokenService _tokenService;
     private readonly IClienteService _clienteService;
     private readonly IClienteRepository _clienteRepository;
-    private readonly ApiBasesDeDatosProyecto.IDentity.Serivicios.IUserService _userService;
-    private readonly IPaisRepository _paisRepository;
+    private readonly IUserService _userService;
+    private readonly IPaisRepository _paisRepository; // Añadido
     private readonly IMapper _mapper;
     private readonly Contexto _context;
 
@@ -28,7 +28,7 @@ public class AccountController : ControllerBase
         ITokenService tokenService,
         IClienteService clienteService,
         IClienteRepository clienteRepository,
-        ApiBasesDeDatosProyecto.IDentity.Serivicios.IUserService userService,
+        IUserService userService,
         IPaisRepository paisRepository,
         IMapper mapper,
         Contexto context)
@@ -52,6 +52,20 @@ public class AccountController : ControllerBase
     {
         var users = await _userService.GetAllUsersAsync();
         return Ok(users);
+    }
+
+    [HttpGet("activeUsers")]
+    public IActionResult GetActiveUsers()
+    {
+        var activeUsers = _context.Users.Where(u => u.IsDeleted == false).ToList();
+        return Ok(activeUsers);
+    }
+
+    [HttpGet("activeUsers")]
+    public IActionResult GetActiveUsers()
+    {
+        var activeUsers = _context.Users.Where(u => u.IsDeleted == false).ToList();
+        return Ok(activeUsers);
     }
 
     // SuperAdmin y Admin: Verificar el rol de un usuario

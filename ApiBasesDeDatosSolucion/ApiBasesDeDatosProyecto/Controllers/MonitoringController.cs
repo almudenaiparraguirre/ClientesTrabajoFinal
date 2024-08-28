@@ -1,41 +1,65 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using System;
-using System.Collections.Generic;
+﻿using System.Collections.Concurrent;
 
-namespace ApiBasesDeDatosProyecto.Controllers
+[Route("api/[controller]")]
+[ApiController]
+public class MonitoringController : ControllerBase
 {
-    [Route("api/[controller]")]
-    [ApiController]
-    public class MonitoringController : ControllerBase
+    private readonly IMonitoringDataRepository _repository;
+    private static readonly ConcurrentBag<TaskCompletionSource<MonitoringData>> _pendingRequests = new ConcurrentBag<TaskCompletionSource<MonitoringData>>();
+
+    public MonitoringController(IMonitoringDataRepository repository)
     {
-        [HttpGet]
-        public ActionResult<IEnumerable<MonitoringData>> GetMonitoringData()
+        _repository = repository;
+    }
+
+    [HttpGet]
+    public async Task<ActionResult<IEnumerable<MonitoringData>>> GetMigrationData()
+    {
+        var data = await _repository.GetAllAsync();
+        return Ok(data);
+    }
+
+    [HttpGet("last")]
+    public async Task<IActionResult> GetLast()
+    {
+        var lastRecord = await _repository.GetLastAsync();
+        if (lastRecord == null)
         {
-            var random = new Random();
-            var data = new List<MonitoringData>();
-
-            string[] paises = { "México", "Estados Unidos", "Canadá", "Brasil", "Argentina" };
-            string[] clientes = { "Cliente A", "Cliente B", "Cliente C", "Cliente D", "Cliente E" };
-
-            // Genera un número aleatorio entre 10 y 20 para el total de transferencias
-            int numberOfTransfers = random.Next(10, 21);
-
-            for (int i = 0; i < numberOfTransfers; i++)
-            {
-                data.Add(new MonitoringData
-                {
-                    Id = i,
-                    Name = $"Transacción {i + 1}",
-                    PaisOrigen = paises[random.Next(paises.Length)],
-                    PaisDestino = paises[random.Next(paises.Length)],
-                    ClienteOrigen = clientes[random.Next(clientes.Length)],
-                    ClienteDestino = clientes[random.Next(clientes.Length)],
-                    Value = random.NextDouble() * 10000,  // Asumiendo que el valor es una cantidad monetaria o métrica similar
-                    Timestamp = DateTime.Now.AddSeconds(-random.Next(0, 60))
-                });
-            }
-
-            return Ok(data);
+            return NotFound(); // Devuelve 404 si no hay registros
         }
+        return Ok(lastRecord);
+    }
+
+    [HttpGet("subscribe")]
+    public async Task<IActionResult> Subscribe()
+    {
+        var tcs = new TaskCompletionSource<MonitoringData>();
+        _pendingRequests.Add(tcs);
+
+        var timeoutCancellationTokenSource = new CancellationTokenSource();
+        var timeout = Task.Delay(90000, timeoutCancellationTokenSource.Token); // Timeout de 90 segundos
+
+        var completedTask = await Task.WhenAny(tcs.Task, timeout);
+
+        timeoutCancellationTokenSource.Cancel();
+
+        if (completedTask == timeout)
+        {
+            return StatusCode(204); // No Content
+        }
+
+        return Ok(await tcs.Task);
+    }
+
+    [HttpPost("notify")]
+    public async Task<IActionResult> Notify()
+    {
+        var lastRecord = await _repository.GetLastAsync();
+        foreach (var tcs in _pendingRequests)
+        {
+            tcs.TrySetResult(lastRecord);
+        }
+        _pendingRequests.Clear();
+        return Ok();
     }
 }

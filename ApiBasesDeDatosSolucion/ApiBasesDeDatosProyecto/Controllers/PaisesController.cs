@@ -25,7 +25,7 @@ public class PaisesController : ControllerBase
         _logger.LogInformation($"Usuario autenticado: {User.Identity.IsAuthenticated}");
         _logger.LogInformation($"Nombre de usuario: {User.Identity.Name}");
         _logger.LogInformation("Obteniendo todos los países.");
-        List<Pais> lista = await _paisRepository.ObtenerTodos();
+        List<Pais> lista = await _paisRepository.ObtenerTodosAsync();
         _logger.LogInformation($"Se obtuvieron {lista.Count} países.");
         return Ok(_mapper.Map<List<PaisDto>>(lista));
     }
@@ -35,7 +35,7 @@ public class PaisesController : ControllerBase
     public async Task<ActionResult<PaisDto>> Get(int id)
     {
         _logger.LogInformation($"Obteniendo país con id {id}.");
-        var pais = await _paisRepository.ObtenerPorId(id);
+        var pais = await _paisRepository.ObtenerPorIdAsync(id);
         if (pais == null)
         {
             _logger.LogWarning($"No se ha encontrado el país con id {id}.");
@@ -90,9 +90,9 @@ public class PaisesController : ControllerBase
         }
 
         var pais = _mapper.Map<Pais>(paisDto);
-        _paisRepository.Agregar(pais);
+        _paisRepository.AgregarAsync(pais);
 
-        if (await _paisRepository.GuardarCambios())
+        if (await _paisRepository.GuardarCambiosAsync())
         {
             _logger.LogInformation($"País con ID {pais.Id} creado correctamente.");
             return CreatedAtAction(nameof(Get), new { id = pais.Id }, paisDto);
@@ -121,9 +121,9 @@ public class PaisesController : ControllerBase
         }
 
         var pais = _mapper.Map<Pais>(paisDto);
-        _paisRepository.Actualizar(pais);
+        _paisRepository.ActualizarAsync(pais);
 
-        if (await _paisRepository.GuardarCambios())
+        if (await _paisRepository.GuardarCambiosAsync())
         {
             _logger.LogInformation($"País con ID {id} actualizado correctamente.");
             return NoContent();
@@ -138,16 +138,16 @@ public class PaisesController : ControllerBase
     public async Task<ActionResult> Delete(int id)
     {
         _logger.LogInformation($"Eliminando país con ID {id}.");
-        var pais = await _paisRepository.ObtenerPorId(id);
+        var pais = await _paisRepository.ObtenerPorIdAsync(id);
         if (pais == null)
         {
             _logger.LogWarning($"País con ID {id} no encontrado.");
             return NotFound();
         }
 
-        _paisRepository.Eliminar(pais);
+        _paisRepository.EliminarAsync(pais);
 
-        if (await _paisRepository.GuardarCambios())
+        if (await _paisRepository.GuardarCambiosAsync())
         {
             _logger.LogInformation($"País con ID {id} eliminado correctamente.");
             return NoContent();

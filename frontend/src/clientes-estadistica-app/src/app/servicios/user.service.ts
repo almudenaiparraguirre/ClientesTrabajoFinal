@@ -21,7 +21,7 @@ export class UserService {
   constructor(private http: HttpClient) { }
 
   getUsuarios(): Observable<Usuario[]> {
-    return this.http.get<Usuario[]>(`${this.URL}Account/users`);
+    return this.http.get<Usuario[]>(`${this.URL}Account/activeUsers`);
   }
 
   autenticarUsuario(email: string, password: string, remember: boolean): Observable<any> {
@@ -48,18 +48,18 @@ export class UserService {
     // Hacer la solicitud GET
     return this.http.get<{ id: number }>(url);
   }
-
-  editarCliente(cliente: Cliente): Observable<void> {
+  
+  editarCliente(cliente: Cliente): Observable<void>{
     // Construir la URL con el parámetro de consulta
-    const url = `${this.URL}updateUser?email=${encodeURIComponent(cliente.email)}`;
+    const url = `${this.URL}Cliente/${cliente.email}`;
     // Convertir fecha de nacimiento a timestamp (milisegundos)
-    cliente.fechaNacimiento = new Date(cliente.fechaNacimiento).getTime();
+    //cliente.fechaNacimiento = new Date(cliente.fechaNacimiento).getTime();
     // Enviar la solicitud PUT
     return this.http.put<void>(url, cliente);
   }
 
   editarUsuario(usuario: Usuario): Observable<any>{
-    const url = `${this.URL}Account/update/${usuario.email}`;
+    const url = `${this.URL}Account/updateUser?email=${usuario.email}`;
     usuario.dateOfBirth = new Date(usuario.dateOfBirth).getTime();
     return this.http.put(url, usuario);
   }

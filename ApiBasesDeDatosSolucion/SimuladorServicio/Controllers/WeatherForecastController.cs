@@ -1,33 +1,36 @@
 using Microsoft.AspNetCore.Mvc;
 
+using System.Threading.Tasks;
+
 namespace SimuladorServicio.Controllers
 {
     [ApiController]
     [Route("[controller]")]
-    public class WeatherForecastController : ControllerBase
+    public class MonitoringController : ControllerBase
     {
-        private static readonly string[] Summaries = new[]
-        {
-            "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-        };
+        private readonly ILogger<MonitoringController> _logger;
+        private readonly MonitoringService _monitoringService;
 
-        private readonly ILogger<WeatherForecastController> _logger;
-
-        public WeatherForecastController(ILogger<WeatherForecastController> logger)
+        public MonitoringController(ILogger<MonitoringController> logger, MonitoringService monitoringService)
         {
             _logger = logger;
+            _monitoringService = monitoringService;
         }
 
-        [HttpGet(Name = "GetWeatherForecast")]
-        public IEnumerable<WeatherForecast> Get()
+        // Endpoint para enviar mensajes de monitoreo aleatorios
+        [HttpPost("send-random-messages")]
+        public async Task<IActionResult> SendRandomMessages()
         {
-            return Enumerable.Range(1, 5).Select(index => new WeatherForecast
+            try
             {
-                Date = DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
-                TemperatureC = Random.Shared.Next(-20, 55),
-                Summary = Summaries[Random.Shared.Next(Summaries.Length)]
-            })
-            .ToArray();
+                await _monitoringService.SendRandomMessages();
+                return Ok("Mensajes aleatorios enviados.");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error al enviar mensajes aleatorios.");
+                return StatusCode(500, "Error al enviar mensajes.");
+            }
         }
     }
 }
