@@ -21,7 +21,7 @@ public class MonitoringService
             ClienteDestino = Clientes[Random.Next(Clientes.Length)],
             ValorOrigen = Math.Round(Random.NextDouble() * 10000, 2),  // Valor monetario o métrico con 2 decimales
             ValorDestino = Math.Round(Random.NextDouble() * 10000, 2),
-            Timestamp = DateTime.Now.AddSeconds(-Random.Next(0, 3600)) // Hasta 1 hora atrás
+            Timestamp = DateTime.Now
         };
     }
 

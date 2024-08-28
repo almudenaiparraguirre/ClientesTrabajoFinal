@@ -1,72 +1,65 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
-using ApiBasesDeDatosProyecto.Repository;
-using ApiBasesDeDatosProyecto.Models; // Asegúrate de importar el namespace donde está MonitoringData
+﻿using System.Collections.Concurrent;
 
-namespace ApiBasesDeDatosProyecto.Controllers
+[Route("api/[controller]")]
+[ApiController]
+public class MonitoringController : ControllerBase
 {
-    [Route("api/[controller]")]
-    [ApiController]
-    public class MonitoringController : ControllerBase
+    private readonly IMonitoringDataRepository _repository;
+    private static readonly ConcurrentBag<TaskCompletionSource<MonitoringData>> _pendingRequests = new ConcurrentBag<TaskCompletionSource<MonitoringData>>();
+
+    public MonitoringController(IMonitoringDataRepository repository)
     {
-        private readonly IMonitoringDataRepository _repository;
-        private static readonly ConcurrentBag<TaskCompletionSource<IEnumerable<MonitoringData>>> _pendingRequests = new ConcurrentBag<TaskCompletionSource<IEnumerable<MonitoringData>>>();
+        _repository = repository;
+    }
 
-        // Inyección de dependencia del repositorio
-        public MonitoringController(IMonitoringDataRepository repository)
+    [HttpGet]
+    public async Task<ActionResult<IEnumerable<MonitoringData>>> GetMigrationData()
+    {
+        var data = await _repository.GetAllAsync();
+        return Ok(data);
+    }
+
+    [HttpGet("last")]
+    public async Task<IActionResult> GetLast()
+    {
+        var lastRecord = await _repository.GetLastAsync();
+        if (lastRecord == null)
         {
-            _repository = repository;
+            return NotFound(); // Devuelve 404 si no hay registros
+        }
+        return Ok(lastRecord);
+    }
+
+    [HttpGet("subscribe")]
+    public async Task<IActionResult> Subscribe()
+    {
+        var tcs = new TaskCompletionSource<MonitoringData>();
+        _pendingRequests.Add(tcs);
+
+        var timeoutCancellationTokenSource = new CancellationTokenSource();
+        var timeout = Task.Delay(90000, timeoutCancellationTokenSource.Token); // Timeout de 90 segundos
+
+        var completedTask = await Task.WhenAny(tcs.Task, timeout);
+
+        timeoutCancellationTokenSource.Cancel();
+
+        if (completedTask == timeout)
+        {
+            return StatusCode(204); // No Content
         }
 
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<MonitoringData>>> GetMigrationData()
+        return Ok(await tcs.Task);
+    }
+
+    [HttpPost("notify")]
+    public async Task<IActionResult> Notify()
+    {
+        var lastRecord = await _repository.GetLastAsync();
+        foreach (var tcs in _pendingRequests)
         {
-            // Uso del método GetAllAsync del repositorio para obtener los datos
-            var data = await _repository.GetAllAsync();
-
-            // Devuelve los datos obtenidos
-            return Ok(data);
+            tcs.TrySetResult(lastRecord);
         }
-
-        [HttpGet("subscribe")]
-        public async Task<IActionResult> Subscribe()
-        {
-            var tcs = new TaskCompletionSource<IEnumerable<MonitoringData>>();
-            _pendingRequests.Add(tcs);
-
-            // Espera hasta que se complete la tarea o se cancele
-            var timeoutCancellationTokenSource = new CancellationTokenSource();
-            var timeout = Task.Delay(90000, timeoutCancellationTokenSource.Token); // Timeout de 30 segundos
-
-            var completedTask = await Task.WhenAny(tcs.Task, timeout);
-
-            // Cancela el timeout si la tarea se completó
-            timeoutCancellationTokenSource.Cancel();
-
-            if (completedTask == timeout)
-            {
-                // Timeout alcanzado sin datos nuevos
-                return StatusCode(204); // No Content
-            }
-
-            // Envía la respuesta cuando los datos están listos
-            return Ok(await tcs.Task);
-        }
-
-        // Método para simular la notificación de datos
-        [HttpPost("notify")]
-        public async Task<IActionResult> Notify()
-        {
-            var data = await _repository.GetAllAsync();
-            foreach (var tcs in _pendingRequests)
-            {
-                tcs.TrySetResult(data);
-            }
-            _pendingRequests.Clear();
-            return Ok();
-        }
+        _pendingRequests.Clear();
+        return Ok();
     }
 }

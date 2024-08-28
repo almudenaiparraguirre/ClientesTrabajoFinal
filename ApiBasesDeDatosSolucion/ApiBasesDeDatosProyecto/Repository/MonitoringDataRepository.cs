@@ -25,6 +25,14 @@ namespace ApiBasesDeDatosProyecto.Repository
             return await _context.MonitoringDatas.FindAsync(id);
         }
 
+        public async Task<MonitoringData> GetLastAsync()
+        {
+            // Asegúrate de que 'Timestamp' sea un campo en tu entidad 'MonitoringData'
+            return await _context.MonitoringDatas
+                .OrderByDescending(md => md.Timestamp) // Ordenar por Timestamp en orden descendente
+                .FirstOrDefaultAsync(); // Toma el primer registro
+        }
+
         public async Task AddAsync(MonitoringData monitoringData)
         {
             _context.MonitoringDatas.Add(monitoringData);
