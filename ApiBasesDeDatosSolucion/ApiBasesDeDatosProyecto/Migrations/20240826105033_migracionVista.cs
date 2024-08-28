@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace ApiBasesDeDatosProyecto.Migrations
 {
     /// <inheritdoc />
-    public partial class migracion2208 : Migration
+    public partial class migracionVista : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -70,6 +70,27 @@ namespace ApiBasesDeDatosProyecto.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Paises", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "ProAlmClientePorPaisDtos",
+                columns: table => new
+                {
+                    ClienteId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    ClienteNombre = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ClienteApellido = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    FechaNacimiento = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Empleo = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Email = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    PaisId = table.Column<int>(type: "int", nullable: false),
+                    PaisNombre = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Divisa = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Iso3 = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ProAlmClientePorPaisDtos", x => x.ClienteId);
                 });
 
             migrationBuilder.CreateTable(
@@ -312,6 +333,9 @@ namespace ApiBasesDeDatosProyecto.Migrations
 
             migrationBuilder.DropTable(
                 name: "Clientes");
+
+            migrationBuilder.DropTable(
+                name: "ProAlmClientePorPaisDtos");
 
             migrationBuilder.DropTable(
                 name: "Usuarios");

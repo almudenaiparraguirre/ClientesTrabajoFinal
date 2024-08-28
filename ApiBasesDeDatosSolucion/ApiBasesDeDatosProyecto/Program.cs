@@ -1,18 +1,22 @@
 using Microsoft.OpenApi.Models;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using Serilog;
+using System.Text;
+using System.Security.Claims;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// 1. Agregar servicios a la aplicaci?n
+// 1. Agregar servicios a la aplicación
 builder.Services.AddDbContext<Contexto>(options =>
 {
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
 });
 
-
 // Cargar la configuración de Identity desde appsettings.json
 builder.Services.Configure<IdentitySettings>(builder.Configuration.GetSection("Identity"));
-
-// Obtener la configuración cargada
 var identitySettings = builder.Configuration.GetSection("Identity").Get<IdentitySettings>();
 
 // Configurar Identity
@@ -66,10 +70,25 @@ builder.Services.AddCors(options =>
         });
 });
 
-//Serilog
+// Configurar políticas de autorización
+builder.Services.AddAuthorization(options =>
+{
+    // Define la política para el permiso ManageAll
+    options.AddPolicy("ManageAllPolicy", policy =>
+        policy.RequireClaim("Permissions", "ManageAll"));
+
+    // Puedes definir más políticas aquí según sea necesario
+    options.AddPolicy("ManageAdminsPolicy", policy =>
+        policy.RequireClaim("Permissions", "ManageAdmins"));
+
+    options.AddPolicy("ManageClientsPolicy", policy =>
+        policy.RequireClaim("Permissions", "ManageClients"));
+});
+
+// Configuración de Serilog
 Log.Logger = new LoggerConfiguration()
     .MinimumLevel.Information()
-    .Filter.ByExcluding(logEvent => logEvent.Level == Serilog.Events.LogEventLevel.Debug) // Excluir eventos de nivel Debug
+    .Filter.ByExcluding(logEvent => logEvent.Level == Serilog.Events.LogEventLevel.Debug)
     .WriteTo.Console()
     .WriteTo.File("Logs/logClientes.txt", rollingInterval: RollingInterval.Day)
     .CreateLogger();
@@ -77,8 +96,6 @@ Log.Logger = new LoggerConfiguration()
 builder.Host.UseSerilog(); // Usa Serilog como el logger
 
 builder.Services.AddControllers();
-
-// Servicio para el mapeado
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
 // Registrar repositorios
@@ -91,7 +108,6 @@ builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddTransient<ClienteService>();
 builder.Services.AddScoped<IVistaClientesPaisesRepository, VistaClientesPaisesRepository>();
 
-
 // Configurar MediatR
 builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(Program).Assembly));
 
@@ -99,7 +115,7 @@ builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(Progr
 builder.Services.AddSignalR();
 
 
-// Agregar swagger
+// Agregar Swagger
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
 {
@@ -129,30 +145,41 @@ builder.Services.AddSwaggerGen(options =>
     });
 });
 
-
 // Register the SignalR client service with the URL of the simulator's hub
 builder.Services.AddSingleton<SignalRClientService>(provider =>
     new SignalRClientService("https://localhost:7040/simuladorHub"));
 builder.Services.AddSingleton<SignalRClientService>(provider =>
     new SignalRClientService("https://localhost:7050/simuladorHub"));
 
-
-
 // Paso intermedio entre el 1 y el 2 (Construye la app)
 var app = builder.Build();
 
-app.MapHub<NotificationHub>("/notificationHub");
+// Llamar a la inicialización de datos (SeedData)
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
 
+    try
+    {
+        // Inicializar datos (SeedData)
+        await SeedData.Initialize(services);
+    }
+    catch (Exception ex)
+    {
+        var logger = services.GetRequiredService<ILogger<Program>>();
+        logger.LogError(ex, "An error occurred seeding the DB.");
+        throw; // Re-throw the exception after logging it
+    }
+}
 
-await CreateRoles(app);
-
-
-// 2. Configurar middleware
+// Configurar middleware
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+
 
 // Redireccionar de http a https
 app.UseHttpsRedirection();
@@ -160,38 +187,19 @@ app.UseHttpsRedirection();
 // Usar CORS
 app.UseCors("AllowSpecificOrigins");
 
-app.UseAuthentication(); // Agregar autenticaci?n
+app.UseAuthentication(); // Agregar autenticación
 app.UseAuthorization();
 
-// Enrutamiento, determina que controlador y accion se ejecutar en funcion de la URL solicitada
+app.MapHub<NotificationHub>("/notificationHub");
+
+// Enrutamiento
 app.MapControllers();
 
 // Start listening to the SignalR hub
 var signalRClientServices = app.Services.GetServices<SignalRClientService>();
-
 var listeningTasks = signalRClientServices.Select(service => service.StartListeningAsync());
 
 await Task.WhenAll(listeningTasks);
 
-// Ejecutar la aplicaci?n
+// Ejecutar la aplicación
 app.Run();
-
-async Task CreateRoles(WebApplication app)
-{
-    using (var scope = app.Services.CreateScope())
-    {
-        var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
-
-        string[] roleNames = { "Client", "Admin" };
-        IdentityResult roleResult;
-
-        foreach (var roleName in roleNames)
-        {
-            var roleExist = await roleManager.RoleExistsAsync(roleName);
-            if (!roleExist)
-            {
-                roleResult = await roleManager.CreateAsync(new IdentityRole(roleName));
-            }
-        }
-    }
-}
