@@ -19,12 +19,13 @@ import { UsersInfoComponent } from './menu/usuarios/users-info/users-info.compon
 import { EstadisticaComponent } from './estadistica/estadistica.component';
 import { HomeComponent } from './home/home.component';
 import { DashboardComponent } from './monitor/dashboard.component';
+import { PerfilComponent } from '../perfil/perfil.component';
 
 const routes: Routes = [
   { path: "login", component: LoginComponent},
   { path: "users", component: UsersInfoComponent},
   { path: 'home', component: HomeComponent },
-
+  {path: 'perfil', component: PerfilComponent},
   { path: "registro", component: RegistroComponent },
   { path: "registroAdmin", component: RegistroAdminComponent },
   { path: 'users-info', component: UsersInfoComponent, canActivate: [AuthGuard], },

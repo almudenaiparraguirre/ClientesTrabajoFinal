@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100 font-sans leading-normal tracking-normal">
+    <mat-card class="profile-card">
+        <mat-card-header>
+          <mat-card-title>{{ usuario.nombre }} {{ usuario.apellido }}</mat-card-title>
+          <mat-card-subtitle>{{ usuario.empleo }}</mat-card-subtitle>
+        </mat-card-header>
+        <mat-card-content>
+          <div class="profile-info">
+            <p><strong>Email:</strong> {{ usuario.email }}</p>
+            <p><strong>País:</strong> {{ usuario.paisNombre }}</p>
+            <p><strong>Fecha de Nacimiento:</strong> {{ usuario.dateOfBirth | date:'longDate' }}</p>
+            <p><strong>Rol:</strong> {{ usuario.rol | titlecase }}</p>
+          </div>
+        </mat-card-content>
+      </mat-card>
+</body>
+</html>
