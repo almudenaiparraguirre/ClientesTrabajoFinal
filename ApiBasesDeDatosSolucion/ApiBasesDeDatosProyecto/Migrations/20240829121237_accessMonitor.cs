@@ -8,11 +8,31 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace ApiBasesDeDatosProyecto.Migrations
 {
     /// <inheritdoc />
-    public partial class usuarios : Migration
+    public partial class accessMonitor : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.CreateTable(
+                name: "AccessMonitoringDatas",
+                columns: table => new
+                {
+                    Empleo = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Nombre = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Apellido = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    FechaNacimiento = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    PaisId = table.Column<int>(type: "int", nullable: false),
+                    Pais = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Email = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Usuario = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    TipoAcceso = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    FechaRecibido = table.Column<DateTime>(type: "datetime2", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_AccessMonitoringDatas", x => x.Empleo);
+                });
+
             migrationBuilder.CreateTable(
                 name: "AspNetRoles",
                 columns: table => new
@@ -61,9 +81,7 @@ namespace ApiBasesDeDatosProyecto.Migrations
                 name: "MonitoringDatas",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     PaisOrigen = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     PaisDestino = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     ClienteOrigen = table.Column<string>(type: "nvarchar(max)", nullable: false),
@@ -74,7 +92,7 @@ namespace ApiBasesDeDatosProyecto.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_MonitoringDatas", x => x.Id);
+                    table.PrimaryKey("PK_MonitoringDatas", x => x.Name);
                 });
 
             migrationBuilder.CreateTable(
@@ -312,6 +330,9 @@ namespace ApiBasesDeDatosProyecto.Migrations
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.DropTable(
+                name: "AccessMonitoringDatas");
+
             migrationBuilder.DropTable(
                 name: "AspNetRoleClaims");
 

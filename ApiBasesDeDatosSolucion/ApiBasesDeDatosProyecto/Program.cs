@@ -91,6 +91,7 @@ builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddTransient<ClienteService>();
 builder.Services.AddScoped<IVistaClientesPaisesRepository, VistaClientesPaisesRepository>();
 builder.Services.AddTransient<IMonitoringDataRepository, MonitoringDataRepository>();
+builder.Services.AddScoped<IAccessMonitoringDataRepository, AccessMonitoringDataRepository>();
 
 
 

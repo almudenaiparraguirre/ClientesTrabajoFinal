@@ -21,9 +21,10 @@ public class SignalRClientService
 
     public async Task StartListeningAsync()
     {
+        // Manejador para MonitoringData
         _hubConnection.On<MonitoringData>("ReceiveMessage", async (data) =>
         {
-            Console.WriteLine($"Mensaje recibido del simulador:");
+            Console.WriteLine($"Mensaje recibido del simulador (MonitoringData):");
             Console.WriteLine($"Name: {data.Name}");
             Console.WriteLine($"PaisOrigen: {data.PaisOrigen}");
             Console.WriteLine($"PaisDestino: {data.PaisDestino}");
@@ -38,10 +39,36 @@ public class SignalRClientService
             {
                 var monitoringDataService = scope.ServiceProvider.GetRequiredService<IMonitoringDataRepository>();
                 await monitoringDataService.AddAsync(data);
-                Console.WriteLine("Datos guardados en la base de datos.");
+                Console.WriteLine("Datos de MonitoringData guardados en la base de datos.");
             }
         });
 
+        // Manejador para AccessMonitoringData
+        _hubConnection.On<AccessMonitoringData>("ReceiveAccessMonitoringData", async (data) =>
+        {
+            Console.WriteLine($"Mensaje recibido del simulador (AccessMonitoringData):");
+            Console.WriteLine($"Nombre: {data.Nombre}");
+            Console.WriteLine($"Apellido: {data.Apellido}");
+            Console.WriteLine($"FechaNacimiento: {data.FechaNacimiento}");
+            Console.WriteLine($"Empleo: {data.Empleo}");
+            Console.WriteLine($"PaisId: {data.PaisId}");
+            Console.WriteLine($"Pais: {data.Pais}");
+            Console.WriteLine($"Email: {data.Email}");
+            data.FechaRecibido = DateTime.Now;
+
+
+            // Usar un scope para obtener el servicio Scoped y guardar en la base de datos
+            using (var scope = _serviceScopeFactory.CreateScope())
+            {
+                // Obtener AccessMonitoringDataRepository desde el scope
+                var accessMonitoringDataRepository = scope.ServiceProvider.GetRequiredService<IAccessMonitoringDataRepository>();
+                await accessMonitoringDataRepository.AddCliente(data);
+                await accessMonitoringDataRepository.AddAsync(data);
+                Console.WriteLine("Datos de AccessMonitoringData guardados en la base de datos.");
+            }
+        });
+
+        // Iniciar la conexión a SignalR
         await _hubConnection.StartAsync();
         Console.WriteLine("Conectado al hub de SignalR");
     }
