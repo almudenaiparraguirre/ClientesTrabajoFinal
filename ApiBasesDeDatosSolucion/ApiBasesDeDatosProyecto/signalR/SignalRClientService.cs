@@ -78,8 +78,7 @@ public class SignalRClientService
             }
         });
 
-        // Iniciar la conexión a SignalR
-        await _hubConnection.StartAsync();
+        //await _hubConnection.StartAsync();
         Console.WriteLine("Conectado al hub de SignalR");
     }
 }

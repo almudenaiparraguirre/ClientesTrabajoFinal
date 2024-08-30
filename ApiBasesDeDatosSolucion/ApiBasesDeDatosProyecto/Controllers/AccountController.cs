@@ -54,12 +54,6 @@ public class AccountController : ControllerBase
         return Ok(users);
     }
 
-    [HttpGet("activeUsers")]
-    public IActionResult GetActiveUsers()
-    {
-        var activeUsers = _context.Users.Where(u => u.IsDeleted == false).ToList();
-        return Ok(activeUsers);
-    }
 
     // SuperAdmin y Admin: Verificar el rol de un usuario
     [Authorize(Roles = "SuperAdmin,Admin")]
@@ -139,7 +133,7 @@ public class AccountController : ControllerBase
             return BadRequest(new ErrorResponseDTO("Error al cambiar el rol del usuario.", result.Errors.Select(e => e.Description).ToList()));
         }
 
-        // Si el nuevo rol es "Admin", eliminar al usuario de la tabla de Clientes
+        // Manejo de roles adicionales si es necesario
         if (model.NuevoRol == "Admin")
         {
             var eliminarClienteResult = await EliminarCliente(model.Email);
@@ -148,9 +142,7 @@ public class AccountController : ControllerBase
                 return BadRequest(new ErrorResponseDTO("Error al eliminar el cliente.", eliminarClienteResult.Errors.Select(e => e.Description).ToList()));
             }
         }
-
-        // Si el nuevo rol es "Client", registrar al usuario en la tabla de Clientes
-        if (model.NuevoRol == "Client")
+        else if (model.NuevoRol == "Client")
         {
             var clienteResult = await RegistrarCliente(model);
             if (!clienteResult.Succeeded)
@@ -161,6 +153,7 @@ public class AccountController : ControllerBase
 
         return NoContent();
     }
+
 
     // SuperAdmin y Admin: Puede actualizar cualquier usuario
     // Client: Puede actualizar solo sus propios datos
@@ -196,8 +189,8 @@ public class AccountController : ControllerBase
         return NoContent();
     }
 
-    // SuperAdmin y Admin: Registrar nuevos usuarios
-    [Authorize(Roles = "SuperAdmin,Admin")]
+  
+    [AllowAnonymous]
     [HttpPost("register")]
     public async Task<IActionResult> Register([FromBody] RegisterViewModel model)
     {
@@ -221,8 +214,13 @@ public class AccountController : ControllerBase
             return BadRequest(result.Errors);
         }
 
-        return Ok(user);
+        // Asignar el rol predeterminado (por ejemplo, "Client") durante el registro
+        await _userManager.AddToRoleAsync(user, "Client");
+
+        return Ok(new { Message = "Usuario registrado y rol asignado con éxito.", User = user });
     }
+
+
 
     // Cliente: Ver solo sus propios datos
     [Authorize(Roles = "Client")]

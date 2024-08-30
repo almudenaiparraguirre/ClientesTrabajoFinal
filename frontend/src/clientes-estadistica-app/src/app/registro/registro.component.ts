@@ -119,6 +119,7 @@ export class RegistroComponent implements OnInit {
     // Registrar usuario
     this.miServicio.registrarUsuario(usuario).subscribe(
       response => {
+
         const datosCambioRol: CambioRolModel = {
           Email: this.registroForm.value.Correo,
           NuevoRol: "Client",
@@ -128,15 +129,7 @@ export class RegistroComponent implements OnInit {
           Empleo: this.registroForm.value.Empleo,
           FechaNacimiento: fechaNacISO
         };
-
-        this.miServicio.añadirRolUsuario(datosCambioRol).subscribe(
-          response => {
-            this.router.navigate(['/login']);
-          },
-          error => {
-            this.handleError(error, 'Error al añadir rol');
-          }
-        );
+        this.router.navigate(['/login']);
       },
       error => {
         this.handleError(error, 'Error al registrar usuario');
