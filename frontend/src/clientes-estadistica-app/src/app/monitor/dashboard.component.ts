@@ -28,6 +28,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   totalMoneyTransferred: number = 0;
   totalTransfersCompleted: number = 0;
+  averageMoneyTransferred: number = 0;
 
   constructor(private http: HttpClient, private monitorDataService: MonitorDataService) { }
 
@@ -59,6 +60,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
           this.updateFinancialChart();
           this.updateCountriesComparisonChart();
           this.calculateTotals();
+          this.calculateAverageMoneyTransferred();
           this.updateTransferTable(); // Asegúrate de que la tabla esté actualizada
         }
       },
@@ -82,6 +84,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
                         this.updateFinancialChart();
                         this.updateCountriesComparisonChart();
                         this.calculateTotals();
+                        this.calculateAverageMoneyTransferred();
                     }
                     setTimeout(poll, this.POLLING_INTERVAL);
                 },
@@ -140,6 +143,14 @@ export class DashboardComponent implements OnInit, OnDestroy {
   private calculateTotals() {
     this.totalMoneyTransferred = this.transferencias.reduce((sum, t) => sum + t.valorDestino, 0);
     this.totalTransfersCompleted = this.transferencias.length;
+  }
+
+  private calculateAverageMoneyTransferred() {
+    if (this.totalTransfersCompleted > 0) {
+      this.averageMoneyTransferred = this.totalMoneyTransferred / this.totalTransfersCompleted;
+    } else {
+      this.averageMoneyTransferred = 0;
+    }
   }
 
   private updateTransferTable(): void {

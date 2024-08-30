@@ -1,3 +1,4 @@
+using SimuladorServicio;
 using SimuladorServicio.Servicios;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -17,9 +18,10 @@ builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(Progr
 
 // Register the monitoring service
 builder.Services.AddSingleton<MonitoringService>();
+builder.Services.AddSingleton<AccessMonitoringService>();
 
 // Register the background service
-builder.Services.AddHostedService<MonitoringBackgroundService>();
+//builder.Services.AddHostedService<MonitoringBackgroundService>();
 
 var app = builder.Build();
 

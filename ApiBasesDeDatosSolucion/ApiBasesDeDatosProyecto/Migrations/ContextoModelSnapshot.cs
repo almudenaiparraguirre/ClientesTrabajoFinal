@@ -151,29 +151,6 @@ namespace ApiBasesDeDatosProyecto.Migrations
                         });
                 });
 
-            modelBuilder.Entity("ApiBasesDeDatosProyecto.Entities.Usuario", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Email")
-                        .IsRequired()
-                        .HasMaxLength(256)
-                        .HasColumnType("nvarchar(256)");
-
-                    b.Property<string>("UserName")
-                        .IsRequired()
-                        .HasMaxLength(40)
-                        .HasColumnType("nvarchar(40)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Usuarios");
-                });
-
             modelBuilder.Entity("ApiBasesDeDatosProyecto.Entities.VistaClientesPaises", b =>
                 {
                     b.Property<string>("ClienteApellido")
@@ -216,6 +193,49 @@ namespace ApiBasesDeDatosProyecto.Migrations
                     b.ToTable((string)null);
 
                     b.ToView("VistaClientesPaises", (string)null);
+                });
+
+            modelBuilder.Entity("ApiBasesDeDatosProyecto.Models.AccessMonitoringData", b =>
+                {
+                    b.Property<string>("Empleo")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("Apellido")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("FechaNacimiento")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("FechaRecibido")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Nombre")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Pais")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("PaisId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("TipoAcceso")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Usuario")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Empleo");
+
+                    b.ToTable("AccessMonitoringDatas");
                 });
 
             modelBuilder.Entity("ApiBasesDeDatosProyecto.Models.ApplicationUser", b =>
@@ -296,6 +316,41 @@ namespace ApiBasesDeDatosProyecto.Migrations
                         .HasFilter("[NormalizedUserName] IS NOT NULL");
 
                     b.ToTable("AspNetUsers", (string)null);
+                });
+
+            modelBuilder.Entity("ApiBasesDeDatosProyecto.Models.MonitoringData", b =>
+                {
+                    b.Property<string>("Name")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("ClienteDestino")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ClienteOrigen")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PaisDestino")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PaisOrigen")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("Timestamp")
+                        .HasColumnType("datetime2");
+
+                    b.Property<double>("ValorDestino")
+                        .HasColumnType("float");
+
+                    b.Property<double>("ValorOrigen")
+                        .HasColumnType("float");
+
+                    b.HasKey("Name");
+
+                    b.ToTable("MonitoringDatas");
                 });
 
             modelBuilder.Entity("ApiBasesDeDatosProyecto.Models.ProAlmClientePorPaisDto", b =>

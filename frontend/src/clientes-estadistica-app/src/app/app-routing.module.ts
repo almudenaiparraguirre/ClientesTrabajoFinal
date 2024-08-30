@@ -20,6 +20,7 @@ import { EstadisticaComponent } from './estadistica/estadistica.component';
 import { HomeComponent } from './home/home.component';
 import { DashboardComponent } from './monitor/dashboard.component';
 import { PerfilComponent } from '../perfil/perfil.component';
+import { DashboardClientesComponent } from './client-access-monitor/client-access-monitor.component';
 
 const routes: Routes = [
   { path: "login", component: LoginComponent},
@@ -30,6 +31,7 @@ const routes: Routes = [
   { path: "registroAdmin", component: RegistroAdminComponent },
   { path: 'users-info', component: UsersInfoComponent, canActivate: [AuthGuard], },
   { path: 'dashboard', component: DashboardComponent, canActivate: [AuthGuard], },
+  { path: 'dashboardclientes', component: DashboardClientesComponent},
   { path: "estadistica", component: EstadisticaComponent},
   { path: "estadisticas", component: EstadisticasComponent,
     children: [

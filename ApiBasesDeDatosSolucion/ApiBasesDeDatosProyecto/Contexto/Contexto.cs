@@ -11,6 +11,7 @@ namespace ApiBasesDeDatosProyecto.Context
         public DbSet<VistaClientesPaises> VistaClientesPaises { get; set; }
         public DbSet<ProAlmClientePorPaisDto> ProAlmClientePorPaisDtos { get; set; }
         public DbSet<MonitoringData> MonitoringDatas { get; set; }  // Agregar esta línea
+        public DbSet<AccessMonitoringData> AccessMonitoringDatas { get; set; }
 
         public Contexto(DbContextOptions<Contexto> options) : base(options) { }
 

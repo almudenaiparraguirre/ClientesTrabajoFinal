@@ -9,9 +9,9 @@ namespace SimuladorServicio.Controllers
     public class MonitoringController : ControllerBase
     {
         private readonly ILogger<MonitoringController> _logger;
-        private readonly MonitoringService _monitoringService;
+        private readonly AccessMonitoringService _monitoringService;
 
-        public MonitoringController(ILogger<MonitoringController> logger, MonitoringService monitoringService)
+        public MonitoringController(ILogger<MonitoringController> logger, AccessMonitoringService monitoringService)
         {
             _logger = logger;
             _monitoringService = monitoringService;
@@ -23,7 +23,7 @@ namespace SimuladorServicio.Controllers
         {
             try
             {
-                await _monitoringService.SendRandomMessages();
+                await _monitoringService.GenerateRandomAccessMonitoringData();
                 return Ok("Mensajes aleatorios enviados.");
             }
             catch (Exception ex)

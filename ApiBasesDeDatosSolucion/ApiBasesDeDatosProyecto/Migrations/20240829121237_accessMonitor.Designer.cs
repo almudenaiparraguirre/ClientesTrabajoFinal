@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ApiBasesDeDatosProyecto.Migrations
 {
     [DbContext(typeof(Contexto))]
-    [Migration("20240823120927_migracionGeneral")]
-    partial class migracionGeneral
+    [Migration("20240829121237_accessMonitor")]
+    partial class accessMonitor
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -154,49 +154,6 @@ namespace ApiBasesDeDatosProyecto.Migrations
                         });
                 });
 
-            modelBuilder.Entity("ApiBasesDeDatosProyecto.Entities.Usuario", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Email")
-                        .IsRequired()
-                        .HasMaxLength(256)
-                        .HasColumnType("nvarchar(256)");
-
-                    b.Property<string>("UserName")
-                        .IsRequired()
-                        .HasMaxLength(40)
-                        .HasColumnType("nvarchar(40)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Usuarios");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            Email = "das@gmail.com",
-                            UserName = "PEPE1"
-                        },
-                        new
-                        {
-                            Id = 2,
-                            Email = "daaaaaaas@gmail.com",
-                            UserName = "PEPE2"
-                        },
-                        new
-                        {
-                            Id = 3,
-                            Email = "dadsdsds@gmail.com",
-                            UserName = "PEPE3"
-                        });
-                });
-
             modelBuilder.Entity("ApiBasesDeDatosProyecto.Entities.VistaClientesPaises", b =>
                 {
                     b.Property<string>("ClienteApellido")
@@ -239,6 +196,49 @@ namespace ApiBasesDeDatosProyecto.Migrations
                     b.ToTable((string)null);
 
                     b.ToView("VistaClientesPaises", (string)null);
+                });
+
+            modelBuilder.Entity("ApiBasesDeDatosProyecto.Models.AccessMonitoringData", b =>
+                {
+                    b.Property<string>("Empleo")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("Apellido")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("FechaNacimiento")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("FechaRecibido")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Nombre")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Pais")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("PaisId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("TipoAcceso")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Usuario")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Empleo");
+
+                    b.ToTable("AccessMonitoringDatas");
                 });
 
             modelBuilder.Entity("ApiBasesDeDatosProyecto.Models.ApplicationUser", b =>
@@ -323,21 +323,14 @@ namespace ApiBasesDeDatosProyecto.Migrations
 
             modelBuilder.Entity("ApiBasesDeDatosProyecto.Models.MonitoringData", b =>
                 {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    b.Property<string>("Name")
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("ClienteDestino")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ClienteOrigen")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -358,7 +351,7 @@ namespace ApiBasesDeDatosProyecto.Migrations
                     b.Property<double>("ValorOrigen")
                         .HasColumnType("float");
 
-                    b.HasKey("Id");
+                    b.HasKey("Name");
 
                     b.ToTable("MonitoringDatas");
                 });
