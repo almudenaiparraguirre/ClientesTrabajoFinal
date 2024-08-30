@@ -197,14 +197,14 @@ namespace ApiBasesDeDatosProyecto.Migrations
 
             modelBuilder.Entity("ApiBasesDeDatosProyecto.Models.AccessMonitoringData", b =>
                 {
-                    b.Property<string>("Empleo")
+                    b.Property<string>("Email")
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Apellido")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Email")
+                    b.Property<string>("Empleo")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -233,7 +233,7 @@ namespace ApiBasesDeDatosProyecto.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.HasKey("Empleo");
+                    b.HasKey("Email");
 
                     b.ToTable("AccessMonitoringDatas");
                 });

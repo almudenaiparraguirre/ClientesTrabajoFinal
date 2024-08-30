@@ -46,7 +46,7 @@ namespace ApiBasesDeDatosProyecto.Controllers
         public async Task<ActionResult<List<ClienteDto>>> Get()
         {
             _logger.LogInformation($"Obteniendo todos los clientes.");
-            List<Cliente> lista = await _clienteRepository.ObtenerTodos();
+            List<Cliente> lista = await _clienteRepository.ObtenerTodosAsync();
             _logger.LogInformation($"Se obtuvieron {lista.Count} clientes.");
             return Ok(_mapper.Map<List<ClienteDto>>(lista));
         }
@@ -57,7 +57,7 @@ namespace ApiBasesDeDatosProyecto.Controllers
         public async Task<ActionResult<ClienteDto>> Get(int id)
         {
             _logger.LogInformation($"Obteniendo cliente con ID {id}.");
-            var cliente = await _clienteRepository.ObtenerPorId(id);
+            var cliente = await _clienteRepository.ObtenerPorIdAsync(id);
             if (cliente == null)
             {
                 _logger.LogWarning($"Cliente con ID {id} no encontrado.");
@@ -246,7 +246,7 @@ namespace ApiBasesDeDatosProyecto.Controllers
 
             var cliente = await _contexto.Clientes
                 .Include(c => c.Pais)
-                .FirstOrDefaultAsync(c => c.Email == email
+                .FirstOrDefaultAsync(c => c.Email == email);
 
 
             if (cliente == null)

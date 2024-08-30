@@ -35,7 +35,7 @@ export class DashboardClientesComponent implements OnInit, OnDestroy {
     private http: HttpClient,
     private monitorDataService: MonitorDataService,
     private renderer: Renderer2
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.loadInitialData();
@@ -144,20 +144,46 @@ export class DashboardClientesComponent implements OnInit, OnDestroy {
 
   // Métodos para gráficos
   private initClientesChart(): void {
-    const ctx = document.getElementById('clientesChart') as HTMLCanvasElement;
-    this.clientesChart = new Chart(ctx, {
-      type: 'line',
-      data: {
-        labels: [],
-        datasets: [{
-          label: 'Clientes Activos',
-          data: [],
-          borderColor: 'rgba(75, 192, 192, 1)',
-          fill: false
-        }]
-      }
-    });
-  }
+    try {
+        const ctx = document.getElementById('clientesChart') as HTMLCanvasElement;
+        this.clientesChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: [],
+                datasets: [
+                    {
+                        label: 'Registros',
+                        data: [],
+                        borderColor: 'rgba(75, 192, 192, 1)',
+                        backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                        fill: true
+                    },
+                    {
+                        label: 'Logins',
+                        data: [],
+                        borderColor: 'rgba(255, 99, 132, 1)',
+                        backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                        fill: true
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    x: {
+                        beginAtZero: true
+                    },
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    } catch (error) {
+        console.error('Error initializing clientesChart:', error);
+    }
+}
+
 
   private initClientesPorPaisChart(): void {
     const ctx = document.getElementById('clientesPorPaisChart') as HTMLCanvasElement;
@@ -177,8 +203,50 @@ export class DashboardClientesComponent implements OnInit, OnDestroy {
   }
 
   private updateClientesChart(): void {
-    // Actualiza el gráfico de clientes según los datos disponibles
-  }
+    const registrosPorPeriodo: { [key: string]: number } = {};
+    const loginsPorPeriodo: { [key: string]: number } = {};
+
+    this.clientes.forEach((cliente) => {
+        const tipoAcceso = cliente.tipoAcceso.toLowerCase(); // Normaliza el tipoAcceso a minúsculas
+        const periodo = this.getPeriod(cliente);
+
+        console.log('Cliente tipoAcceso:', tipoAcceso); // Verificación de tipoAcceso
+        console.log('Periodo:', periodo); // Verificación de periodo
+
+        if (tipoAcceso === 'registro') {
+            registrosPorPeriodo[periodo] = (registrosPorPeriodo[periodo] || 0) + 1;
+        } else if (tipoAcceso === 'login') {
+            loginsPorPeriodo[periodo] = (loginsPorPeriodo[periodo] || 0) + 1;
+        }
+    });
+
+    console.log('Registros por periodo:', registrosPorPeriodo);
+    console.log('Logins por periodo:', loginsPorPeriodo);
+
+    const periodos = Object.keys(registrosPorPeriodo).sort();
+    const datosRegistros = periodos.map((periodo) => registrosPorPeriodo[periodo] || 0);
+    const datosLogins = periodos.map((periodo) => loginsPorPeriodo[periodo] || 0);
+
+    this.clientesChart.data.labels = periodos;
+    this.clientesChart.data.datasets[0].data = datosRegistros;
+    this.clientesChart.data.datasets[1].data = datosLogins;
+    this.clientesChart.update();
+}
+
+
+
+
+private getPeriod(cliente: ClienteMonitor): string {
+  // Suponiendo que el cliente tiene una fecha de acceso
+  // Ahora queremos agrupar por día completo (YYYY-MM-DD)
+  const fechaAcceso = new Date(cliente.fechaRecibido); // Ajusta según tu modelo de datos
+  const año = fechaAcceso.getFullYear();
+  const mes = fechaAcceso.getMonth() + 1; // Meses en JS van de 0-11
+  const dia = fechaAcceso.getDate();
+  return `${año}-${mes < 10 ? '0' : ''}${mes}-${dia < 10 ? '0' : ''}${dia}`; // Formato: YYYY-MM-DD
+}
+
+
 
   private updateClientesPorPaisChart(): void {
     // Objeto para contar clientes por país
@@ -204,7 +272,6 @@ export class DashboardClientesComponent implements OnInit, OnDestroy {
     this.clientesPorPaisChart.update();
 }
 
-
   private updateCardMetrics(): void {
     this.totalClientes = this.clientes.length;
     this.nuevosClientes = this.clientes.filter(cliente => {
@@ -218,13 +285,13 @@ export class DashboardClientesComponent implements OnInit, OnDestroy {
   private updateTable(): void {
     const tableBody = document.getElementById('clientesTableBody');
     if (tableBody) {
-        tableBody.innerHTML = ''; // Limpiar el contenido actual de la tabla
+      tableBody.innerHTML = ''; // Limpiar el contenido actual de la tabla
 
-        this.displayedClientes.forEach((cliente) => {
-            const row = document.createElement('tr');
-            row.className = 'border-b'; // Asegura que las filas tengan un borde inferior
+      this.displayedClientes.forEach((cliente) => {
+        const row = document.createElement('tr');
+        row.className = 'border-b'; // Asegura que las filas tengan un borde inferior
 
-            row.innerHTML = `
+        row.innerHTML = `
                 <td class="px-4 py-2">${cliente.nombre}</td>
                 <td class="px-4 py-2">${cliente.apellido}</td>
                 <td class="px-4 py-2">${cliente.pais}</td>
@@ -233,9 +300,9 @@ export class DashboardClientesComponent implements OnInit, OnDestroy {
                 <td class="px-4 py-2">${cliente.tipoAcceso}</td>
             `;
 
-            tableBody.appendChild(row); // Insertar la fila en el cuerpo de la tabla
-        });
+        tableBody.appendChild(row); // Insertar la fila en el cuerpo de la tabla
+      });
     }
-}
+  }
 
 }

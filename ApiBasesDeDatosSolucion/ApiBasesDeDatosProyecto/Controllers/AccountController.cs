@@ -61,13 +61,6 @@ public class AccountController : ControllerBase
         return Ok(activeUsers);
     }
 
-    [HttpGet("activeUsers")]
-    public IActionResult GetActiveUsers()
-    {
-        var activeUsers = _context.Users.Where(u => u.IsDeleted == false).ToList();
-        return Ok(activeUsers);
-    }
-
     // SuperAdmin y Admin: Verificar el rol de un usuario
     [Authorize(Roles = "SuperAdmin,Admin")]
     [HttpGet("verificarRol")]

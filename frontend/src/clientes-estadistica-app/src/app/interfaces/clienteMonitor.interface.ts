@@ -8,5 +8,6 @@ export interface ClienteMonitor {
     pais: string;
     email: string;
     usuario: string;
+    fechaRecibido: Date;
   }
   
