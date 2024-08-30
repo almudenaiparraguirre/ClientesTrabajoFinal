@@ -8,7 +8,7 @@ import { MonitoringData } from '../interfaces/monitorData.interface';
 })
 export class MonitorDataService {
 
-  private apiUrl = 'https://localhost:7107/api/Monitoring';  // Cambia la URL según tu configuración
+  private apiUrl = 'https://localhost:44339/api/Monitoring';  // Cambia la URL según tu configuración
 
   constructor(private http: HttpClient) { }
 

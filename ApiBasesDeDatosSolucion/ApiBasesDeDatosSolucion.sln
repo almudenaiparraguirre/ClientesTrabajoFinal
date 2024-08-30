@@ -9,7 +9,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimuladorServicio", "Simula
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimuladorServicio2", "SimuladorServicio2\SimuladorServicio2.csproj", "{46B4382F-63EF-4144-AAA7-12587EA28194}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ApiGrupo2.Test", "ApiGrupo2.Test\ApiGrupo2.Test.csproj", "{FC8F5DB5-82F6-40A8-B689-8C24D669BE80}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ApiGrupo2.Test", "ApiGrupo2.Test\ApiGrupo2.Test.csproj", "{FC8F5DB5-82F6-40A8-B689-8C24D669BE80}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "seleniumTests", "seleniumTests\seleniumTests.csproj", "{368C57C0-190A-4C30-BAA5-16C5D1C5D866}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,6 +35,10 @@ Global
 		{FC8F5DB5-82F6-40A8-B689-8C24D669BE80}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FC8F5DB5-82F6-40A8-B689-8C24D669BE80}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FC8F5DB5-82F6-40A8-B689-8C24D669BE80}.Release|Any CPU.Build.0 = Release|Any CPU
+		{368C57C0-190A-4C30-BAA5-16C5D1C5D866}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{368C57C0-190A-4C30-BAA5-16C5D1C5D866}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{368C57C0-190A-4C30-BAA5-16C5D1C5D866}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{368C57C0-190A-4C30-BAA5-16C5D1C5D866}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
