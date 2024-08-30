@@ -1,5 +1,10 @@
 ﻿using ApiBasesDeDatosProyecto.Entities;
-using Humanizer;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 [Route("api/[controller]")]
 [ApiController]
@@ -26,7 +31,7 @@ public class AccountController : ControllerBase
         IUserService userService,
         IPaisRepository paisRepository,
         IMapper mapper,
-        Contexto context) // Añadido
+        Contexto context)
     {
         _userManager = userManager;
         _signInManager = signInManager;
@@ -35,15 +40,16 @@ public class AccountController : ControllerBase
         _clienteService = clienteService;
         _userService = userService;
         _paisRepository = paisRepository;
-        _mapper = mapper; // Añadido
+        _mapper = mapper;
         _clienteRepository = clienteRepository;
         _context = context;
     }
 
+    // SuperAdmin: Puede ver todos los usuarios
+    [Authorize(Roles = "SuperAdmin")]
     [HttpGet("users")]
     public async Task<ActionResult<IEnumerable<ApplicationUser>>> GetUsers()
     {
-        // Obtener todos los usuarios sin filtrar por correo electrónico.
         var users = await _userService.GetAllUsersAsync();
         return Ok(users);
     }
@@ -55,6 +61,15 @@ public class AccountController : ControllerBase
         return Ok(activeUsers);
     }
 
+    [HttpGet("activeUsers")]
+    public IActionResult GetActiveUsers()
+    {
+        var activeUsers = _context.Users.Where(u => u.IsDeleted == false).ToList();
+        return Ok(activeUsers);
+    }
+
+    // SuperAdmin y Admin: Verificar el rol de un usuario
+    [Authorize(Roles = "SuperAdmin,Admin")]
     [HttpGet("verificarRol")]
     public async Task<IActionResult> VerificarRol(string email)
     {
@@ -71,7 +86,6 @@ public class AccountController : ControllerBase
             return NotFound("El usuario no tiene roles asignados.");
         }
 
-        // Suponiendo que quieres devolver solo el primer rol:
         var userRoleDto = new UserRoleDto
         {
             Email = email,
@@ -81,84 +95,37 @@ public class AccountController : ControllerBase
         return Ok(userRoleDto);
     }
 
-    /*[HttpDelete("users/{id}")]
-    public async Task<IActionResult> DeleteUser(string id)
+    // SuperAdmin: Puede borrar cualquier usuario
+    [Authorize(Roles = "SuperAdmin")]
+    [HttpDelete("users/{email}")]
+    public async Task<IActionResult> DeleteUsuario(string email)
     {
-        var result = await _userService.DeleteUserAsync(id);
-        if (result)
+        var usuario = await _context.Users.SingleOrDefaultAsync(u => u.Email == email);
+        if (usuario == null)
         {
-            return NoContent(); // Devuelve 204 No Content
+            return NotFound("Usuario no encontrado");
         }
-        return NotFound(new { message = "User not found" }); // Si el usuario no se encuentra, devuelve 404
-    }*/
 
-    [HttpGet("users/getUser")]
-    public async Task<ActionResult<ApplicationUser>> GetUserByEmail([FromQuery] string email)
-    {
-        var userDto = await _userService.GetUserByEmailAsync(email);
-        if (userDto == null)
-        {
-            return NotFound(new { message = "User not found" });
-        }
-        return Ok(userDto);
+        usuario.IsDeleted = true;
+        await _context.SaveChangesAsync();
+
+        return Ok();
     }
 
-    [HttpPost("register")]
-    public async Task<IActionResult> Register([FromBody] RegisterViewModel model)
-    {
-        // Validar el modelo antes de procesar
-
-        //DateTime FechaNac = DateTimeOffset.FromUnixTimeMilliseconds(model.FechaNacimiento).UtcDateTime;
-
-        TryValidateModel(model);
-        if (!ModelState.IsValid)
-        {
-            return BadRequest(ModelState);
-        }
-
-        // Aquí model.FechaNacimiento ya es un DateTime, así que se puede usar directamente
-        var user = new ApplicationUser
-        {
-            FullName = $"{model.Nombre} {model.Apellido}",
-            UserName = model.Email,
-            Email = model.Email,
-            DateOfBirth = model.FechaNacimiento,
-        };
-
-        // Crear el usuario
-        var result = await _userManager.CreateAsync(user, model.Password);
-        if (!result.Succeeded)
-        {
-            return BadRequest(result.Errors);
-        }
-
-        return Ok(user);
-    }
-
-    [HttpPost("login")]
-    public async Task<IActionResult> Login([FromBody] LoginViewModel model)
-    {
-        var result = await _signInManager.PasswordSignInAsync(
-            model.Email,
-            model.Password,
-            model.RememberMe,
-            lockoutOnFailure: false);
-
-        if (result.Succeeded)
-        {
-            var user = await _userManager.FindByEmailAsync(model.Email);
-            var token = _tokenService.GenerateJwtToken(user);
-            return Ok(new { Token = token });
-        }
-
-        // Devolver un BadRequest con un mensaje de error
-        var errorResponse = new ErrorResponseDTO("Credenciales no validas.", new List<string> { "The email or password is incorrect." });
-        return BadRequest(errorResponse);
-    }
-
+    // SuperAdmin y Admin: Cambiar el rol de un usuario
+    [Authorize(Roles = "SuperAdmin,Admin")]
     [HttpPost("cambiarRolUsuario")]
     public async Task<IActionResult> CambiarRolUsuario([FromBody] ChangeRoleViewModel model)
     {
+        var currentUser = await _userManager.GetUserAsync(User);
+        var currentRoles = await _userManager.GetRolesAsync(currentUser);
+
+        // Evitar que los Admins puedan asignarse a sí mismos o a otros el rol de SuperAdmin
+        if (currentRoles.Contains("Admin") && model.NuevoRol == "SuperAdmin")
+        {
+            return Forbid("Los Admins no pueden asignar el rol de SuperAdmin.");
+        }
+
         // Buscar el usuario por su correo electrónico
         var user = await _userManager.FindByEmailAsync(model.Email);
         if (user == null)
@@ -202,6 +169,110 @@ public class AccountController : ControllerBase
         return NoContent();
     }
 
+    // SuperAdmin y Admin: Puede actualizar cualquier usuario
+    // Client: Puede actualizar solo sus propios datos
+    [Authorize(Roles = "SuperAdmin,Admin,Client")]
+    [HttpPut("updateUser")]
+    public async Task<IActionResult> UpdateUser(string email, [FromBody] EditUserModel model)
+    {
+        var user = await _userManager.FindByEmailAsync(email);
+        if (user == null)
+        {
+            return NotFound(new ErrorResponseDTO("Usuario no encontrado."));
+        }
+
+        // Si es un cliente, debe actualizar solo sus propios datos
+        var currentUser = await _userManager.GetUserAsync(User);
+        var isClient = await _userManager.IsInRoleAsync(currentUser, "Client");
+
+        if (isClient && !string.Equals(currentUser.Email, email, System.StringComparison.OrdinalIgnoreCase))
+        {
+            return Forbid();
+        }
+
+        user.FullName = model.Nombre + " " + model.Apellido;
+        user.DateOfBirth = model.FechaNacimiento;
+
+        var result = await _userManager.UpdateAsync(user);
+        if (!result.Succeeded)
+        {
+            var errors = result.Errors.Select(e => e.Description).ToList();
+            return BadRequest(new ErrorResponseDTO("Error al actualizar el usuario.", errors));
+        }
+
+        return NoContent();
+    }
+
+    // SuperAdmin y Admin: Registrar nuevos usuarios
+    [Authorize(Roles = "SuperAdmin,Admin")]
+    [HttpPost("register")]
+    public async Task<IActionResult> Register([FromBody] RegisterViewModel model)
+    {
+        TryValidateModel(model);
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState);
+        }
+
+        var user = new ApplicationUser
+        {
+            FullName = $"{model.Nombre} {model.Apellido}",
+            UserName = model.Email,
+            Email = model.Email,
+            DateOfBirth = model.FechaNacimiento,
+        };
+
+        var result = await _userManager.CreateAsync(user, model.Password);
+        if (!result.Succeeded)
+        {
+            return BadRequest(result.Errors);
+        }
+
+        return Ok(user);
+    }
+
+    // Cliente: Ver solo sus propios datos
+    [Authorize(Roles = "Client")]
+    [HttpGet("users/getUser")]
+    public async Task<ActionResult<ApplicationUser>> GetUserByEmail([FromQuery] string email)
+    {
+        var currentUser = await _userManager.GetUserAsync(User);
+        if (currentUser.Email != email)
+        {
+            return Forbid();
+        }
+
+        var userDto = await _userService.GetUserByEmailAsync(email);
+        if (userDto == null)
+        {
+            return NotFound(new { message = "User not found" });
+        }
+        return Ok(userDto);
+    }
+
+    // SuperAdmin, Admin: Inicio de sesión
+    [AllowAnonymous]
+    [HttpPost("login")]
+    public async Task<IActionResult> Login([FromBody] LoginViewModel model)
+    {
+        var result = await _signInManager.PasswordSignInAsync(
+            model.Email,
+            model.Password,
+            model.RememberMe,
+            lockoutOnFailure: false);
+
+        if (result.Succeeded)
+        {
+            var user = await _userManager.FindByEmailAsync(model.Email);
+            var token = _tokenService.GenerateJwtToken(user);
+            return Ok(new { Token = token });
+        }
+
+        var errorResponse = new ErrorResponseDTO("Credenciales no validas.", new List<string> { "The email or password is incorrect." });
+        return BadRequest(errorResponse);
+    }
+
+    // Métodos privados para cambiar roles y gestionar clientes se mantienen iguales
     private async Task<IdentityResult> CambiarRolesUsuario(ApplicationUser user, string nuevoRol)
     {
         var currentRoles = await _userManager.GetRolesAsync(user);
@@ -226,7 +297,6 @@ public class AccountController : ControllerBase
         return IdentityResult.Success;
     }
 
-    // Método para eliminar un cliente basado en su email
     private async Task<IdentityResult> EliminarCliente(string email)
     {
         var cliente = await _clienteRepository.ObtenerPorEmail(email);
@@ -252,8 +322,6 @@ public class AccountController : ControllerBase
             return IdentityResult.Failed(new IdentityError { Description = "País no encontrado." });
         }
 
-        //DateTime fechaNac = DateTimeOffset.FromUnixTimeMilliseconds(model.FechaNacimiento).UtcDateTime;
-
         var cliente = new Cliente
         {
             Nombre = model.Nombre,
@@ -266,49 +334,5 @@ public class AccountController : ControllerBase
 
         await _clienteService.RegisterClientAsync(cliente);
         return IdentityResult.Success;
-    }
-
-    [HttpPut("updateUser")]
-    public async Task<IActionResult> UpdateUser(string email, [FromBody] EditUserModel model)
-    {
-        // Buscar el usuario existente por su correo electrónico
-        var user = await _userManager.FindByEmailAsync(email);
-        if (user == null)
-        {
-            return NotFound(new ErrorResponseDTO("Usuario no encontrado."));
-        }
-
-        // Usar AutoMapper para mapear el modelo al usuario existente
-        //DateTime FechaNac = DateTimeOffset.FromUnixTimeMilliseconds(model.FechaNacimiento).UtcDateTime;
-        user.FullName = model.Nombre + " " + model.Apellido;
-        user.DateOfBirth = model.FechaNacimiento;
-        //_mapper.Map(model, user);
-
-        // Actualizar el usuario en la base de datos
-        var result = await _userManager.UpdateAsync(user);
-        if (!result.Succeeded)
-        {
-            var errors = result.Errors.Select(e => e.Description).ToList();
-            return BadRequest(new ErrorResponseDTO("Error al actualizar el usuario.", errors));
-        }
-
-        // Devolver NoContent en caso de éxito
-        return NoContent();
-    }
-
-    [HttpDelete("users/{email}")]
-    public async Task<IActionResult> DeleteUsuario(string email)
-    {
-        var usuario = await _context.Users.SingleOrDefaultAsync(u => u.Email == email);
-        if (usuario == null)
-        {
-            return NotFound("Usuario no encontrado");
-        }
-
-        // Marcar como eliminado lógico
-        usuario.IsDeleted = true;
-        await _context.SaveChangesAsync();
-
-        return Ok();
     }
 }

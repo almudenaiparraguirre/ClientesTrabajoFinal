@@ -1,5 +1,7 @@
 ﻿namespace ApiBasesDeDatosProyecto.Controllers;
 using Microsoft.AspNetCore.Authorization;
+
+
 [Route("api/[controller]")]
 [ApiController]
 [Authorize]

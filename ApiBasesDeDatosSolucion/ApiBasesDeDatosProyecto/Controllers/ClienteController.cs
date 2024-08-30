@@ -1,120 +1,140 @@
 ﻿using ApiBasesDeDatosProyecto.Helpers;
-using static System.Runtime.InteropServices.JavaScript.JSType;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
-namespace ApiBasesDeDatosProyecto.Controllers;
-
-[Route("api/[controller]")]
-[ApiController]
-
-public class ClienteController : ControllerBase
+namespace ApiBasesDeDatosProyecto.Controllers
 {
-    private readonly IClienteRepository _clienteRepository;
-    private readonly IPaisRepository _paisRepository;
-    private readonly IMapper _mapper;
-    private readonly ILogger<ClienteController> _logger;
-    private readonly ClienteService _clienteService;
-    private readonly Contexto _contexto;
-
-    public ClienteController(
-        IClienteRepository clienteRepository,
-        IMapper mapper,
-        IPaisRepository paisRepository,
-        ILogger<ClienteController> logger,
-        ClienteService clienteService,
-        Contexto contexto)
+    [Route("api/[controller]")]
+    [ApiController]
+    public class ClienteController : ControllerBase
     {
-        _clienteRepository = clienteRepository;
-        _paisRepository = paisRepository;
-        _mapper = mapper;
-        _logger = logger;
-        _clienteService = clienteService;
-        _contexto = contexto;
-    }
+        private readonly IClienteRepository _clienteRepository;
+        private readonly IPaisRepository _paisRepository;
+        private readonly IMapper _mapper;
+        private readonly ILogger<ClienteController> _logger;
+        private readonly ClienteService _clienteService;
+        private readonly Contexto _contexto;
+        private readonly UserManager<IdentityUser> _userManager;
 
-    // GET: api/cliente
-    [HttpGet]
-
-    public async Task<ActionResult<List<ClienteDto>>> Get()
-    {
-        _logger.LogInformation($"Obteniendo todos los clientes.");
-        List<Cliente> lista = await _clienteRepository. ObtenerTodosAsync();
-        _logger.LogInformation($"Se obtuvieron {lista.Count} clientes.");
-        return Ok(_mapper.Map<List<ClienteDto>>(lista));
-    }
-
-    // GET api/cliente/5
-    [HttpGet("{id}")]
-    public async Task<ActionResult<ClienteDto>> Get(int id)
-    {
-        _logger.LogInformation($"Obteniendo cliente con ID {id}.");
-        var cliente = await _clienteRepository.ObtenerPorIdAsync(id);
-        if (cliente == null)
+        public ClienteController(
+            IClienteRepository clienteRepository,
+            IMapper mapper,
+            IPaisRepository paisRepository,
+            ILogger<ClienteController> logger,
+            ClienteService clienteService,
+            Contexto contexto,
+            UserManager<IdentityUser> userManager)
         {
-            _logger.LogWarning($"Cliente con ID {id} no encontrado.");
-            return NotFound(new ErrorResponseDTO($"No se encontraron clientes con id {id}."));
-        }
-        return Ok(_mapper.Map<ClienteDto>(cliente));
-    }
-
-    [HttpGet("GetClientesPorNombrePais")]
-    public async Task<ActionResult<List<ProAlmClientePorPaisDto>>> GetClientesPorNombrePais([FromQuery] string nombre)
-    {
-        _logger.LogInformation($"Obteniendo clientes para el país con nombre {nombre}.");
-
-        var pais = await _paisRepository.ObtenerPorNombre(nombre);
-        if (pais == null)
-        {
-            _logger.LogWarning($"País con nombre {nombre} no encontrado.");
-            return NotFound(new ErrorResponseDTO($"País con nombre {nombre} no encontrado."));
+            _clienteRepository = clienteRepository;
+            _paisRepository = paisRepository;
+            _mapper = mapper;
+            _logger = logger;
+            _clienteService = clienteService;
+            _contexto = contexto;
+            _userManager = userManager;
         }
 
-        var clientes = await _clienteRepository.ObtenerClientesPorPaisAsync(pais.Id);
-        if (clientes == null || clientes.Count == 0)
+        // GET: api/cliente
+        [HttpGet]
+        [Authorize(Roles = "SuperAdmin,Admin")]
+        public async Task<ActionResult<List<ClienteDto>>> Get()
         {
-            _logger.LogWarning($"No se encontraron clientes para el país con nombre {nombre}.");
-            return NotFound(new ErrorResponseDTO($"No se encontraron clientes para el país con nombre {nombre}."));
+            _logger.LogInformation($"Obteniendo todos los clientes.");
+            List<Cliente> lista = await _clienteRepository.ObtenerTodos();
+            _logger.LogInformation($"Se obtuvieron {lista.Count} clientes.");
+            return Ok(_mapper.Map<List<ClienteDto>>(lista));
         }
 
-        return Ok(_mapper.Map<List<ProAlmClientePorPaisDto>>(clientes));
-    }
-
-    [HttpGet("ObtenerClientesPorPais/{paisId}")]
-    public async Task<ActionResult<List<Cliente>>> ObtenerClientesPorPais(int paisId)
-    {
-        var clientes = await _clienteRepository.ObtenerClientesPorPaisAsync(paisId);
-
-        if (clientes == null || clientes.Count == 0)
+        // GET api/cliente/5
+        [HttpGet("{id}")]
+        [Authorize(Roles = "SuperAdmin,Admin,Client")]
+        public async Task<ActionResult<ClienteDto>> Get(int id)
         {
-            return NotFound();
+            _logger.LogInformation($"Obteniendo cliente con ID {id}.");
+            var cliente = await _clienteRepository.ObtenerPorId(id);
+            if (cliente == null)
+            {
+                _logger.LogWarning($"Cliente con ID {id} no encontrado.");
+                return NotFound(new ErrorResponseDTO($"No se encontraron clientes con id {id}."));
+            }
+            
+            // Authorize the Client role to view only their own data
+            if (User.IsInRole("Client") && cliente.Email != User.Identity.Name)
+            {
+                return Forbid("No tienes permiso para ver los datos de otro cliente.");
+            }
+
+            return Ok(_mapper.Map<ClienteDto>(cliente));
         }
 
-        return Ok(clientes);
-    }
-
-    [HttpGet("GetClientesGenerados")]
-    public ActionResult<List<Cliente>> GetClientesGenerados(int count = 10)
-    {
-        var clientes = _clienteService.GetClientes(count);
-        return Ok(clientes);
-    }
-
-
-    // POST api/cliente
-    [HttpPost]
-    public async Task<ActionResult> Post([FromBody] ClienteDto clienteDto)
-    {
-        _logger.LogInformation($"Creando un nuevo cliente.");
-        if (clienteDto == null)
+        [HttpGet("GetClientesPorNombrePais")]
+        [Authorize(Roles = "SuperAdmin,Admin")]
+        public async Task<ActionResult<List<ProAlmClientePorPaisDto>>> GetClientesPorNombrePais([FromQuery] string nombre)
         {
-            _logger.LogWarning($"El objeto ClienteDto recibido es nulo.");
-            return BadRequest($"El objeto ClienteDto no puede ser nulo.");
+            _logger.LogInformation($"Obteniendo clientes para el país con nombre {nombre}.");
+
+            var pais = await _paisRepository.ObtenerPorNombre(nombre);
+            if (pais == null)
+            {
+                _logger.LogWarning($"País con nombre {nombre} no encontrado.");
+                return NotFound(new ErrorResponseDTO($"País con nombre {nombre} no encontrado."));
+            }
+
+            var clientes = await _clienteRepository.ObtenerClientesPorPaisAsync(pais.Id);
+            if (clientes == null || clientes.Count == 0)
+            {
+                _logger.LogWarning($"No se encontraron clientes para el país con nombre {nombre}.");
+                return NotFound(new ErrorResponseDTO($"No se encontraron clientes para el país con nombre {nombre}."));
+            }
+
+            return Ok(_mapper.Map<List<ProAlmClientePorPaisDto>>(clientes));
         }
 
-        if (!ModelState.IsValid)
+        [HttpGet("ObtenerClientesPorPais/{paisId}")]
+        [Authorize(Roles = "SuperAdmin,Admin")]
+        public async Task<ActionResult<List<Cliente>>> ObtenerClientesPorPais(int paisId)
         {
-            _logger.LogWarning($"El modelo ClienteDto no es válido. Errores: {ModelState}");
-            return BadRequest(ModelState);
+            var clientes = await _clienteRepository.ObtenerClientesPorPaisAsync(paisId);
+
+            if (clientes == null || clientes.Count == 0)
+            {
+                return NotFound();
+            }
+
+            return Ok(clientes);
         }
+
+        [HttpGet("GetClientesGenerados")]
+        [Authorize(Roles = "SuperAdmin")]
+        public ActionResult<List<Cliente>> GetClientesGenerados(int count = 10)
+        {
+            var clientes = _clienteService.GetClientes(count);
+            return Ok(clientes);
+        }
+
+        // POST api/cliente
+        [HttpPost]
+        [Authorize(Roles = "SuperAdmin,Admin")]
+        public async Task<ActionResult> Post([FromBody] ClienteDto clienteDto)
+        {
+            _logger.LogInformation($"Creando un nuevo cliente.");
+            if (clienteDto == null)
+            {
+                _logger.LogWarning($"El objeto ClienteDto recibido es nulo.");
+                return BadRequest($"El objeto ClienteDto no puede ser nulo.");
+            }
+
+            if (!ModelState.IsValid)
+            {
+                _logger.LogWarning($"El modelo ClienteDto no es válido. Errores: {ModelState}");
+                return BadRequest(ModelState);
+            }
 
         var cliente = _mapper.Map<Cliente>(clienteDto);
         _clienteRepository.AgregarAsync(cliente);
@@ -125,45 +145,49 @@ public class ClienteController : ControllerBase
             return CreatedAtAction(nameof(Get), new { id = cliente.Id }, clienteDto);
         }
 
-        _logger.LogError($"No se pudo agregar el cliente.");
-        return BadRequest($"No se pudo agregar el cliente.");
-    }
-
-    // PUT api/cliente/5
-    [HttpPut("{email}")]
-    public async Task<ActionResult> Put(string email, [FromBody] EditViewModel clienteDto)
-    {
-        _logger.LogInformation($"Actualizando cliente con email {email}.");
-
-        if (email != clienteDto.Email)
-        {
-            _logger.LogWarning($"Email del cliente en la solicitud ({clienteDto.Email}) no coincide con el email de la URL ({email}).");
-            return BadRequest("El email del cliente no coincide.");
+            _logger.LogError($"No se pudo agregar el cliente.");
+            return BadRequest($"No se pudo agregar el cliente.");
         }
 
-        if (!ModelState.IsValid)
+        // PUT api/cliente/5
+        [HttpPut("{email}")]
+        [Authorize(Roles = "SuperAdmin,Admin")]
+        public async Task<ActionResult> Put(string email, [FromBody] EditViewModel clienteDto)
         {
-            _logger.LogWarning($"El modelo ClienteDto no es válido. Errores: {ModelState}");
-            return BadRequest(ModelState);
-        }
+            _logger.LogInformation($"Actualizando cliente con email {email}.");
 
-        // Buscar el cliente existente en la base de datos
-        var clienteExistente = await _clienteRepository.ObtenerPorEmail(email);
-        if (clienteExistente == null)
-        {
-            _logger.LogWarning($"Cliente con email {email} no encontrado.");
-            return NotFound("Cliente no encontrado.");
-        }
+            if (email != clienteDto.Email)
+            {
+                _logger.LogWarning($"Email del cliente en la solicitud ({clienteDto.Email}) no coincide con el email de la URL ({email}).");
+                return BadRequest("El email del cliente no coincide.");
+            }
 
-        // Mapear las propiedades del DTO al cliente existente
-        //DateTime FechaNac = DateTimeOffset.FromUnixTimeMilliseconds(clienteDto.FechaNacimiento).UtcDateTime;
-        //_mapper.Map(clienteDto, clienteExistente);
+            if (!ModelState.IsValid)
+            {
+                _logger.LogWarning($"El modelo ClienteDto no es válido. Errores: {ModelState}");
+                return BadRequest(ModelState);
+            }
 
-        clienteExistente.Nombre = clienteDto.Nombre;
-        clienteExistente.Apellido = clienteDto.Apellido;
-        clienteExistente.FechaNacimiento = clienteDto.FechaNacimiento;
-        clienteExistente.PaisId = clienteDto.PaisId;
-        clienteExistente.Empleo = clienteDto.Empleo;
+            // Buscar el cliente existente en la base de datos
+            var clienteExistente = await _clienteRepository.ObtenerPorEmail(email);
+            if (clienteExistente == null)
+            {
+                _logger.LogWarning($"Cliente con email {email} no encontrado.");
+                return NotFound("Cliente no encontrado.");
+            }
+
+            // Authorize Admin to edit other clients, but not their own data
+            if (User.IsInRole("Client") && email != User.Identity.Name)
+            {
+                return Forbid("No tienes permiso para editar los datos de otro cliente.");
+            }
+
+            // Mapear las propiedades del DTO al cliente existente
+            clienteExistente.Nombre = clienteDto.Nombre;
+            clienteExistente.Apellido = clienteDto.Apellido;
+            clienteExistente.FechaNacimiento = clienteDto.FechaNacimiento;
+            clienteExistente.PaisId = clienteDto.PaisId;
+            clienteExistente.Empleo = clienteDto.Empleo;
 
         await _clienteRepository.ActualizarAsync(clienteExistente);
 
@@ -174,20 +198,27 @@ public class ClienteController : ControllerBase
             return NoContent();
         }
 
-        return Ok(new { message = "Client edited successfully." });
-    }
-
-    // DELETE api/cliente/5
-    [HttpDelete("{email}")]
-    public async Task<ActionResult> Delete(string email)
-    {
-        _logger.LogInformation($"Eliminando cliente con ID {email}.");
-        var cliente = await _clienteRepository.ObtenerPorEmail(email);
-        if (cliente == null)
-        {
-            _logger.LogWarning($"Cliente con ID {email} no encontrado para eliminar.");
-            return NotFound();
+            return Ok(new { message = "Client edited successfully." });
         }
+
+        // DELETE api/cliente/5
+        [HttpDelete("{email}")]
+        [Authorize(Roles = "SuperAdmin,Admin")]
+        public async Task<ActionResult> Delete(string email)
+        {
+            _logger.LogInformation($"Eliminando cliente con ID {email}.");
+            var cliente = await _clienteRepository.ObtenerPorEmail(email);
+            if (cliente == null)
+            {
+                _logger.LogWarning($"Cliente con ID {email} no encontrado para eliminar.");
+                return NotFound();
+            }
+
+            // Authorize Admin to delete other clients, but not their own data
+            if (User.IsInRole("Client") && email != User.Identity.Name)
+            {
+                return Forbid("No tienes permiso para eliminar los datos de otro cliente.");
+            }
 
         _clienteRepository.EliminarAsync(cliente);
 
@@ -197,43 +228,49 @@ public class ClienteController : ControllerBase
             return NoContent();
         }
 
-        _logger.LogError($"No se pudo eliminar el cliente con ID {email}.");
-        return BadRequest($"No se pudo eliminar el cliente.");
-    }
-
-    [HttpGet("GetPaisPorEmail")]
-    public IActionResult GetPaisPorEmail(string email)
-    {
-        
-        var cliente = _contexto.Clientes
-            .Include(c => c.Pais)  
-            .FirstOrDefault(c => c.Email == email);
-
-    
-        if (cliente == null)
-        {
-            return NotFound("Cliente no encontrado.");
+            _logger.LogError($"No se pudo eliminar el cliente con ID {email}.");
+            return BadRequest($"No se pudo eliminar el cliente.");
         }
 
-        // Si el cliente se encuentra, retorna el nombre del país en un OK
-        return Ok(cliente.Pais.Nombre);
-    }
-
-    [HttpGet("GetClientePorEmail")]
-    public IActionResult GetClientePorEmail(string email)
-    {
-
-        var cliente = _contexto.Clientes
-            .FirstOrDefault(c => c.Email == email);
-
-
-        if (cliente == null)
+        // Método para obtener el país por email con validación de roles
+        [Authorize(Roles = "SuperAdmin,Admin,Client")]
+        [HttpGet("GetPaisPorEmail")]
+        public async Task<IActionResult> GetPaisPorEmail(string email)
         {
-            return NotFound("Cliente no encontrado.");
+            var currentUser = await _userManager.GetUserAsync(User);
+
+            if (User.IsInRole("Client") && email != currentUser.Email)
+            {
+                return Forbid("No tienes permiso para ver los datos de otro cliente.");
+            }
+
+            var cliente = await _contexto.Clientes
+                .Include(c => c.Pais)
+                .FirstOrDefaultAsync(c => c.Email == email
+
+
+            if (cliente == null)
+            {
+                return NotFound("Cliente no encontrado.");
+            }
+
+            return Ok(cliente.Pais.Nombre);
         }
 
-        // Si el cliente se encuentra, retorna el nombre del país en un OK
-        return Ok(cliente);
-    }
+        // Método para obtener un cliente por email
+        [Authorize(Roles = "SuperAdmin,Admin")]
+        [HttpGet("GetClientePorEmail")]
+        public async Task<IActionResult> GetClientePorEmail(string email)
+        {
+            var cliente = await _contexto.Clientes
+                .FirstOrDefaultAsync(c => c.Email == email);
 
+            if (cliente == null)
+            {
+                return NotFound("Cliente no encontrado.");
+            }
+
+            return Ok(cliente);
+        }
+    }
 }

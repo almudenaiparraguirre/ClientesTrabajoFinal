@@ -10,6 +10,7 @@
           <li><a href="#" class="text-lg hover:text-gray-400 transition duration-300">Inicio</a></li>
           <li><a href="#" class="text-lg hover:text-gray-400 transition duration-300">Usuarios</a></li>
           <li><a href="#" class="text-lg hover:text-gray-400 transition duration-300">Clientes</a></li>
+          <li><a href="#" class="text-lg hover:text-gray-400 transition duration-300" [href]="'http://localhost:4200/perfil'">Perfil</a></li>
         </ul>
       </nav>
     </div>
@@ -90,7 +91,7 @@
 
         <div class="flex justify-end gap-2 mt-6">
           <button type="button" (click)="closeAddModal()" class="bg-gray-300 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500">Cancelar</button>
-          <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500">Guardar</button>
+          <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500">Añadir</button>
         </div>
       </form>
     </div>
