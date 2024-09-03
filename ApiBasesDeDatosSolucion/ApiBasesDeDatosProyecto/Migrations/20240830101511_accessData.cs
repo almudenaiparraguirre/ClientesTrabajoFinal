@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace ApiBasesDeDatosProyecto.Migrations
 {
     /// <inheritdoc />
-    public partial class accessMonitor : Migration
+    public partial class accessData : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -17,20 +17,20 @@ namespace ApiBasesDeDatosProyecto.Migrations
                 name: "AccessMonitoringDatas",
                 columns: table => new
                 {
-                    Empleo = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Email = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     Nombre = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Apellido = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     FechaNacimiento = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Empleo = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     PaisId = table.Column<int>(type: "int", nullable: false),
                     Pais = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Email = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Usuario = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     TipoAcceso = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     FechaRecibido = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_AccessMonitoringDatas", x => x.Empleo);
+                    table.PrimaryKey("PK_AccessMonitoringDatas", x => x.Email);
                 });
 
             migrationBuilder.CreateTable(

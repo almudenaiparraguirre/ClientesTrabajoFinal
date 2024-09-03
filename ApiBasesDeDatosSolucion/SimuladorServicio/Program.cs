@@ -21,7 +21,9 @@ builder.Services.AddSingleton<MonitoringService>();
 builder.Services.AddSingleton<AccessMonitoringService>();
 
 // Register the background service
-//builder.Services.AddHostedService<MonitoringBackgroundService>();
+builder.Services.AddHostedService<MonitoringBackgroundService>();
+
+builder.Services.AddHostedService<AccessMonitoringBackgroundService>();
 
 var app = builder.Build();
 
@@ -41,11 +43,5 @@ app.MapControllers();
 // Map SignalR hubs
 app.MapHub<SimuladorHub>("/simuladorHub");
 
-// Define an endpoint to trigger sending random messages
-app.MapPost("/send-random-messages", async (MonitoringService monitoringService) =>
-{
-    await monitoringService.SendRandomMessages();
-    return Results.Ok();
-});
 
 app.Run();

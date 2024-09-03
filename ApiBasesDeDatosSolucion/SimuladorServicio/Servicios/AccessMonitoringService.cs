@@ -11,21 +11,25 @@ public class AccessMonitoringService
     private static readonly string[] Apellidos = { "Gómez", "Pérez", "Rodríguez", "Martínez", "Hernández" };
     private static readonly string[] Empleos = { "Ingeniero", "Médico", "Profesor", "Abogado", "Diseñador" };
     private static readonly string[] Dominios = { "example.com", "test.com", "demo.com", "mail.com", "service.com" };
-    private static readonly string[] Paises = { "México", "Estados Unidos", "Canadá", "Brasil", "Argentina" };
+    private static readonly string[] Paises = {"", "España", "Francia", "Italia", "Albania"};
+    private static readonly string[] TiposAcceso = { "Login", "Registro"};
 
     private static AccessMonitoringData GenerateRandomCliente()
     {
+
+        var nPais = Random.Next(1, 5);
+
         return new AccessMonitoringData
         {
             Nombre = Nombres[Random.Next(Nombres.Length)],
             Apellido = Apellidos[Random.Next(Apellidos.Length)],
             FechaNacimiento = DateTime.Now.AddYears(-Random.Next(18, 70)), // Edad entre 18 y 70 años
             Empleo = Empleos[Random.Next(Empleos.Length)],
-            PaisId = Random.Next(1, 6), // ID de país entre 1 y 5
-            Pais = Paises[Random.Next(Paises.Length)],
+            PaisId = nPais, // ID de país entre 1 y 4
+            Pais = Paises[nPais],
             Email = $"{Guid.NewGuid()}@{Dominios[Random.Next(Dominios.Length)]}",
             Usuario = $"{Nombres[Random.Next(Nombres.Length)]}{Random.Next(1000, 9999)}",
-            TipoAcceso = "Login",
+            TipoAcceso = TiposAcceso[Random.Next(0, 2)],
         };
     }
 

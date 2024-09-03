@@ -8,14 +8,13 @@
 
         public DateTime FechaNacimiento { get; set; }
 
-
-        [Key]
         public string Empleo { get; set; }
 
         public int PaisId { get; set; }
 
         public string Pais { get; set; }
 
+        [Key]
         public string Email { get; set; }
 
         public string Usuario { get; set; }

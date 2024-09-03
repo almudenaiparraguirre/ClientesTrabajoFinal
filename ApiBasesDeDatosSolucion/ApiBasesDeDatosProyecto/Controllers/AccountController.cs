@@ -54,9 +54,8 @@ public class AccountController : ControllerBase
         return Ok(users);
     }
 
-
     [HttpGet("activeUsers")]
-    public IActionResult GetActiveUsers()
+    public async Task<ActionResult<IEnumerable<ApplicationUser>>> GetActiveUsers()
     {
         var activeUsers = _context.Users.Where(u => u.IsDeleted == false).ToList();
         return Ok(activeUsers);

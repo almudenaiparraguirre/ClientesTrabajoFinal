@@ -1,5 +1,8 @@
 import { Component, OnInit } from '@angular/core';
-import { Usuario } from '../app/clases/usuario';
+import { Router } from '@angular/router';
+import { AuthService } from '../app/servicios/auth.service'; // Asegúrate de la ruta correcta
+import { Usuario } from '../app/clases/usuario'; // Asegúrate de la ruta correcta
+import { UserService } from '../app/servicios/user.service'; // Asegúrate de la ruta correcta
 
 @Component({
   selector: 'app-perfil',
@@ -7,19 +10,27 @@ import { Usuario } from '../app/clases/usuario';
   styleUrls: ['./perfil.component.css']
 })
 export class PerfilComponent implements OnInit {
-  totalMoneyTransferred: number = 0; // Define la propiedad totalMoneyTransferred
-  totalTransfersCompleted: number = 0; // Define la propiedad totalTransfersCompleted
+  totalMoneyTransferred: number = 0;
+  totalTransfersCompleted: number = 0;
   usuario: Usuario;
+  userService: UserService;
 
-  constructor() { }
+  constructor(private authService: AuthService, private router: Router) { }
 
   ngOnInit(): void {
-    // Aquí puedes inicializar o cargar datos para estas propiedades
     this.loadProfileData();
   }
 
+  canActivate(): boolean {
+    if (this.authService.isLoggedIn()) {
+      return true;
+    } else {
+      this.router.navigate(['/login']);
+      return false;
+    }
+  }
+
   loadProfileData(): void {
-    // Simula la carga de datos
     this.totalMoneyTransferred = 1234.56;
     this.totalTransfersCompleted = 42;
   }

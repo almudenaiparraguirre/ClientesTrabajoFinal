@@ -19,6 +19,15 @@ public class SignalRClientService
         _serviceScopeFactory = serviceScopeFactory;
     }
 
+    private DateTime GetRandomDateInLast7Days()
+    {
+        var today = DateTime.Now;
+        var sevenDaysAgo = today.AddDays(-7);
+        var random = new Random();
+        var randomDays = random.Next(0, 8); // Rango de 0 a 7 días
+        return sevenDaysAgo.AddDays(randomDays);
+    }
+
     public async Task StartListeningAsync()
     {
         // Manejador para MonitoringData
@@ -55,6 +64,7 @@ public class SignalRClientService
             Console.WriteLine($"Pais: {data.Pais}");
             Console.WriteLine($"Email: {data.Email}");
             data.FechaRecibido = DateTime.Now;
+            Console.WriteLine($"Fechar: {data.FechaRecibido}");
 
 
             // Usar un scope para obtener el servicio Scoped y guardar en la base de datos

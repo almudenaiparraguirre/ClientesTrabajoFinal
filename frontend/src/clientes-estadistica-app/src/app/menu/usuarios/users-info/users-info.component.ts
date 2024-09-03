@@ -74,14 +74,17 @@ export class UsersInfoComponent implements OnInit, OnDestroy {
         data => {
           // Procesar cada usuario para separar nombre y apellido
           this.usuarios = data.map(usuario => {
-            const [nombre, ...resto] = usuario.fullName.split(' ');
-            const apellido = resto.join(' ');
-            console.log(nombre + apellido);
+            //const [nombre, ...resto] = usuario.fullName.split(' ');
+            //const apellido = resto.join(' ');
+            //console.log(nombre + apellido);
   
             return {
               ...usuario,
-              nombre: nombre,
-              apellido: apellido
+              //nombre: nombre,
+              //apellido: apellido
+              userName: usuario.userName || '-',
+              fullName: usuario.fullName || '-',
+              email: usuario.email || '-'
             };
           });
   
