@@ -15,10 +15,25 @@
         <div class="bg-gray-800 text-gray-100 w-full md:w-64 min-h-screen p-4">
             <h3 class="text-2xl font-semibold mb-6">Dashboard</h3>
             <nav class="flex flex-col space-y-4">
-                <a href="#" class="hover:text-gray-400">Clientes</a>
-                <a href="http://localhost:4200/dashboard" class="hover:text-gray-400">Transferencias</a>
-                <a href="#" class="hover:text-gray-400">Forms</a>
+                <a href="http://localhost:4200/dashboard"
+                    class="bg-gray-700 hover:bg-gray-600 text-center py-4 rounded-md shadow-md">
+                    Transferencias
+                </a>
+                <a href="http://localhost:4200/dashboardclientes"
+                class="bg-blue-800 hover:bg-blue-700 text-center py-4 rounded-md shadow-md">
+                    Accesos
+                </a>
             </nav>
+
+            <!-- Separador Vertical -->
+            <hr class="my-6 border-gray-600" />
+
+            <div class="mt-6">
+                <a href="http://localhost:4200/users-info"
+                    class="bg-blue-600 hover:bg-blue-500 text-white py-2 px-4 rounded-md shadow-md block text-center">
+                    Volver
+                </a>
+            </div>
         </div>
 
         <!-- Main Content -->
@@ -30,16 +45,16 @@
                     <p id="totalClientes" class="text-2xl font-bold">{{ totalClientes }}</p>
                 </div>
                 <div class="bg-white p-4 rounded-lg shadow-lg">
-                    <h5 class="text-gray-600 text-lg font-semibold">Clientes Nuevos Este Mes</h5>
+                    <h5 class="text-gray-600 text-lg font-semibold">Media edad Clientes</h5>
                     <p class="text-2xl font-bold">{{ nuevosClientes }}</p>
                 </div>
                 <div class="bg-white p-4 rounded-lg shadow-lg">
-                    <h5 class="text-gray-600 text-lg font-semibold">Clientes Activos</h5>
-                    <p class="text-2xl font-bold">{{ clientesActivos }}</p>
+                    <h5 class="text-gray-600 text-lg font-semibold">Número de Registros</h5>
+                    <p class="text-2xl font-bold">{{ totalRegistros }}</p>
                 </div>
                 <div class="bg-white p-4 rounded-lg shadow-lg">
-                    <h5 class="text-gray-600 text-lg font-semibold">Clientes Inactivos</h5>
-                    <p class="text-2xl font-bold">{{ clientesInactivos }}</p>
+                    <h5 class="text-gray-600 text-lg font-semibold">Número de Logins</h5>
+                    <p class="text-2xl font-bold">{{ totalLogins }}</p>
                 </div>
             </div>
 
@@ -87,12 +102,10 @@
                 </div>
 
                 <!-- Botones de paginación -->
-                <div class="flex justify-between mt-4">
-                    <button (click)="onPrevPage()" [disabled]="currentPage === 1"
-                        class="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400">Anterior</button>
-                    <span class="text-lg font-semibold">Página {{currentPage}} de {{totalPages}}</span>
-                    <button (click)="onNextPage()" [disabled]="currentPage === totalPages"
-                        class="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400">Siguiente</button>
+                <div class="flex justify-center mt-4">
+                    <button (click)="onPrevPage()" [disabled]="currentPage === 1" class="px-4 m-4 py-2 bg-gray-300 rounded hover:bg-gray-400">Anterior</button>
+                    <span class="mt-5 text-lg font-semibold">Página {{currentPage}} de {{totalPages}}</span>
+                    <button (click)="onNextPage()" [disabled]="currentPage === totalPages" class="px-4 m-4 py-2 bg-gray-300 rounded hover:bg-gray-400">Siguiente</button>
                 </div>
             </div>
         </div>

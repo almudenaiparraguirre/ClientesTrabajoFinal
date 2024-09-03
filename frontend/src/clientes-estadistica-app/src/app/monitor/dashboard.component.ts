@@ -29,6 +29,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   totalMoneyTransferred: number = 0;
   totalTransfersCompleted: number = 0;
   averageMoneyTransferred: number = 0;
+  transferenciasHoy: number = 0;
 
   constructor(private http: HttpClient, private monitorDataService: MonitorDataService) { }
 
@@ -143,6 +144,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   private calculateTotals() {
     this.totalMoneyTransferred = this.transferencias.reduce((sum, t) => sum + t.valorDestino, 0);
     this.totalTransfersCompleted = this.transferencias.length;
+    this.transferenciasHoy = this.getTransferenciasHoy();
   }
 
   private calculateAverageMoneyTransferred() {
@@ -209,6 +211,18 @@ export class DashboardComponent implements OnInit, OnDestroy {
       this.countriesComparisonChart.data.datasets[1].data = [];
       this.countriesComparisonChart.update();
     }
+  }
+
+  private getTransferenciasHoy(): number {
+    const todayStart = new Date();
+    todayStart.setHours(0, 0, 0, 0); // Inicio del día
+  
+    const todayEnd = new Date();
+    todayEnd.setHours(23, 59, 59, 999); // Fin del día
+  
+    return this.transferencias.filter(t =>
+      new Date(t.timestamp) >= todayStart && new Date(t.timestamp) <= todayEnd
+    ).length;
   }
 
   onPrevPage(): void {

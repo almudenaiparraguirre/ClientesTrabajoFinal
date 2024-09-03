@@ -16,7 +16,7 @@ export class UserService {
 
   //URL AMIN
   //private readonly URL = "https://localhost:44339/api/";
-  private readonly URL = "https://localhost:44339/api/";
+  private readonly URL = "https://localhost:7107/api/";
 
   constructor(private http: HttpClient) { }
 
