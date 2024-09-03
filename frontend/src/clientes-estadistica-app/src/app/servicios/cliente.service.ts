@@ -9,7 +9,8 @@ import { environment } from '../../environments/environment';
 })
 export class ClienteService {
 
-  private readonly URL = "https://localhost:44339/api/Cliente";
+  //private readonly URL = "https://localhost:44339/api/Cliente";
+  private readonly URL = "https://localhost:7107/api/Cliente";
 
   constructor(private http: HttpClient) { }
 
