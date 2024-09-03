@@ -24,20 +24,18 @@ export class UserService {
     return this.http.get<Usuario[]>(`${this.URL}Account/activeUsers`);
   }
 
+  isLoggedIn(): boolean {
+    return !!localStorage.getItem('token');
+  }
+
   autenticarUsuario(email: string, password: string, remember: boolean): Observable<any> {
     remember = false;
     return this.http.post<any>(`${this.URL}Account/login`, { email, password, remember });
   }
 
-
- 
-
 // TO DO
   registrarUsuario(usuario: any): Observable<any> {
     console.log(usuario); // Asegúrate de que los campos estén presentes y correctos DEBUG
-    const timestamp = 1712275200000; // Ejemplo de timestamp en milisegundos
-    const date = new Date(timestamp);
-    const formattedDate = date.toISOString().split('T')[0];
     return this.http.post<any>(`${this.URL}Account/register`, usuario);
   }
 
@@ -70,6 +68,10 @@ export class UserService {
 
   eliminarUsuario(email: string): Observable<any> {
     return this.http.delete(`${this.URL}Account/users/${email}`);
+  }
+
+  obtenerUsuarioActual(): Observable<any>{
+    return this.http.get(`${this.URL}Account/CurrentUser`);
   }
 
   private formatDateToBackend(date: Date): string {

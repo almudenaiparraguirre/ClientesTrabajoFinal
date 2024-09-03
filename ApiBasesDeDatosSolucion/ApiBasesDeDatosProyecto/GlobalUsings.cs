@@ -24,3 +24,6 @@ global using ApiBasesDeDatosProyecto.Helpers;
 
 global using Serilog;
 global using Microsoft.AspNetCore.Authorization;
+global using System;
+global using System.Collections.Generic;
+global using System.Threading.Tasks;
