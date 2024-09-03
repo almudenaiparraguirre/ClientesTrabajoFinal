@@ -38,22 +38,26 @@ export class LoginComponent implements OnInit {
 
   authentication() {
     this.usuarioService.autenticarUsuario(this.email, this.contrase, true)
-      .pipe(
-        catchError(error => {
-          if (error.status === 401) {
-            this.showError('Credenciales incorrectas');
-          } else {
-            this.showError('Ocurrió un error al intentar autenticarse. Por favor, intente de nuevo.');
-          }
-          return throwError(error);
-        })
-      )
-      .subscribe(response => {
-        if (response && response.token) {
-          localStorage.setItem('token', response.token);
-          this.route.navigate(['/users-info']); // Redirige a la ruta protegida
-        }
-      });
+  .pipe(
+    catchError(error => {
+      if (error.status === 401) {
+        this.showError('Credenciales incorrectas');
+      } else {
+        this.showError('Ocurrió un error al intentar autenticarse. Por favor, intente de nuevo.');
+      }
+      return throwError(error);
+    })
+  )
+  .subscribe(response => {
+    console.log('Respuesta del servidor:', response); // Imprimir toda la respuesta
+
+    if (response && response.token) {
+      localStorage.setItem('token', response.token.result);
+      //console.log("Este es el token seteado: " + localStorage.getItem('token'));
+      this.route.navigate(['/users-info']); // Redirige a la ruta protegida
+    }
+  });
+
   }
 
   redirectToRegisterPage() {

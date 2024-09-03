@@ -1,4 +1,3 @@
 ﻿public interface ITokenService
 {
-    string GenerateJwtToken(ApplicationUser user);
-}
+Task<string> GenerateJwtToken(ApplicationUser user);}

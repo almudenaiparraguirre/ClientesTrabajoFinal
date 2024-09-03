@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
+using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -20,7 +21,7 @@ namespace ApiBasesDeDatosProyecto.Controllers
         private readonly ILogger<ClienteController> _logger;
         private readonly ClienteService _clienteService;
         private readonly Contexto _contexto;
-        private readonly UserManager<IdentityUser> _userManager;
+        private readonly UserManager<ApplicationUser> _userManager;
 
         public ClienteController(
             IClienteRepository clienteRepository,
@@ -29,7 +30,7 @@ namespace ApiBasesDeDatosProyecto.Controllers
             ILogger<ClienteController> logger,
             ClienteService clienteService,
             Contexto contexto,
-            UserManager<IdentityUser> userManager)
+            UserManager<ApplicationUser> userManager)
         {
             _clienteRepository = clienteRepository;
             _paisRepository = paisRepository;
@@ -50,9 +51,10 @@ namespace ApiBasesDeDatosProyecto.Controllers
             _logger.LogInformation($"Se obtuvieron {lista.Count} clientes.");
             return Ok(_mapper.Map<List<ClienteDto>>(lista));
         }
+    
 
-        // GET api/cliente/5
-        [HttpGet("{id}")]
+    // GET api/cliente/5
+    [HttpGet("{id}")]
         [Authorize(Roles = "SuperAdmin,Admin,Client")]
         public async Task<ActionResult<ClienteDto>> Get(int id)
         {
