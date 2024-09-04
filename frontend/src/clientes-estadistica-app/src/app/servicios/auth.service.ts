@@ -15,8 +15,4 @@ export class AuthService {
   isLoggedIn(): boolean {
     return !!localStorage.getItem('token'); // Comprueba si hay un token en el almacenamiento local
   }
-
-  getUserEmail(): string {
-    return localStorage.getItem('email'); 
-  }
 }

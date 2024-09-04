@@ -19,7 +19,7 @@ export class DashboardClientesComponent implements OnInit, OnDestroy {
 
   private pollingSubscription: Subscription;
   private readonly POLLING_INTERVAL = 1000; // Intervalo de sondeo en milisegundos
-  private readonly API_URL = 'https://localhost:7107/api/monitoring/subscribe';
+  private readonly API_URL = 'https://localhost:7107/api/Clientemonitoring/subscribe';
   private isReceiving: boolean = true;
 
   // Gráficos
@@ -28,8 +28,8 @@ export class DashboardClientesComponent implements OnInit, OnDestroy {
 
   totalClientes: number = 0;
   nuevosClientes: number = 0;
-  clientesActivos: number = 0;
-  clientesInactivos: number = 0;
+  totalRegistros: number = 0;
+  totalLogins: number = 0;
 
   constructor(
     private http: HttpClient,
@@ -76,28 +76,32 @@ export class DashboardClientesComponent implements OnInit, OnDestroy {
 
   private startLongPolling(): void {
     const poll = () => {
-      this.http.get<ClienteMonitor[]>(this.API_URL).subscribe(
-        (newClientes) => {
-          if (this.isReceiving && newClientes) {
-            this.clientes.push(...newClientes);
-            this.updatePagination();
-            this.updateClientesChart();
-            this.updateClientesPorPaisChart();
-            this.updateCardMetrics();
-            this.updateTable(); // Actualiza la tabla con los nuevos clientes
-          }
-          if (this.isReceiving) {
-            setTimeout(poll, this.POLLING_INTERVAL);
-          }
-        },
-        (error) => {
-          console.error('Error en la solicitud:', error);
-          setTimeout(poll, this.POLLING_INTERVAL);
+        if (this.isReceiving) {
+            if (this.pollingSubscription) {
+                this.pollingSubscription.unsubscribe();
+            }
+            this.pollingSubscription = this.http.get<ClienteMonitor>(this.API_URL).subscribe(
+                data => {
+                    if (data && this.isReceiving) {
+                        this.clientes.push(data);
+                        this.updatePagination();
+                        this.updateTable(); 
+                        this.updateClientesChart();
+                        this.updateClientesPorPaisChart();
+                        this.updateCardMetrics();
+                    }
+                    setTimeout(poll, this.POLLING_INTERVAL);
+                },
+                error => {
+                    console.error('Error fetching updates', error);
+                    setTimeout(poll, this.POLLING_INTERVAL);
+                }
+            );
         }
-      );
     };
     poll();
-  }
+}
+
 
   pauseReceiving(): void {
     this.isReceiving = false;
@@ -123,7 +127,7 @@ export class DashboardClientesComponent implements OnInit, OnDestroy {
     this.totalPages = Math.ceil(this.clientes.length / this.pageSize);
     const startIndex = (this.currentPage - 1) * this.pageSize;
     const endIndex = startIndex + this.pageSize;
-    this.displayedClientes = this.clientes.slice(startIndex, endIndex);
+    this.displayedClientes = this.clientes.slice().reverse().slice(startIndex, endIndex);
   }
 
   onPrevPage(): void {
@@ -210,9 +214,6 @@ export class DashboardClientesComponent implements OnInit, OnDestroy {
         const tipoAcceso = cliente.tipoAcceso.toLowerCase(); // Normaliza el tipoAcceso a minúsculas
         const periodo = this.getPeriod(cliente);
 
-        console.log('Cliente tipoAcceso:', tipoAcceso); // Verificación de tipoAcceso
-        console.log('Periodo:', periodo); // Verificación de periodo
-
         if (tipoAcceso === 'registro') {
             registrosPorPeriodo[periodo] = (registrosPorPeriodo[periodo] || 0) + 1;
         } else if (tipoAcceso === 'login') {
@@ -220,18 +221,23 @@ export class DashboardClientesComponent implements OnInit, OnDestroy {
         }
     });
 
-    console.log('Registros por periodo:', registrosPorPeriodo);
-    console.log('Logins por periodo:', loginsPorPeriodo);
+    // Ordenar los periodos y preparar los datos para el gráfico
+    const periodos = [...new Set([...Object.keys(registrosPorPeriodo), ...Object.keys(loginsPorPeriodo)])].sort();
 
-    const periodos = Object.keys(registrosPorPeriodo).sort();
-    const datosRegistros = periodos.map((periodo) => registrosPorPeriodo[periodo] || 0);
-    const datosLogins = periodos.map((periodo) => loginsPorPeriodo[periodo] || 0);
+    const datosRegistros = periodos.map((periodo) => {
+        return registrosPorPeriodo[periodo] || 0;
+    });
+
+    const datosLogins = periodos.map((periodo) => {
+        return loginsPorPeriodo[periodo] || 0;
+    });
 
     this.clientesChart.data.labels = periodos;
     this.clientesChart.data.datasets[0].data = datosRegistros;
     this.clientesChart.data.datasets[1].data = datosLogins;
     this.clientesChart.update();
 }
+
 
 
 
@@ -272,14 +278,72 @@ private getPeriod(cliente: ClienteMonitor): string {
     this.clientesPorPaisChart.update();
 }
 
-  private updateCardMetrics(): void {
-    this.totalClientes = this.clientes.length;
-    this.nuevosClientes = this.clientes.filter(cliente => {
-      // Lógica para determinar si el cliente es nuevo
-    }).length;
-    //this.clientesActivos = this.clientes.filter(cliente => cliente.estado === 'activo').length;
-    //this.clientesInactivos = this.clientes.filter(cliente => cliente.estado === 'inactivo').length;
+// Método para actualizar las métricas de la tarjeta
+private updateCardMetrics(): void {
+  // Total de clientes
+  this.totalClientes = this.clientes.length;
+
+  // Inicializar contadores
+  const tipoAccesoCounts = this.clientes.reduce((counts, cliente) => {
+    const tipoAcceso = cliente.tipoAcceso.toLowerCase(); // Normalizar a minúsculas
+
+    if (tipoAcceso === 'registro') {
+      counts.registros += 1;
+    } else if (tipoAcceso === 'login') {
+      counts.logins += 1;
+    }
+
+    return counts;
+  }, { registros: 0, logins: 0 });
+
+  this.totalRegistros = tipoAccesoCounts.registros;
+  this.totalLogins = tipoAccesoCounts.logins;
+
+  // Calcular la media de edad
+  const totalEdades = this.clientes.reduce((sum, cliente) => {
+    let fechaNacimiento = cliente.fechaNacimiento;
+
+    // Verificar y convertir fechaNacimiento si es necesario
+    if (!(fechaNacimiento instanceof Date)) {
+      fechaNacimiento = new Date(fechaNacimiento); // Convertir de cadena a Date si es necesario
+    }
+
+    if (isNaN(fechaNacimiento.getTime())) {
+      console.error('Fecha de nacimiento no válida:', fechaNacimiento);
+      return sum; // O manejar el error de otra manera
+    }
+
+    const edad = this.calcularEdad(fechaNacimiento);
+    return sum + edad;
+  }, 0);
+
+  // Calcular la media de edad si hay clientes
+  const mediaEdad = this.clientes.length > 0 ? totalEdades / this.clientes.length : 0;
+
+  // Asignar la media de edad a la variable nuevosClientes
+  this.nuevosClientes = Math.floor(mediaEdad);
+}
+
+// Método para calcular la edad basado en la fecha de nacimiento
+private calcularEdad(fechaNacimiento: Date): number {
+  // Verifica si fechaNacimiento es una instancia de Date
+  if (!(fechaNacimiento instanceof Date)) {
+    throw new Error('fechaNacimiento debe ser una instancia de Date');
   }
+
+  const hoy = new Date();
+  let edad = hoy.getFullYear() - fechaNacimiento.getFullYear();
+  const mes = hoy.getMonth() - fechaNacimiento.getMonth();
+
+  // Verifica si el cumpleaños de este año ya pasó
+  // o si todavía no ha pasado
+  if (mes < 0 || (mes === 0 && hoy.getDate() < fechaNacimiento.getDate())) {
+    edad--;
+  }
+
+  return edad;
+}
+
 
   // Método para actualizar la tabla de clientes
   private updateTable(): void {

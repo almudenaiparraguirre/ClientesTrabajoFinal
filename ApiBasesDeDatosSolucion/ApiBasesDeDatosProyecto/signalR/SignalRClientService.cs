@@ -63,7 +63,7 @@ public class SignalRClientService
             Console.WriteLine($"PaisId: {data.PaisId}");
             Console.WriteLine($"Pais: {data.Pais}");
             Console.WriteLine($"Email: {data.Email}");
-            data.FechaRecibido = GetRandomDateInLast7Days();
+            data.FechaRecibido = DateTime.Now;
             Console.WriteLine($"Fechar: {data.FechaRecibido}");
 
 

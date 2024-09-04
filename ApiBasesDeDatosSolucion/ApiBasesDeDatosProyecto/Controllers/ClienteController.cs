@@ -5,70 +5,72 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
+using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Threading.Tasks;
 
 namespace ApiBasesDeDatosProyecto.Controllers
 {
-[Route("api/[controller]")]
-[ApiController]
-public class ClienteController : ControllerBase
-{
-    private readonly IClienteRepository _clienteRepository;
-    private readonly IPaisRepository _paisRepository;
-    private readonly IMapper _mapper;
-    private readonly ILogger<ClienteController> _logger;
-    private readonly ClienteService _clienteService;
-    private readonly Contexto _contexto;
-    private readonly UserManager<ApplicationUser> _userManager;
-
-    public ClienteController(
-        IClienteRepository clienteRepository,
-        IMapper mapper,
-        IPaisRepository paisRepository,
-        ILogger<ClienteController> logger,
-        ClienteService clienteService,
-        Contexto contexto,
-        UserManager<ApplicationUser> userManager)
+    [Route("api/[controller]")]
+    [ApiController]
+    public class ClienteController : ControllerBase
     {
-        _clienteRepository = clienteRepository;
-        _paisRepository = paisRepository;
-        _mapper = mapper;
-        _logger = logger;
-        _clienteService = clienteService;
-        _contexto = contexto;
-        _userManager = userManager;
-    }
+        private readonly IClienteRepository _clienteRepository;
+        private readonly IPaisRepository _paisRepository;
+        private readonly IMapper _mapper;
+        private readonly ILogger<ClienteController> _logger;
+        private readonly ClienteService _clienteService;
+        private readonly Contexto _contexto;
+        private readonly UserManager<ApplicationUser> _userManager;
 
-    // GET: api/cliente
-    [HttpGet]
-    //[Authorize(Roles = "SuperAdmin,Admin")]
-    public async Task<ActionResult<List<ClienteDto>>> Get()
-    {
-        _logger.LogInformation($"Obteniendo todos los clientes.");
-        List<Cliente> lista = await _clienteRepository.ObtenerTodosAsync();
-        _logger.LogInformation($"Se obtuvieron {lista.Count} clientes.");
-        return Ok(_mapper.Map<List<ClienteDto>>(lista));
-    }
+        public ClienteController(
+            IClienteRepository clienteRepository,
+            IMapper mapper,
+            IPaisRepository paisRepository,
+            ILogger<ClienteController> logger,
+            ClienteService clienteService,
+            Contexto contexto,
+            UserManager<ApplicationUser> userManager)
+        {
+            _clienteRepository = clienteRepository;
+            _paisRepository = paisRepository;
+            _mapper = mapper;
+            _logger = logger;
+            _clienteService = clienteService;
+            _contexto = contexto;
+            _userManager = userManager;
+        }
+
+        // GET: api/cliente
+        [HttpGet]
+        [Authorize(Roles = "SuperAdmin,Admin")]
+        public async Task<ActionResult<List<ClienteDto>>> Get()
+        {
+            _logger.LogInformation($"Obteniendo todos los clientes.");
+            List<Cliente> lista = await _clienteRepository.ObtenerTodosAsync();
+            _logger.LogInformation($"Se obtuvieron {lista.Count} clientes.");
+            return Ok(_mapper.Map<List<ClienteDto>>(lista));
+        }
+    
 
     // GET api/cliente/5
     [HttpGet("{id}")]
-    [Authorize(Roles = "SuperAdmin,Admin,Client")]
-    public async Task<ActionResult<ClienteDto>> Get(int id)
-    {
-        _logger.LogInformation($"Obteniendo cliente con ID {id}.");
-        var cliente = await _clienteRepository.ObtenerPorIdAsync(id);
-        if (cliente == null)
+        [Authorize(Roles = "SuperAdmin,Admin,Client")]
+        public async Task<ActionResult<ClienteDto>> Get(int id)
         {
-            _logger.LogWarning($"Cliente con ID {id} no encontrado.");
-            return NotFound(new ErrorResponseDTO($"No se encontraron clientes con id {id}."));
-        }
-        
-        // Authorize the Client role to view only their own data
-        if (User.IsInRole("Client") && cliente.Email != User.Identity.Name)
-        {
-            return Forbid("No tienes permiso para ver los datos de otro cliente.");
-        }
+            _logger.LogInformation($"Obteniendo cliente con ID {id}.");
+            var cliente = await _clienteRepository.ObtenerPorIdAsync(id);
+            if (cliente == null)
+            {
+                _logger.LogWarning($"Cliente con ID {id} no encontrado.");
+                return NotFound(new ErrorResponseDTO($"No se encontraron clientes con id {id}."));
+            }
+            
+            // Authorize the Client role to view only their own data
+            if (User.IsInRole("Client") && cliente.Email != User.Identity.Name)
+            {
+                return Forbid("No tienes permiso para ver los datos de otro cliente.");
+            }
 
         return Ok(_mapper.Map<ClienteDto>(cliente));
     }

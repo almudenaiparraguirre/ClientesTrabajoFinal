@@ -285,6 +285,7 @@ public class AccountController : ControllerBase
 
     // SuperAdmin, Admin: Inicio de sesión
     [AllowAnonymous]
+
     [HttpPost("login")]
     public async Task<IActionResult> Login([FromBody] LoginViewModel model)
     {

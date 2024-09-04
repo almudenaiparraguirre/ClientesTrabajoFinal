@@ -4,6 +4,8 @@ import { UserService } from 'src/app/servicios/user.service';
 import { ClienteService } from 'src/app/servicios/cliente.service';
 import { Usuario } from 'src/app/clases/usuario'; 
 import { Cliente } from 'src/app/clases/cliente'; 
+import { HttpHeaders } from '@angular/common/http';
+import { AuthService } from 'src/app/servicios/auth.service';
 
 @Component({
   selector: 'app-users-info',
@@ -39,7 +41,7 @@ export class UsersInfoComponent implements OnInit, OnDestroy {
   // Variable para almacenar la suscripción
   private subscription: Subscription = new Subscription();
 
-  constructor(private userService: UserService, private clienteService: ClienteService) { }
+  constructor(private userService: UserService, private clienteService: ClienteService,private authService: AuthService) { }
 
   ngOnInit(): void {
     this.loadUsuarios();
@@ -88,6 +90,7 @@ export class UsersInfoComponent implements OnInit, OnDestroy {
   
           this.filteredUsuarios = this.usuarios;
           this.totalUsuarios = this.usuarios.length;
+
         },
         error => {
           console.error('Error fetching users', error);
@@ -97,19 +100,34 @@ export class UsersInfoComponent implements OnInit, OnDestroy {
   }  
 
   loadClientes(): void {
-    this.subscription.add(
-      this.clienteService.getClientes().subscribe(
-        data => {
-          this.clientes = data;
-          this.filteredClientes = data;
-          this.totalClientes = data.length;
-        },
-        error => {
-          console.error('Error fetching clients', error);
+    const token = this.authService.getToken();
+    //console.log('Token utilizado para la solicitud:', token);
+  
+    const headers = new HttpHeaders({
+      'Authorization': `Bearer ${token}`
+    });
+  
+    this.clienteService.getClientes().subscribe( // Cambiado para usar getClientes sin parámetros
+      (clientes) => {
+        console.log('Clientes cargados', clientes);
+        this.clientes = clientes;
+        this.filteredClientes = this.clientes; // Asegúrate de tener una lista filtrada también
+        this.totalClientes = this.clientes.length;
+      },
+      (error) => {
+        console.error('Error fetching clients', error);
+        if (error.status === 403) {
+          alert('No tienes permiso para acceder a esta ruta.');
+        } else if (error.status === 401) {
+          alert('No estás autorizado. Por favor, inicia sesión.');
+        } else {
+          alert('Ocurrió un error inesperado.');
         }
-      )
+      }
     );
   }
+
+  
 
   filterResults() {
     if (this.activeTab === 'table1') {

@@ -1,9 +1,10 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { map, Observable } from 'rxjs';
 import { Usuario } from '../clases/usuario';
 import { environment } from '../../environments/environment';
 import { Cliente } from '../clases/cliente';
+import { AuthService } from './auth.service';
 
 @Injectable({
   providedIn: 'root'
@@ -18,10 +19,19 @@ export class UserService {
   //private readonly URL = "https://localhost:44339/api/";
   private readonly URL = "https://localhost:7107/api/";
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient,private authService: AuthService) { }
 
   getUsuarios(): Observable<Usuario[]> {
-    return this.http.get<Usuario[]>(`${this.URL}Account/activeUsers`);
+    // Obtener el token
+    const token = this.authService.getToken();
+
+    // Configurar los encabezados con el token
+    const headers = new HttpHeaders({
+      'Authorization': `Bearer ${token}` // Agregar el token al encabezado
+    });
+
+    // Realizar la solicitud GET con los encabezados
+    return this.http.get<Usuario[]>(`${this.URL}Account/activeUsers`, { headers });
   }
 
   isLoggedIn(): boolean {

@@ -53,9 +53,6 @@ export class LoginComponent implements OnInit {
       .subscribe(response => {
         if (response && response.token) {
           localStorage.setItem('token', response.token);
-          localStorage.setItem('email', this.email);
-          this.authService.currentUserEmail = this.email;
-          console.log(this.authService.currentUserEmail);
           this.route.navigate(['/users-info']); // Redirige a la ruta protegida
         }
       });

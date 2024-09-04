@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using ApiBasesDeDatosProyecto.Context;
+using System.Net.Http;
 
 namespace ApiBasesDeDatosProyecto.Repository
 {
@@ -13,6 +14,7 @@ namespace ApiBasesDeDatosProyecto.Repository
         private readonly Contexto _context;
         private readonly IClienteRepository _clienteRepository;
         private readonly IMapper _mapper;
+        private static readonly HttpClient _httpClient = new HttpClient();
 
         public AccessMonitoringDataRepository(IClienteRepository clienteRepository, Contexto context, IMapper mapper)
         {
@@ -44,7 +46,7 @@ namespace ApiBasesDeDatosProyecto.Repository
         {
             _context.AccessMonitoringDatas.Add(accmonitoringData);
             await _context.SaveChangesAsync();
-            //await NotifyChangesAsync(); // Llama a Notify después de la operación
+            await NotifyChangesAsync(); // Llama a Notify después de la operación
         }
 
         public async Task<AccessMonitoringData> AddCliente(AccessMonitoringData model)
@@ -54,8 +56,20 @@ namespace ApiBasesDeDatosProyecto.Repository
 
             // Llamar al método de repositorio para añadir el cliente a la base de datos
             await _clienteRepository.AddClienteAsync(cliente);
-
             return model;
+        }
+
+        private async Task NotifyChangesAsync()
+        {
+            // Asume que la API está alojada localmente; ajusta la URL según sea necesario
+            var notifyUrl = "https://localhost:7107/api/ClienteMonitoring/notify";
+            var response = await _httpClient.PostAsync(notifyUrl, null);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                // Manejo de errores (log, excepciones, etc.)
+                Console.WriteLine("Error notifying changes.");
+            }
         }
     }
 }
