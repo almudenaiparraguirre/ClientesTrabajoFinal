@@ -165,6 +165,9 @@ builder.Services.AddSingleton<SignalRClientService>(provider =>
 // Paso intermedio entre el 1 y el 2 (Construye la app)
 var app = builder.Build();
 
+// Aplica las migraciones de base de datos.
+ApplyMigrations(app);
+
 // Llamar a la inicializaci�n de datos (SeedData)
 using (var scope = app.Services.CreateScope())
 {
@@ -218,3 +221,24 @@ await Task.WhenAll(listeningTasks);
 
 // Ejecutar la aplicaci�n
 app.Run();
+
+static void ApplyMigrations(WebApplication app)
+{
+    using (var scope = app.Services.CreateScope())
+    {
+        var services = scope.ServiceProvider;
+        try
+        {
+            // Obtiene el contexto de base de datos y aplica las migraciones.
+            var context = services.GetRequiredService<Contexto>();
+            context.Database.Migrate();
+
+        }
+        catch (Exception ex)
+        {
+            // Registra cualquier error que ocurra durante la aplicaciï¿½n de migraciones.
+            var logger = services.GetRequiredService<ILogger<Program>>();
+            logger.LogError(ex, "An error occurred while migrating the database.");
+        }
+    }
+}
