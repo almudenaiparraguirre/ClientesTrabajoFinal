@@ -84,7 +84,7 @@ builder.Services.AddAuthorization(options =>
     options.AddPolicy("ManageAllPolicy", policy =>
         policy.RequireClaim("Permissions", "ManageAll"));
 
-    // Puedes definir m�s pol�ticas aqu� seg�n sea necesario
+    // Puedes definir m�s pol�ticas aqu� seg�n sea necesario 
     options.AddPolicy("ManageAdminsPolicy", policy =>
         policy.RequireClaim("Permissions", "ManageAdmins"));
 
