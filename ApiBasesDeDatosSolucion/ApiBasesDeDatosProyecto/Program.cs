@@ -59,16 +59,22 @@ builder.Services.AddAuthentication(x =>
     };
 });
 
-// Configurar CORS
+// Configuraciï¿½n de CORS para permitir solicitudes desde orï¿½genes especï¿½ficos.
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowSpecificOrigins",
-        policy =>
-        {
-            policy.WithOrigins("http://localhost:4200") // Cambia esto por el origen de tu frontend
-                  .AllowAnyHeader()
-                  .AllowAnyMethod();
-        });
+    options.AddPolicy("AllowLocalhost",
+        builder => builder
+            .WithOrigins("http://localhost:4200")  // Permite solicitudes desde localhost:4200.
+            .AllowAnyHeader()  // Permite cualquier encabezado.
+            .AllowAnyMethod()  // Permite cualquier mï¿½todo HTTP.
+            .AllowCredentials());  // Permite el uso de credenciales.
+
+    options.AddPolicy("AllowAzureHost",
+        builder => builder
+            .WithOrigins("https://delightful-ocean-0ed177403.5.azurestaticapps.net")  // Permite solicitudes desde el host de Azure.
+            .AllowAnyHeader()  // Permite cualquier encabezado.
+            .AllowAnyMethod()  // Permite cualquier mï¿½todo HTTP.
+            .AllowCredentials());  // Permite el uso de credenciales.
 });
 
 // Configurar pol�ticas de autorizaci�n
@@ -180,14 +186,18 @@ using (var scope = app.Services.CreateScope())
 // Configurar middleware
 if (app.Environment.IsDevelopment())
 {
-    app.UseSwagger();
-    app.UseSwaggerUI();
+    app.UseSwagger();  // Habilita Swagger en desarrollo.
+    app.UseSwaggerUI();  // Habilita la interfaz de usuario de Swagger.
+    app.UseCors("AllowLocalhost");  // Usa la polï¿½tica de CORS para localhost.
+}
+else
+{
+    app.UseCors("AllowAzureHost");  // Usa la polï¿½tica de CORS para el host de Azure.
 }
 
 
-
-// Redireccionar de http a https
-app.UseHttpsRedirection();
+    // Redireccionar de http a https
+    app.UseHttpsRedirection();
 
 // Usar CORS
 app.UseCors("AllowSpecificOrigins");
