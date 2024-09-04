@@ -3,6 +3,7 @@ import { UserService } from '../servicios/user.service';
 import { Usuario } from '../clases/usuario';
 import { Router } from '@angular/router';
 import { catchError, throwError } from 'rxjs';
+import { AuthService } from '../servicios/auth.service';
 
 @Component({
   selector: 'app-login',
@@ -20,7 +21,8 @@ export class LoginComponent implements OnInit {
   password: any;
   username: any;
 
-  constructor(private usuarioService: UserService, private route: Router) { }
+  constructor(private usuarioService: UserService, private route: Router,
+    private authService: AuthService) { }
 
   ngOnInit() {
     this.getUsuarios();
@@ -51,6 +53,9 @@ export class LoginComponent implements OnInit {
       .subscribe(response => {
         if (response && response.token) {
           localStorage.setItem('token', response.token);
+          localStorage.setItem('email', this.email);
+          this.authService.currentUserEmail = this.email;
+          console.log(this.authService.currentUserEmail);
           this.route.navigate(['/users-info']); // Redirige a la ruta protegida
         }
       });

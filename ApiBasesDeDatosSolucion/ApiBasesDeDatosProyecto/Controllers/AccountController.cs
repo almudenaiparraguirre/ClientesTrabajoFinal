@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 
 [Route("api/[controller]")]
@@ -229,22 +230,57 @@ public class AccountController : ControllerBase
 
 
     // Cliente: Ver solo sus propios datos
-    [Authorize(Roles = "Client")]
+    //[Authorize(Roles = "Client")]
     [HttpGet("users/getUser")]
     public async Task<ActionResult<ApplicationUser>> GetUserByEmail([FromQuery] string email)
     {
-        var currentUser = await _userManager.GetUserAsync(User);
-        if (currentUser.Email != email)
+        var currentUser = await _userManager.FindByEmailAsync(email);
+        if (currentUser.Email == email)
         {
-            return Forbid();
+            return Ok(email);
         }
 
-        var userDto = await _userService.GetUserByEmailAsync(email);
-        if (userDto == null)
+        var userRol = await _userManager.GetRolesAsync(currentUser);
+        var dateOfBirth = currentUser.DateOfBirth;
+        var nombreCompleto = currentUser.FullName;
+        var nombreUsuario = currentUser.UserName;
+
+        if (currentUser == null)
         {
             return NotFound(new { message = "User not found" });
         }
-        return Ok(userDto);
+
+        return Ok(new
+        {
+            email = currentUser.Email,
+            fullName = nombreCompleto,
+            DateOfBirth = dateOfBirth,
+            rol = userRol
+        });
+    }
+
+    [HttpGet("users/getCompleteUserInfo")]
+    public async Task<ActionResult> GetCompleteUserInfoByEmail(string email)
+    {
+        var currentUser = await _userManager.FindByEmailAsync(email);
+        if (currentUser == null)
+        {
+            return NotFound(new { message = "User not found" });
+        }
+
+        var userRol = await _userManager.GetRolesAsync(currentUser);
+        var dateOfBirth = currentUser.DateOfBirth;
+        var nombreCompleto = currentUser.FullName;
+        var paisNombre = currentUser.UserName;
+
+        return Ok(new
+        {
+            email = currentUser.Email,
+            fullName = nombreCompleto,
+            dateOfBirth = dateOfBirth,
+            rol = userRol.FirstOrDefault(),  // Si solo necesitas un rol
+            paisNombre = paisNombre
+        });
     }
 
     // SuperAdmin, Admin: Inicio de sesión

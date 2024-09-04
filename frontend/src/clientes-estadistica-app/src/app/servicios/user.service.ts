@@ -70,9 +70,21 @@ export class UserService {
     return this.http.delete(`${this.URL}Account/users/${email}`);
   }
 
-  obtenerUsuarioActual(): Observable<any>{
-    return this.http.get(`${this.URL}Account/CurrentUser`);
+  obtenerUsuarioPorEmail(email: string): Observable<any> {
+    return this.http.get(`${this.URL}Account/users/getUser?email=${email}`, { responseType: 'text' }).pipe(
+      map(response => {
+        try {
+          return JSON.parse(response);
+        } catch {
+          return { email: response }; // Fallback if it's not valid JSON
+        }
+      })
+    );
   }
+
+  obtenerDatosCompletosUsuarioPorEmail(email: string): Observable<any> {
+    return this.http.get(`${this.URL}Account/users/getCompleteUserInfo?email=${email}`);
+  }  
 
   private formatDateToBackend(date: Date): string {
     return date.toISOString();

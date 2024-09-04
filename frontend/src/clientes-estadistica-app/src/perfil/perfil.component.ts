@@ -12,15 +12,40 @@ import { UserService } from '../app/servicios/user.service'; // Asegúrate de la
 export class PerfilComponent implements OnInit {
   totalMoneyTransferred: number = 0;
   totalTransfersCompleted: number = 0;
-  usuario: Usuario;
-  userService: UserService;
+  usuario: any;
+  userData: any;
+  email: string;
 
-  constructor(private authService: AuthService, private router: Router) { }
+  constructor(private router: Router,
+    public authService: AuthService,
+    private userService: UserService) { }
 
-  ngOnInit(): void {
-    this.loadProfileData();
-  }
-
+    ngOnInit(): void {
+      if (this.authService.isLoggedIn()) {
+        console.log(this.authService.getUserEmail());
+        this.userService.obtenerUsuarioPorEmail(this.authService.getUserEmail()).subscribe({
+          next: (response) => {
+            this.email = response.email;
+            this.userService.obtenerDatosCompletosUsuarioPorEmail(this.email).subscribe({
+              next: (userData) => {
+                this.usuario = userData;
+                console.log(this.usuario); // Ahora tienes todos los datos del usuario
+              },
+              error: (error) => {
+                console.log(error);
+              }
+            });
+            this.usuario = response;
+            console.log(response);
+        },
+        error: (error) => {
+          console.log(error)
+        }});
+      } else {
+        this.router.navigate(['/login']);
+      }
+    }
+    
   canActivate(): boolean {
     if (this.authService.isLoggedIn()) {
       return true;
