@@ -4,6 +4,8 @@ import { Subscription } from 'rxjs';
 import { MonitorDataService } from '../servicios/monitor-data.service';
 import { MonitoringData } from '../interfaces/monitorData.interface';
 import { Chart } from 'chart.js/auto';
+import { environment } from 'src/environments/environment';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-dashboard',
@@ -19,7 +21,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   private pollingSubscription: Subscription;
   private readonly POLLING_INTERVAL = 1000; // Intervalo de sondeo en milisegundos
-  private readonly API_URL = 'https://localhost:7107/api/monitoring/subscribe';
+  private readonly API_URL = environment.apiUrl + '/api/monitoring/subscribe';
   private isReceiving: boolean = true; // Controla si la recepción está activa
 
   // Gráficos
@@ -31,7 +33,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   averageMoneyTransferred: number = 0;
   transferenciasHoy: number = 0;
 
-  constructor(private http: HttpClient, private monitorDataService: MonitorDataService) { }
+  constructor(private http: HttpClient, private monitorDataService: MonitorDataService, private router: Router) { }
 
   ngOnInit(): void {
     this.loadInitialData();
@@ -52,6 +54,15 @@ export class DashboardComponent implements OnInit, OnDestroy {
     }
   }
 
+  // Método para redirigir al dashboard
+  redirectToDashboard() {
+    this.router.navigate(['/dashboard']); // Asegúrate de que la ruta esté configurada correctamente en tu routing module
+  }
+
+  // Método para redirigir al dashboard de clientes
+  redirectToDashboardClientes() {
+    this.router.navigate(['/dashboardclientes']); // Asegúrate de que esta ruta también esté configurada en tu routing module
+  }
   private loadInitialData(): void {
     this.monitorDataService.getTransferencias().subscribe(
       data => {

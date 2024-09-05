@@ -15,24 +15,24 @@
         <div class="bg-gray-800 text-gray-100 w-full md:w-64 min-h-screen p-4">
             <h3 class="text-2xl font-semibold mb-6">Dashboard</h3>
             <nav class="flex flex-col space-y-4">
-                <a href="http://localhost:4200/dashboard"
-                    class="bg-gray-700 hover:bg-gray-600 text-center py-4 rounded-md shadow-md">
+                <a (click)="redirectToDashboard()" class="bg-gray-700 hover:bg-gray-600 text-center py-4 rounded-md shadow-md">
                     Transferencias
-                </a>
-                <a href="http://localhost:4200/dashboardclientes"
-                class="bg-blue-800 hover:bg-blue-700 text-center py-4 rounded-md shadow-md">
+                  </a>
+                  
+                  <a (click)="redirectToDashboardClientes()" class="bg-blue-800 hover:bg-blue-700 text-center py-4 rounded-md shadow-md">
                     Accesos
-                </a>
+                  </a>
+                  
             </nav>
 
             <!-- Separador Vertical -->
             <hr class="my-6 border-gray-600" />
 
             <div class="mt-6">
-                <a href="http://localhost:4200/users-info"
-                    class="bg-blue-600 hover:bg-blue-500 text-white py-2 px-4 rounded-md shadow-md block text-center">
+                <a (click)="redirectToUsersInfo()" class="bg-blue-600 hover:bg-blue-500 text-white py-2 px-4 rounded-md shadow-md block text-center">
                     Volver
                 </a>
+                  
             </div>
         </div>
 
