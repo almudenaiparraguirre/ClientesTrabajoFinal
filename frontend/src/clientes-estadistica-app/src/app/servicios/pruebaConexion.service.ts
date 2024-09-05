@@ -9,15 +9,15 @@ import { environment } from '../../environments/environment';
 })
 export class PruebaConexionService {
 
-    // IMPORTANTE:
-  //    1 URL ESTADISTICA Y OTRA PARA CLIENTES
-  private readonly url_estadistica = environment.apiUrl;
+  //   // IMPORTANTE:
+  // //    1 URL ESTADISTICA Y OTRA PARA CLIENTES
+  // private readonly url_estadistica = environment.apiUrl;
 
-  constructor(private http: HttpClient) { }
+  // constructor(private http: HttpClient) { }
 
-  // -------------------- Método Sergio para Debuggear en Azure, no borrar:
-  getUsuariosPrueba(): Observable<Usuario[]> {
-    return this.http.get<Usuario[]>(this.url_estadistica);
-  }
-  // -------------------- Fin Método Sergio para Debuggear en Azure, no borrar:
+  // // -------------------- Método Sergio para Debuggear en Azure, no borrar:
+  // getUsuariosPrueba(): Observable<Usuario[]> {
+  //   return this.http.get<Usuario[]>(this.url_estadistica);
+  // }
+  // // -------------------- Fin Método Sergio para Debuggear en Azure, no borrar:
 }
