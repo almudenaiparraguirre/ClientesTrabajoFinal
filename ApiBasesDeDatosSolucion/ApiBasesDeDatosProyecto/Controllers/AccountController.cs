@@ -193,9 +193,9 @@ public class AccountController : ControllerBase
 
         // Actualizar propiedades del usuario
         userToUpdate.FullName = $"{model.Nombre} {model.Apellido}";
-        if (model.FechaNacimiento.HasValue)
+        if (model.DateOfBirth.HasValue)
         {
-            userToUpdate.DateOfBirth = model.FechaNacimiento.Value;
+            userToUpdate.DateOfBirth = model.DateOfBirth.Value;
         }
         else
         {
