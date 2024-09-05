@@ -115,7 +115,7 @@ builder.Services.AddTransient<ClienteService>();
 builder.Services.AddScoped<IVistaClientesPaisesRepository, VistaClientesPaisesRepository>();
 builder.Services.AddTransient<IMonitoringDataRepository, MonitoringDataRepository>();
 builder.Services.AddScoped<IAccessMonitoringDataRepository, AccessMonitoringDataRepository>();
-
+builder.Services.AddScoped<ITokenRepository, TokenRepository>();
 
 
 // Configurar MediatR

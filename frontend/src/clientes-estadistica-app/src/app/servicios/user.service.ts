@@ -115,8 +115,8 @@ export class UserService {
     );
   }
 
-  obtenerDatosCompletosUsuarioPorEmail(email: string): Observable<any> {
-    return this.http.get(`${this.URL}Account/users/getCompleteUserInfo?email=${email}`);
+  obtenerDatosCompletosUsuarioPorToken(token: string): Observable<any> {
+    return this.http.get(`${this.URL}Account/users/getCompleteUserInfo?token=${token}`);
   }  
 
   private formatDateToBackend(date: Date): string {

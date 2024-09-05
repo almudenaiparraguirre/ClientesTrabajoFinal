@@ -7,7 +7,6 @@
 
         public string? Empleo { get; set; }
 
-        // Campos adicionales para clientes
         public string? Nombre { get; set; }
         public string? Apellido { get; set; }
         public  DateTime FechaNacimiento { get; set; }

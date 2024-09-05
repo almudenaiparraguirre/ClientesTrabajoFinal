@@ -8,6 +8,21 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&family=Poppins:wght@300;600&display=swap" rel="stylesheet">
+    <style>
+        .profile-info {
+            padding: 1rem;
+        }
+        .input-edit {
+            margin-bottom: 0.5rem;
+        }
+        .btn-save, .btn-cancel, .btn-edit {
+            margin-top: 1rem;
+        }
+        .separator {
+            border-bottom: 1px solid #e5e7eb; /* Color de la separación */
+            margin: 1rem 0; /* Espacio alrededor de la separación */
+        }
+    </style>
 </head>
 <body class="bg-white font-sans leading-normal tracking-normal">
 
@@ -29,7 +44,6 @@
                 Usuarios
               </a>
             </li>
-            
             <li><a href="#" class="text-lg hover:text-gray-400 transition duration-300">Perfil</a></li>
           </ul>
         </nav>
@@ -37,19 +51,103 @@
     </header>
 
     <!-- Contenedor de la tarjeta centrado -->
-    <div class="flex items-center justify-center min-h-screen"> <!-- Nuevo contenedor flex para centrar la tarjeta -->
+    <div class="flex items-center justify-center min-h-screen">
         <div class="profile-card">
             <div class="profile-card-header">
                 <img src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80" alt="Imagen de perfil">
-                <div class="profile-card-title"> {{ usuario?.fullName }} </div>
+                <div class="profile-card-title"> {{ usuario?.fullName || usuario?.nombre }} </div>
                 <div class="profile-card-subtitle"> {{ usuario?.rol }} </div>
+                <div class="profile-card-subtitle"> {{ usuario?.email }} </div>
             </div>
             <div class="profile-card-content">
-                <div class="profile-info">
-                    <p><strong>Email:</strong> {{ usuario?.email }}</p>
-                    <p><strong>País:</strong> {{ usuario?.paisNombre }} </p>
-                    <p><strong>Fecha de Nacimiento:</strong> {{ usuario?.dateOfBirth }} </p>
-                    <p><strong>Rol:</strong> {{ usuario?.rol }} </p>
+                <!-- Mostrar datos específicos del rol 'cliente' -->
+                <div *ngIf="usuario?.rol === 'Client'" class="profile-info">
+                    <div *ngIf="!isEditing">
+                        <p><strong>Nombre:</strong> {{ usuario?.nombre }} </p>
+                        <p><strong>Apellido:</strong> {{ usuario?.apellido }} </p>
+                        <p><strong>Fecha de Nacimiento:</strong> {{ usuario?.fechaNacimiento }} </p>
+                        <p><strong>Empleo:</strong> {{ usuario?.empleo }} </p>
+                        <p><strong>País ID:</strong> {{ usuario?.paisID }} </p>
+                        <p><strong>Rol:</strong> {{ usuario?.rol }} </p>
+                        <button (click)="enableEditing()" class="btn-edit">Editar</button>
+                    </div>
+                    <div *ngIf="isEditing">
+                        <label class="block">
+                            Nombre:
+                            <input [(ngModel)]="usuario.nombre" class="input-edit border rounded p-2"/>
+                        </label>
+                        <div class="separator"></div>
+                        <label class="block">
+                            Apellido:
+                            <input [(ngModel)]="usuario.apellido" class="input-edit border rounded p-2"/>
+                        </label>
+                        <div class="separator"></div>
+                        <label class="block">
+                            Fecha de Nacimiento:
+                            <input [(ngModel)]="usuario.fechaNacimiento" type="date" class="input-edit border rounded p-2"/>
+                        </label>
+                        <div class="separator"></div>
+                        <label class="block">
+                            Empleo:
+                            <input [(ngModel)]="usuario.empleo" class="input-edit border rounded p-2"/>
+                        </label>
+                        <div class="separator"></div>
+                        <label class="block">
+                            País ID:
+                            <input [(ngModel)]="usuario.paisID" class="input-edit border rounded p-2"/>
+                        </label>
+                        <div class="separator"></div>
+                        <label class="block">
+                            Rol:
+                            <input [(ngModel)]="usuario.rol" class="input-edit border rounded p-2" disabled/>
+                        </label>
+                        <div class="separator"></div>
+                        <button (click)="saveChangesClient()" class="btn-save bg-blue-500 text-white rounded p-2">Guardar</button>
+                        <button (click)="cancelEditing()" class="btn-cancel bg-red-500 text-white rounded p-2">Cancelar</button>
+                    </div>
+                </div>
+                <!-- Mostrar datos para otros roles -->
+                <div *ngIf="usuario?.rol !== 'Client'" class="profile-info">
+                    <div *ngIf="!isEditing">
+                        <p><strong>Nombre Completo:</strong> {{ usuario?.fullName }} </p>
+                        <p><strong>Fecha de Nacimiento:</strong> {{ usuario?.dateOfBirth }} </p>
+                        <p><strong>Email:</strong> {{ usuario?.email }} </p>
+                        <p><strong>ID Identidad:</strong> {{ usuario?.idIdentity }} </p>
+                        <p><strong>Rol:</strong> {{ usuario?.rol }} </p>
+                        <button (click)="enableEditing()" class="btn-edit">Editar</button>
+                    </div>
+                    <div *ngIf="isEditing">
+                        <label class="block">
+                            Nombre Completo:
+                            <input [(ngModel)]="usuario.fullName" class="input-edit border rounded p-2"/>
+                        </label>
+                        <div class="separator"></div>
+                        <label class="block">
+                            Fecha de Nacimiento:
+                            <input [(ngModel)]="usuario.dateOfBirth" type="date" class="input-edit border rounded p-2"/>
+                        </label>
+                        <div class="separator"></div>
+                        <label class="block">
+                            Email:
+                            <input [(ngModel)]="usuario.email" class="input-edit border rounded p-2" disabled/>
+                        </label>
+                        <div class="separator"></div>
+                        <label class="block">
+                            ID Identidad:
+                            <input [(ngModel)]="usuario.idIdentity" class="input-edit border rounded p-2"/>
+                        </label>
+                        <div class="separator"></div>
+                        <label class="block">
+                            Rol:
+                            <input [(ngModel)]="usuario.rol" class="input-edit border rounded p-2" disabled/>
+                        </label>
+                        <div class="separator"></div>
+                        <div class="flex justify-end space-x-4 mt-6">
+                          <button (click)="saveChanges()" class="btn-save bg-blue-500 text-white rounded p-2 hover:bg-blue-600 transition">Guardar</button>
+                          <button (click)="cancelEditing()" class="btn-cancel bg-red-500 text-white rounded p-2 hover:bg-red-600 transition">Cancelar</button>
+                      </div>
+                      
+                    </div>
                 </div>
             </div>
         </div>

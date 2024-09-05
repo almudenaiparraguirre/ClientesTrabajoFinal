@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthService } from '../app/servicios/auth.service'; // Asegúrate de la ruta correcta
-import { Usuario } from '../app/clases/usuario'; // Asegúrate de la ruta correcta
 import { UserService } from '../app/servicios/user.service'; // Asegúrate de la ruta correcta
+import { PerfilService } from 'src/app/servicios/perfil-service';
 
 @Component({
   selector: 'app-perfil',
@@ -10,42 +10,33 @@ import { UserService } from '../app/servicios/user.service'; // Asegúrate de la
   styleUrls: ['./perfil.component.css']
 })
 export class PerfilComponent implements OnInit {
-  totalMoneyTransferred: number = 0;
-  totalTransfersCompleted: number = 0;
   usuario: any;
-  userData: any;
-  email: string;
+  isEditing: boolean = false;  // Controlador para edición
+  originalData: any;  // Almacenar los datos originales antes de editar
 
   constructor(private router: Router,
-    public authService: AuthService,
-    private userService: UserService) { }
+              public authService: AuthService,
+              private userService: UserService,
+              private perfilService: PerfilService) { }
 
-    ngOnInit(): void {
-      if (this.authService.isLoggedIn()) {
-        console.log(this.authService.getUserEmail());
-        this.userService.obtenerUsuarioPorEmail(this.authService.getUserEmail()).subscribe({
-          next: (response) => {
-            this.email = response.email;
-            this.userService.obtenerDatosCompletosUsuarioPorEmail(this.email).subscribe({
-              next: (userData) => {
-                this.usuario = userData;
-                console.log(this.usuario); // Ahora tienes todos los datos del usuario
-              },
-              error: (error) => {
-                console.log(error);
-              }
-            });
-            this.usuario = response;
-            console.log(response);
+  ngOnInit(): void {
+    if (this.authService.isLoggedIn()) {
+      const userEmail = this.authService.getUserEmail();
+      let token = this.authService.getToken()
+      this.userService.obtenerDatosCompletosUsuarioPorToken(token).subscribe({
+        next: (userData) => {
+          this.usuario = userData;
+          this.originalData = { ...userData };  // Guardar los datos originales
         },
         error: (error) => {
-          console.log(error)
-        }});
-      } else {
-        this.router.navigate(['/login']);
-      }
+          console.log(error);
+        }
+      });
+    } else {
+      this.router.navigate(['/login']);
     }
-    
+  }
+
   canActivate(): boolean {
     if (this.authService.isLoggedIn()) {
       return true;
@@ -55,18 +46,39 @@ export class PerfilComponent implements OnInit {
     }
   }
 
-  loadProfileData(): void {
-    this.totalMoneyTransferred = 1234.56;
-    this.totalTransfersCompleted = 42;
-  }
-  
-  // Redirige a la página de inicio
   redirectToHome() {
-    this.router.navigate(['/home']); // Asegúrate de que esta ruta esté configurada correctamente en el módulo de enrutamiento
+    this.router.navigate(['/home']);
   }
 
-  // Redirige a la página de información de usuarios
   redirectToUsersInfo() {
-    this.router.navigate(['/users-info']); // Asegúrate de que esta ruta esté configurada correctamente en el módulo de enrutamiento
+    this.router.navigate(['/users-info']);
+  }
+
+  // Habilitar edición
+  enableEditing() {
+    this.isEditing = true;
+  }
+
+  // Guardar cambios
+  saveChangesClient() {
+    // Implementa la lógica para guardar los cambios, por ejemplo, llamando a un servicio
+    this.perfilService.actualizarCliente(this.usuario).subscribe({});
+
+    // Deshabilitar edición
+    this.isEditing = false;
+  }
+
+  saveChanges() {
+    // Implementa la lógica para guardar los cambios, por ejemplo, llamando a un servicio
+    // this.userService.updateUser(this.usuario).subscribe({ ... });
+
+    // Deshabilitar edición
+    this.isEditing = false;
+  }
+
+  // Cancelar edición
+  cancelEditing() {
+    this.usuario = { ...this.originalData };  // Restaurar datos originales
+    this.isEditing = false;
   }
 }

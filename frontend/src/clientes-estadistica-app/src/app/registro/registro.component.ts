@@ -113,22 +113,14 @@ export class RegistroComponent implements OnInit {
       Nombre: this.registroForm.value.Nombre,
       Apellido: this.registroForm.value.Apellido,
       PaisNombre: this.registroForm.value.PaisNombre,
-      FechaNacimiento: fechaNacISO
+      FechaNacimiento: fechaNacISO,
+      Empleo: this.registroForm.value.Empleo,
+      
     };
 
     // Registrar usuario
     this.miServicio.registrarUsuario(usuario).subscribe(
       response => {
-
-        const datosCambioRol: CambioRolModel = {
-          Email: this.registroForm.value.Correo,
-          NuevoRol: "Client",
-          Nombre: this.registroForm.value.Nombre,
-          Apellido: this.registroForm.value.Apellido,
-          Pais: this.registroForm.value.PaisNombre,
-          Empleo: this.registroForm.value.Empleo,
-          FechaNacimiento: fechaNacISO
-        };
         this.router.navigate(['/login']);
       },
       error => {

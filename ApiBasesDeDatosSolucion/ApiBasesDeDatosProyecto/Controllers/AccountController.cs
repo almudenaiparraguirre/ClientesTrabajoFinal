@@ -21,6 +21,7 @@ public class AccountController : ControllerBase
     private readonly IUserService _userService;
     private readonly IPaisRepository _paisRepository; // Añadido
     private readonly IMapper _mapper;
+    private readonly ITokenRepository _tokenRepository;
     private readonly Contexto _context;
 
     public AccountController(
@@ -33,6 +34,7 @@ public class AccountController : ControllerBase
         IUserService userService,
         IPaisRepository paisRepository,
         IMapper mapper,
+        ITokenRepository tokenRepository,
         Contexto context)
     {
         _userManager = userManager;
@@ -45,6 +47,7 @@ public class AccountController : ControllerBase
         _mapper = mapper;
         _clienteRepository = clienteRepository;
         _context = context;
+        _tokenRepository = tokenRepository;
     }
 
     // SuperAdmin: Puede ver todos los usuarios
@@ -235,9 +238,23 @@ public class AccountController : ControllerBase
         {
             return BadRequest(result.Errors);
         }
-
         // Asignar el rol predeterminado (por ejemplo, "Client") durante el registro
         await _userManager.AddToRoleAsync(user, "Client");
+
+        Pais paisregistro = await _paisRepository.ObtenerPorNombre(model.PaisNombre);
+
+        var client = new Cliente
+        {
+            Nombre = model.Nombre,
+            Apellido = model.Apellido,
+            Email = model.Email,
+            Empleo = model.Empleo,
+            FechaNacimiento = model.DateOfBirth,
+            PaisId = paisregistro.Id,
+        };
+
+        await _clienteRepository.AddClienteAsync(client);
+       
 
         return Ok(new { Message = "Usuario registrado y rol asignado con éxito.", User = user });
     }
@@ -275,28 +292,57 @@ public class AccountController : ControllerBase
     }
 
     [HttpGet("users/getCompleteUserInfo")]
-    public async Task<ActionResult> GetCompleteUserInfoByEmail(string email)
+public async Task<ActionResult> GetCompleteUserInfoByToken(string token)
+{
+    try
     {
-        var currentUser = await _userManager.FindByEmailAsync(email);
-        if (currentUser == null)
-        {
-            return NotFound(new { message = "User not found" });
-        }
+        // Decodificar el token
+        TokenDecodeDTO datosToken = _tokenRepository.DecodeJwt(token);
+        
+        if (datosToken.Role == "Client")
+            {
+                var cliente = await _clienteRepository.ObtenerPorEmail(datosToken.Email);
+                return Ok(new
+                {
+                    nombre = cliente.Nombre,
+                    apellido = cliente.Apellido,
+                    FechaNacimiento = cliente.FechaNacimiento,
+                    Empleo = cliente.Empleo,
+                    PaisID = cliente.PaisId,
+                    Email = cliente.Email,
+                    rol = "Client" // Campo adicional que indica el rol
+                });
+            } 
+        else
+            {
+                var currentUser = await _userManager.FindByEmailAsync(datosToken.Email);
+                if (currentUser == null)
+                {
+                    return NotFound(new { message = "User not found" });
+                }
 
-        var userRol = await _userManager.GetRolesAsync(currentUser);
-        var dateOfBirth = currentUser.DateOfBirth;
-        var nombreCompleto = currentUser.FullName;
-        var paisNombre = currentUser.UserName;
+                // Devolver la información del usuario
+                return Ok(new
+                {
+                    email = currentUser.Email,
+                    fullName = currentUser.FullName,
+                    dateOfBirth = currentUser.DateOfBirth,
+                    IdIdentity = currentUser.Id,
+                    Rol = datosToken.Role
+                });
+            }
 
-        return Ok(new
-        {
-            email = currentUser.Email,
-            fullName = nombreCompleto,
-            dateOfBirth = dateOfBirth,
-            rol = userRol.FirstOrDefault(),  // Si solo necesitas un rol
-            paisNombre = paisNombre
-        });
+        // Buscar el usuario por el email decodificado
+       
     }
+    catch (Exception ex)
+    {
+        // Manejo de excepciones (Loggear y devolver un error 500 con un mensaje)
+        // Aquí podrías loggear el error usando un logger
+        return StatusCode(500, new { message = "An error occurred while processing your request.", details = ex.Message });
+    }
+}
+
 
     // SuperAdmin, Admin: Inicio de sesión
     [AllowAnonymous]

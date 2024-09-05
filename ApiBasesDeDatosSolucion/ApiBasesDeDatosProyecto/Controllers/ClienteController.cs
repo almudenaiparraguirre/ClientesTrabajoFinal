@@ -193,7 +193,7 @@ namespace ApiBasesDeDatosProyecto.Controllers
                 _logger.LogWarning($"Cliente con email {email} no encontrado.");
                 return NotFound("Cliente no encontrado.");
             }
-
+            /*
             // Obtener el token JWT de la cabecera
             var token = HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
 
@@ -206,7 +206,7 @@ namespace ApiBasesDeDatosProyecto.Controllers
             var role = roleClaim?.Value;
 
             // Verificar que el usuario tenga el rol necesario
-            if (role != "SuperAdmin" && role != "Admin")
+            /*if (role != "SuperAdmin" && role != "Admin")
             {
                 // Autorizar a los Admin para editar otros clientes, pero no sus propios datos
                 if (User.IsInRole("Client") && email.Equals(User.Identity.Name, StringComparison.OrdinalIgnoreCase))
@@ -215,7 +215,7 @@ namespace ApiBasesDeDatosProyecto.Controllers
                 }
 
                 return Forbid("No tienes permiso para editar este cliente.");
-            }
+            }*/
 
             // Mapear las propiedades del DTO al cliente existente
             clienteExistente.Nombre = clienteDto.Nombre;
