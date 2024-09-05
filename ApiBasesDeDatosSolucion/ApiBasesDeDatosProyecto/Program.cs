@@ -232,6 +232,7 @@ static void ApplyMigrations(WebApplication app)
             // Obtiene el contexto de base de datos y aplica las migraciones.
             var context = services.GetRequiredService<Contexto>();
             context.Database.Migrate();
+           
 
         }
         catch (Exception ex)

@@ -1,37 +1,68 @@
 {
-    "navigationFallback": {
-      "rewrite": "/index.html",
-      "exclude": ["/images/*", "/css/*", "/assets/*"]
+  "navigationFallback": {
+    "rewrite": "/index.html",
+    "exclude": ["/images/*", "/css/*", "/assets/*"]
+  },
+  "routes": [
+    {
+      "route": "/login",
+      "serve": "/index.html"
     },
-    "routes": [
-      {
-        "route": "/login",
-        "serve": "/index.html"
-      },
-      {
-        "route": "/registro",
-        "serve": "/index.html"
-      },
-      {
-        "route": "/menu",
-        "serve": "/index.html"
-      },
-      {
-        "route": "/clientes",
-        "serve": "/index.html"
-      },
-      {
-        "route": "/usuarios",
-        "serve": "/index.html"
-      },
-      {
-        "route": "/",
-        "serve": "/index.html"
-      },
-      {
-        "route": "/*",
-        "serve": "/index.html"
-      }
-    ]
-  }
-  
+    {
+      "route": "/registro",
+      "serve": "/index.html"
+    },
+    {
+      "route": "/registroAdmin",
+      "serve": "/index.html"
+    },
+    {
+      "route": "/users",
+      "serve": "/index.html"
+    },
+    {
+      "route": "/home",
+      "serve": "/index.html"
+    },
+    {
+      "route": "/perfil",
+      "serve": "/index.html"
+    },
+    {
+      "route": "/dashboard",
+      "serve": "/index.html"
+    },
+    {
+      "route": "/dashboardclientes",
+      "serve": "/index.html"
+    },
+    {
+      "route": "/estadistica",
+      "serve": "/index.html"
+    },
+    {
+      "route": "/estadisticas/*",
+      "serve": "/index.html"
+    },
+    {
+      "route": "/clientes/*",
+      "serve": "/index.html"
+    },
+    {
+      "route": "/divisas",
+      "serve": "/index.html"
+    },
+    {
+      "route": "/usuarios",
+      "serve": "/index.html"
+    },
+    {
+      "route": "/",
+      "serve": "/index.html"
+    },
+    {
+      "route": "/*",
+      "serve": "/index.html"
+    }
+  ]
+}
