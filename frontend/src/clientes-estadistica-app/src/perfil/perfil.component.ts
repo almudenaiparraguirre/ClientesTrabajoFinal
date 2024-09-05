@@ -70,7 +70,7 @@ export class PerfilComponent implements OnInit {
 
   saveChanges() {
     // Implementa la lógica para guardar los cambios, por ejemplo, llamando a un servicio
-    // this.userService.updateUser(this.usuario).subscribe({ ... });
+    this.perfilService.actualizarUsuario(this.usuario).subscribe({});
 
     // Deshabilitar edición
     this.isEditing = false;

@@ -49,7 +49,6 @@ public class RegisterViewModel : IValidatableObject
         }
 
         // TO DO
-        errors.AddRange(DateOfBirth.ValidateFechaNacimiento());
         errors.AddRange(PaisNombre.ValidatePaisNombre());
 
         return errors;

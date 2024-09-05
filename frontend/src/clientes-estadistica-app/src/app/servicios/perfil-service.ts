@@ -19,7 +19,7 @@ export class PerfilService {
   }
 
   actualizarUsuario(usuario: any): Observable<any> {
-    return this.http.put<any>(`${this.URL}/usuarios/${usuario.email}`, usuario);
+    return this.http.put<any>(`${this.URL}Account/${usuario.email}`, usuario);
   }
 
 }
