@@ -11,13 +11,10 @@ import { AuthService } from './auth.service';
 })
 export class UserService {
 
-  // IMPORTANTE:
-  //    1 URL ESTADISTICA Y OTRA PARA CLIENTES
-  private readonly url_estadistica = environment.apiUrl;
-
+  // Acordaros de usar variables de entorno para las URLs: environment.apiUrl
   //URL AMIN
-  //private readonly URL = "https://localhost:44339/api/";
-  private readonly URL = "https://localhost:7107/api/";
+  
+  private readonly URL = environment.apiUrl + "/api/";
 
   constructor(private http: HttpClient,private authService: AuthService) { }
 
@@ -100,15 +97,15 @@ export class UserService {
     return date.toISOString();
   }
 
-  getEnvios(): Observable<any[]> {
-    return this.http.get<any[]>(`${this.url_estadistica}/getEnvios`).pipe(
-      map(envios => envios.map(envio => ({
-        ...envio,
-        fecha: this.formatearFecha(envio.fecha),
-        cantidad: this.formatearCantidad(envio.cantidad)
-      })))
-    );
-  }
+  // getEnvios(): Observable<any[]> {
+  //   return this.http.get<any[]>(`${this.url_estadistica}/getEnvios`).pipe(
+  //     map(envios => envios.map(envio => ({
+  //       ...envio,
+  //       fecha: this.formatearFecha(envio.fecha),
+  //       cantidad: this.formatearCantidad(envio.cantidad)
+  //     })))
+  //   );
+  // }
 
   private formatearFecha(fecha: any): string {
     let fechaDate: Date;
