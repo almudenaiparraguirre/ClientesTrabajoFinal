@@ -54,6 +54,11 @@ export class DashboardComponent implements OnInit, OnDestroy {
     }
   }
 
+  // Redirige a la página de información de usuarios
+  redirectToUsersInfo() {
+    this.router.navigate(['/users-info']); // Asegúrate de que la ruta esté correctamente configurada en el módulo de enrutamiento
+  }
+
   // Método para redirigir al dashboard
   redirectToDashboard() {
     this.router.navigate(['/dashboard']); // Asegúrate de que la ruta esté configurada correctamente en tu routing module
