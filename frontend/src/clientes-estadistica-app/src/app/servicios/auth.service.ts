@@ -1,13 +1,14 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { catchError, map, Observable, of } from 'rxjs';
+import { environment } from 'src/environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
   
-  private readonly URL = "https://localhost:7107/api/Account/";
+  private readonly URL = environment.apiUrl + "/api/Account/";
   public currentUserEmail: string; // Ajusta a tu endpoint real
 
   constructor(private http: HttpClient) {}

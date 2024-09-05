@@ -6,6 +6,7 @@ import { Usuario } from 'src/app/clases/usuario';
 import { Cliente } from 'src/app/clases/cliente'; 
 import { HttpHeaders } from '@angular/common/http';
 import { AuthService } from 'src/app/servicios/auth.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-users-info',
@@ -41,7 +42,7 @@ export class UsersInfoComponent implements OnInit, OnDestroy {
   // Variable para almacenar la suscripción
   private subscription: Subscription = new Subscription();
 
-  constructor(private userService: UserService, private clienteService: ClienteService,private authService: AuthService) { }
+  constructor(private userService: UserService, private clienteService: ClienteService,private authService: AuthService, private router: Router) { }
 
   ngOnInit(): void {
     this.loadUsuarios();
@@ -147,6 +148,11 @@ export class UsersInfoComponent implements OnInit, OnDestroy {
          cliente.email.toLowerCase().includes(this.searchTerm.toLowerCase()))
       );
     }
+  }
+
+  // Redirige a la página de perfil
+  redirectToProfile() {
+    this.router.navigate(['/perfil']); // Asegúrate de que la ruta '/perfil' esté configurada correctamente en tu routing module
   }
   
 

@@ -59,4 +59,14 @@ export class PerfilComponent implements OnInit {
     this.totalMoneyTransferred = 1234.56;
     this.totalTransfersCompleted = 42;
   }
+  
+  // Redirige a la página de inicio
+  redirectToHome() {
+    this.router.navigate(['/home']); // Asegúrate de que esta ruta esté configurada correctamente en el módulo de enrutamiento
+  }
+
+  // Redirige a la página de información de usuarios
+  redirectToUsersInfo() {
+    this.router.navigate(['/users-info']); // Asegúrate de que esta ruta esté configurada correctamente en el módulo de enrutamiento
+  }
 }

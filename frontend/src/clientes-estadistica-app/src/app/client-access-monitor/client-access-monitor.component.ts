@@ -4,6 +4,8 @@ import { Subscription } from 'rxjs';
 import { MonitorDataService } from '../servicios/monitor-data.service';
 import { ClienteMonitor } from '../interfaces/clienteMonitor.interface';
 import { Chart } from 'chart.js/auto';
+import { environment } from 'src/environments/environment';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-client-access-monitor',
@@ -19,7 +21,7 @@ export class DashboardClientesComponent implements OnInit, OnDestroy {
 
   private pollingSubscription: Subscription;
   private readonly POLLING_INTERVAL = 1000; // Intervalo de sondeo en milisegundos
-  private readonly API_URL = 'https://localhost:7107/api/Clientemonitoring/subscribe';
+  private readonly API_URL = environment.apiUrl + '/api/Clientemonitoring/subscribe';
   private isReceiving: boolean = true;
 
   // Gráficos
@@ -30,11 +32,13 @@ export class DashboardClientesComponent implements OnInit, OnDestroy {
   nuevosClientes: number = 0;
   totalRegistros: number = 0;
   totalLogins: number = 0;
+  
 
   constructor(
     private http: HttpClient,
     private monitorDataService: MonitorDataService,
-    private renderer: Renderer2
+    private renderer: Renderer2,
+    private router: Router
   ) { }
 
   ngOnInit(): void {
@@ -42,6 +46,11 @@ export class DashboardClientesComponent implements OnInit, OnDestroy {
     this.startLongPolling();
     this.initClientesChart();
     this.initClientesPorPaisChart();
+  }
+
+  // Redirige a la página de información de usuarios
+  redirectToUsersInfo() {
+    this.router.navigate(['/users-info']); // Asegúrate de que esta ruta esté configurada correctamente en el enrutador
   }
 
   ngOnDestroy(): void {
@@ -369,4 +378,13 @@ private calcularEdad(fechaNacimiento: Date): number {
     }
   }
 
+  // Redirige a la página del dashboard
+  redirectToDashboard() {
+    this.router.navigate(['/dashboard']); // Asegúrate de que esta ruta esté configurada correctamente
+  }
+
+  // Redirige a la página del dashboard de clientes
+  redirectToDashboardClientes() {
+    this.router.navigate(['/dashboardclientes']); // Asegúrate de que esta ruta esté configurada correctamente
+  }
 }

@@ -59,16 +59,22 @@ builder.Services.AddAuthentication(x =>
     };
 });
 
-// Configurar CORS
+// Configuraciï¿½n de CORS para permitir solicitudes desde orï¿½genes especï¿½ficos.
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowSpecificOrigins",
-        policy =>
-        {
-            policy.WithOrigins("http://localhost:4200") // Cambia esto por el origen de tu frontend
-                  .AllowAnyHeader()
-                  .AllowAnyMethod();
-        });
+    options.AddPolicy("AllowLocalhost",
+        builder => builder
+            .WithOrigins("http://localhost:4200")  // Permite solicitudes desde localhost:4200.
+            .AllowAnyHeader()  // Permite cualquier encabezado.
+            .AllowAnyMethod()  // Permite cualquier mï¿½todo HTTP.
+            .AllowCredentials());  // Permite el uso de credenciales.
+
+    options.AddPolicy("AllowAzureHost",
+        builder => builder
+            .WithOrigins("https://delightful-ocean-0ed177403.5.azurestaticapps.net")  // Permite solicitudes desde el host de Azure.
+            .AllowAnyHeader()  // Permite cualquier encabezado.
+            .AllowAnyMethod()  // Permite cualquier mï¿½todo HTTP.
+            .AllowCredentials());  // Permite el uso de credenciales.
 });
 
 // Configurar pol�ticas de autorizaci�n
@@ -78,7 +84,7 @@ builder.Services.AddAuthorization(options =>
     options.AddPolicy("ManageAllPolicy", policy =>
         policy.RequireClaim("Permissions", "ManageAll"));
 
-    // Puedes definir m�s pol�ticas aqu� seg�n sea necesario
+    // Puedes definir m�s pol�ticas aqu� seg�n sea necesario 
     options.AddPolicy("ManageAdminsPolicy", policy =>
         policy.RequireClaim("Permissions", "ManageAdmins"));
 
@@ -159,6 +165,9 @@ builder.Services.AddSingleton<SignalRClientService>(provider =>
 // Paso intermedio entre el 1 y el 2 (Construye la app)
 var app = builder.Build();
 
+// Aplica las migraciones de base de datos.
+ApplyMigrations(app);
+
 // Llamar a la inicializaci�n de datos (SeedData)
 using (var scope = app.Services.CreateScope())
 {
@@ -180,14 +189,18 @@ using (var scope = app.Services.CreateScope())
 // Configurar middleware
 if (app.Environment.IsDevelopment())
 {
-    app.UseSwagger();
-    app.UseSwaggerUI();
+    app.UseSwagger();  // Habilita Swagger en desarrollo.
+    app.UseSwaggerUI();  // Habilita la interfaz de usuario de Swagger.
+    app.UseCors("AllowLocalhost");  // Usa la polï¿½tica de CORS para localhost.
+}
+else
+{
+    app.UseCors("AllowAzureHost");  // Usa la polï¿½tica de CORS para el host de Azure.
 }
 
 
-
-// Redireccionar de http a https
-app.UseHttpsRedirection();
+    // Redireccionar de http a https
+    app.UseHttpsRedirection();
 
 // Usar CORS
 app.UseCors("AllowSpecificOrigins");
@@ -208,3 +221,24 @@ await Task.WhenAll(listeningTasks);
 
 // Ejecutar la aplicaci�n
 app.Run();
+
+static void ApplyMigrations(WebApplication app)
+{
+    using (var scope = app.Services.CreateScope())
+    {
+        var services = scope.ServiceProvider;
+        try
+        {
+            // Obtiene el contexto de base de datos y aplica las migraciones.
+            var context = services.GetRequiredService<Contexto>();
+            context.Database.Migrate();
+
+        }
+        catch (Exception ex)
+        {
+            // Registra cualquier error que ocurra durante la aplicaciï¿½n de migraciones.
+            var logger = services.GetRequiredService<ILogger<Program>>();
+            logger.LogError(ex, "An error occurred while migrating the database.");
+        }
+    }
+}

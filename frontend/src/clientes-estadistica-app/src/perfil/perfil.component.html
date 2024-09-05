@@ -19,8 +19,17 @@
         </div>
         <nav>
           <ul class="flex space-x-6">
-            <li><a href="#" class="text-lg hover:text-gray-400 transition duration-300" [href]="'http://localhost:4200/home'">Inicio</a></li>
-            <li><a href="#" class="text-lg hover:text-gray-400 transition duration-300" [href]="'http://localhost:4200/users-info'">Usuarios</a></li>
+            <li>
+              <a (click)="redirectToHome()" class="text-lg hover:text-gray-400 transition duration-300">
+                Inicio
+              </a>
+            </li>
+            <li>
+              <a (click)="redirectToUsersInfo()" class="text-lg hover:text-gray-400 transition duration-300">
+                Usuarios
+              </a>
+            </li>
+            
             <li><a href="#" class="text-lg hover:text-gray-400 transition duration-300">Perfil</a></li>
           </ul>
         </nav>
