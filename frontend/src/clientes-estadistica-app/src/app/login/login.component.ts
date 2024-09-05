@@ -4,6 +4,8 @@ import { Usuario } from '../clases/usuario';
 import { Router } from '@angular/router';
 import { catchError, throwError } from 'rxjs';
 import * as jwt_decode from 'jwt-decode';
+import { AuthService } from '../servicios/auth.service';
+
 @Component({
   selector: 'app-login',
   templateUrl: './login.component.html',
@@ -17,7 +19,8 @@ export class LoginComponent implements OnInit {
   email: string = '';
   contrase: string = '';
 
-  constructor(private usuarioService: UserService, private route: Router) { }
+  constructor(private usuarioService: UserService, private route: Router,
+    private authService: AuthService) { }
 
   ngOnInit() {
     this.getUsuarios();

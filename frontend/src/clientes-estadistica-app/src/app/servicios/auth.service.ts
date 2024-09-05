@@ -1,15 +1,23 @@
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { catchError, map, Observable, of } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
+  
+  private readonly URL = "https://localhost:7107/api/Account/";
+  public currentUserEmail: string; // Ajusta a tu endpoint real
 
-  constructor() {}
+  constructor(private http: HttpClient) {}
 
-  // Método para verificar si el usuario está autenticado
   isLoggedIn(): boolean {
     return !!localStorage.getItem('token'); // Comprueba si hay un token en el almacenamiento local
+  }
+
+  getUserEmail(): string {
+    return localStorage.getItem('email'); 
   }
 
   // Método para obtener el token
