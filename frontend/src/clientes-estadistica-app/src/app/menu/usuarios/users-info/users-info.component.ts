@@ -84,12 +84,14 @@ export class UsersInfoComponent implements OnInit, OnDestroy {
               //apellido: apellido
               userName: usuario.userName || '-',
               fullName: usuario.fullName || '-',
-              email: usuario.email || '-'
+              email: usuario.email || '-',
+              dateOfBirth : usuario.dateOfBirth || '-'
             };
           });
   
           this.filteredUsuarios = this.usuarios;
           this.totalUsuarios = this.usuarios.length;
+          console.log('usuarios cargados', this.usuarios);
 
         },
         error => {
@@ -107,6 +109,7 @@ export class UsersInfoComponent implements OnInit, OnDestroy {
       'Authorization': `Bearer ${token}`
     });
   
+
     this.clienteService.getClientes().subscribe( // Cambiado para usar getClientes sin parámetros
       (clientes) => {
         console.log('Clientes cargados', clientes);
@@ -226,47 +229,49 @@ export class UsersInfoComponent implements OnInit, OnDestroy {
 
   onAdd() {
     if (this.addMode === 'user' && this.selectedUsuario) {
-      // Verificar si dateOfBirth tiene un valor válido antes de convertir
-     /* if (this.selectedUsuario.dateOfBirth) {
-        this.selectedUsuario.dateOfBirth = new Date(this.selectedUsuario.dateOfBirth).toISOString();
-      } else {
-        // Si no hay una fecha, puedes optar por no enviar este campo o manejarlo según tu lógica
-        this.selectedUsuario.dateOfBirth = ''; // O manejar un valor por defecto
-      }
-  */
-      this.userService.registrarUsuario(this.selectedUsuario).subscribe(
-        response => {
-          console.log('Usuario añadido correctamente', response);
-          this.loadUsuarios();  // Recargar la lista de usuarios
-          this.closeAddModal();
-        },
-        error => {
-          console.error('Error al añadir el usuario', error);
+        // Verificar si dateOfBirth tiene un valor válido antes de convertir
+        if (this.selectedUsuario.dateOfBirth) {
+            // Convertir la fecha a timestamp (número de milisegundos)
+            this.selectedUsuario.dateOfBirth = new Date(this.selectedUsuario.dateOfBirth).toISOString();
+          } else {
+            // Si no hay una fecha, puedes optar por no enviar este campo o manejarlo según tu lógica
+            this.selectedUsuario.dateOfBirth = null; // O un valor por defecto
         }
-      );
+
+        this.userService.registrarUsuario(this.selectedUsuario).subscribe(
+            response => {
+                console.log('Usuario añadido correctamente', response);
+                this.loadUsuarios();  // Recargar la lista de usuarios
+                this.closeAddModal();
+            },
+            error => {
+                console.error('Error al añadir el usuario', error);
+            }
+        );
     } 
     else if (this.addMode === 'client' && this.selectedCliente){
-      this.clienteService.registrarCliente(this.selectedCliente).subscribe(
-        response => {
-          console.log('Cliente añadido correctamente', response);
-          this.loadClientes();  // Recargar la lista de clientes
-          this.closeAddModal();
-        },
-        error => {
-          console.error('Error al añadir el cliente', error);
-        }
-      );
+        this.clienteService.registrarCliente(this.selectedCliente).subscribe(
+            response => {
+                console.log('Cliente añadido correctamente', response);
+                this.loadClientes();  // Recargar la lista de clientes
+                this.closeAddModal();
+            },
+            error => {
+                console.error('Error al añadir el cliente', error);
+            }
+        );
     }
     else {
-      this.closeAddModal();
+        this.closeAddModal();
     }
-  }  
-
-toTimestamp(dateString: string): number {
-  return new Date(dateString).getTime();
 }
 
-// Convertir timestamp a fecha ISO para mostrarla en el campo
+
+/* toTimestamp(dateString: string): number {
+  return new Date(dateString).getTime();
+} */
+
+
 toDateString(timestamp: number): string {
   return new Date(timestamp).toISOString().split('T')[0];
 }

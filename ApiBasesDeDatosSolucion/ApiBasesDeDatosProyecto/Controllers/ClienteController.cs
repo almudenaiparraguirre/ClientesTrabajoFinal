@@ -169,60 +169,75 @@ namespace ApiBasesDeDatosProyecto.Controllers
         return Ok(clienteDto);
     }
 
-    // PUT api/cliente/5
-    [HttpPut("{email}")]
-        [Authorize(Roles = "SuperAdmin,Admin")]
-    public async Task<ActionResult> Put(string email, [FromBody] EditViewModel clienteDto)
-    {
-        _logger.LogInformation($"Actualizando cliente con email {email}.");
-
-        if (email != clienteDto.Email)
+        [HttpPut("{email}")]
+        public async Task<ActionResult> Put(string email, [FromBody] EditViewModel clienteDto)
         {
-            _logger.LogWarning($"Email del cliente en la solicitud ({clienteDto.Email}) no coincide con el email de la URL ({email}).");
-            return BadRequest("El email del cliente no coincide.");
+            _logger.LogInformation($"Actualizando cliente con email {email}.");
+
+            if (email != clienteDto.Email)
+            {
+                _logger.LogWarning($"Email del cliente en la solicitud ({clienteDto.Email}) no coincide con el email de la URL ({email}).");
+                return BadRequest("El email del cliente no coincide.");
+            }
+
+            if (!ModelState.IsValid)
+            {
+                _logger.LogWarning($"El modelo ClienteDto no es válido. Errores: {ModelState}");
+                return BadRequest(ModelState);
+            }
+
+            // Buscar el cliente existente en la base de datos
+            var clienteExistente = await _clienteRepository.ObtenerPorEmail(email);
+            if (clienteExistente == null)
+            {
+                _logger.LogWarning($"Cliente con email {email} no encontrado.");
+                return NotFound("Cliente no encontrado.");
+            }
+
+            // Obtener el token JWT de la cabecera
+            var token = HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
+
+            // Decodificar el token
+            var handler = new JwtSecurityTokenHandler();
+            var jwtToken = handler.ReadJwtToken(token);
+
+            // Obtener roles desde el payload
+            var roleClaim = jwtToken.Claims.FirstOrDefault(c => c.Type == "http://schemas.microsoft.com/ws/2008/06/identity/claims/role");
+            var role = roleClaim?.Value;
+
+            // Verificar que el usuario tenga el rol necesario
+            if (role != "SuperAdmin" && role != "Admin")
+            {
+                // Autorizar a los Admin para editar otros clientes, pero no sus propios datos
+                if (User.IsInRole("Client") && email.Equals(User.Identity.Name, StringComparison.OrdinalIgnoreCase))
+                {
+                    return Forbid("No tienes permiso para editar tus propios datos.");
+                }
+
+                return Forbid("No tienes permiso para editar este cliente.");
+            }
+
+            // Mapear las propiedades del DTO al cliente existente
+            clienteExistente.Nombre = clienteDto.Nombre;
+            clienteExistente.Apellido = clienteDto.Apellido;
+            clienteExistente.FechaNacimiento = clienteDto.FechaNacimiento;
+            clienteExistente.PaisId = clienteDto.PaisId;
+            clienteExistente.Empleo = clienteDto.Empleo;
+
+            await _clienteRepository.ActualizarAsync(clienteExistente);
+
+            // Intentar guardar los cambios en la base de datos
+            if (await _clienteRepository.GuardarCambiosAsync())
+            {
+                _logger.LogInformation($"Cliente con email {email} actualizado correctamente.");
+                return NoContent();
+            }
+
+            return Ok(new { message = "Cliente editado correctamente." });
         }
 
-        if (!ModelState.IsValid)
-        {
-            _logger.LogWarning($"El modelo ClienteDto no es válido. Errores: {ModelState}");
-            return BadRequest(ModelState);
-        }
-
-        // Buscar el cliente existente en la base de datos
-        var clienteExistente = await _clienteRepository.ObtenerPorEmail(email);
-        if (clienteExistente == null)
-        {
-            _logger.LogWarning($"Cliente con email {email} no encontrado.");
-            return NotFound("Cliente no encontrado.");
-        }
-
-        // Authorize Admin to edit other clients, but not their own data
-        if (User.IsInRole("Client") && email != User.Identity.Name)
-        {
-            return Forbid("No tienes permiso para editar los datos de otro cliente.");
-        }
-
-        // Mapear las propiedades del DTO al cliente existente
-        clienteExistente.Nombre = clienteDto.Nombre;
-        clienteExistente.Apellido = clienteDto.Apellido;
-        clienteExistente.FechaNacimiento = clienteDto.FechaNacimiento;
-        clienteExistente.PaisId = clienteDto.PaisId;
-        clienteExistente.Empleo = clienteDto.Empleo;
-
-    await _clienteRepository.ActualizarAsync(clienteExistente);
-
-    // Intentar guardar los cambios en la base de datos
-    if (await _clienteRepository.GuardarCambiosAsync())
-    {
-        _logger.LogInformation($"Cliente con email {email} actualizado correctamente.");
-        return NoContent();
-    }
-
-        return Ok(new { message = "Client edited successfully." });
-    }
-
-    // DELETE api/cliente/5
-    [HttpDelete("{email}")]
+        // DELETE api/cliente/5
+        [HttpDelete("{email}")]
         [Authorize(Roles = "SuperAdmin,Admin")]
     public async Task<ActionResult> Delete(string email)
     {

@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
+using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -161,41 +162,55 @@ public class AccountController : ControllerBase
     }
 
 
-    // SuperAdmin y Admin: Puede actualizar cualquier usuario
-    // Client: Puede actualizar solo sus propios datos
-    [Authorize(Roles = "SuperAdmin,Admin,Client")]
+    [Authorize]
     [HttpPut("updateUser")]
     public async Task<IActionResult> UpdateUser(string email, [FromBody] EditUserModel model)
     {
-        var user = await _userManager.FindByEmailAsync(email);
-        if (user == null)
+        // Obtener el token JWT de la cabecera
+        var token = HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
+
+        // Decodificar el token
+        var handler = new JwtSecurityTokenHandler();
+        var jwtToken = handler.ReadJwtToken(token);
+
+        // Obtener roles desde el payload
+        var roleClaim = jwtToken.Claims.FirstOrDefault(c => c.Type == "http://schemas.microsoft.com/ws/2008/06/identity/claims/role");
+        var role = roleClaim?.Value;
+
+        // Verificar que el usuario tenga el rol necesario
+        if (role != "SuperAdmin" && role != "Admin")
+        {
+            return Forbid(); // Si no es ni SuperAdmin ni Admin, prohibir acceso
+        }
+
+        // Buscar el usuario a modificar por su email
+        var userToUpdate = await _userManager.FindByEmailAsync(email);
+        if (userToUpdate == null)
         {
             return NotFound(new ErrorResponseDTO("Usuario no encontrado."));
         }
 
-        // Si es un cliente, debe actualizar solo sus propios datos
-        var currentUser = await _userManager.GetUserAsync(User);
-        var isClient = await _userManager.IsInRoleAsync(currentUser, "Client");
-
-        if (isClient && !string.Equals(currentUser.Email, email, System.StringComparison.OrdinalIgnoreCase))
+        // Actualizar propiedades del usuario
+        userToUpdate.FullName = $"{model.Nombre} {model.Apellido}";
+        if (model.FechaNacimiento.HasValue)
         {
-            return Forbid();
+            userToUpdate.DateOfBirth = model.FechaNacimiento.Value;
         }
-
-        user.FullName = model.Nombre + " " + model.Apellido;
-        user.DateOfBirth = model.FechaNacimiento;
-
-        var result = await _userManager.UpdateAsync(user);
+        else
+        {
+            Console.WriteLine("No se proporcionó una fecha de nacimiento válida.");
+        }
+        // Intentar actualizar el usuario
+        var result = await _userManager.UpdateAsync(userToUpdate);
         if (!result.Succeeded)
         {
             var errors = result.Errors.Select(e => e.Description).ToList();
             return BadRequest(new ErrorResponseDTO("Error al actualizar el usuario.", errors));
         }
 
-        return NoContent();
+        return NoContent(); // Actualización exitosa
     }
 
-  
     [AllowAnonymous]
     [HttpPost("register")]
     public async Task<IActionResult> Register([FromBody] RegisterViewModel model)
@@ -211,7 +226,7 @@ public class AccountController : ControllerBase
             FullName = $"{model.Nombre} {model.Apellido}",
             UserName = model.Email,
             Email = model.Email,
-            DateOfBirth = model.FechaNacimiento,
+            DateOfBirth = model.DateOfBirth,
         };
 
         var result = await _userManager.CreateAsync(user, model.Password);

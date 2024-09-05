@@ -16,8 +16,8 @@ export class UserService {
   private readonly url_estadistica = environment.apiUrl;
 
   //URL AMIN
-  //private readonly URL = "https://localhost:44339/api/";
-  private readonly URL = "https://localhost:7107/api/";
+  private readonly URL = "https://localhost:44339/api/";
+  //private readonly URL = "https://localhost:7107/api/";
 
   constructor(private http: HttpClient,private authService: AuthService) { }
 
@@ -61,20 +61,46 @@ export class UserService {
     return this.http.get<{ id: number }>(url);
   }
   
-  editarCliente(cliente: Cliente): Observable<void>{
+  editarCliente(cliente: Cliente): Observable<void> {
+    // Obtener el token JWT del almacenamiento local (localStorage o donde lo guardes)
+    const token = localStorage.getItem('token'); // Asegúrate de que el token esté guardado aquí
+
+    // Construir los encabezados incluyendo el token
+    const headers = new HttpHeaders({
+      'Authorization': `Bearer ${token}` // Agregar el token a los encabezados
+    });
+
     // Construir la URL con el parámetro de consulta
     const url = `${this.URL}Cliente/${cliente.email}`;
-    // Convertir fecha de nacimiento a timestamp (milisegundos)
-    //cliente.fechaNacimiento = new Date(cliente.fechaNacimiento).getTime();
-    // Enviar la solicitud PUT
-    return this.http.put<void>(url, cliente);
+
+    return this.http.put<void>(url, cliente, { headers }); // Incluir los encabezados en la solicitud
   }
 
-  editarUsuario(usuario: Usuario): Observable<any>{
+  editarUsuario(usuario: Usuario): Observable<any> {
     const url = `${this.URL}Account/updateUser?email=${usuario.email}`;
-    usuario.dateOfBirth = new Date(usuario.dateOfBirth).getTime();
-    return this.http.put(url, usuario);
+    
+    // Si la fecha de nacimiento está definida, convertirla a formato ISO
+    if (usuario.dateOfBirth) {
+      usuario.dateOfBirth = new Date(usuario.dateOfBirth).toISOString(); // "1995-10-11"
+      console.log(usuario)
+      console.log("Fecha mandada al back (solo fecha)", usuario.dateOfBirth);
   }
+  
+
+    console.log("Fecha de nacimiento usuario", usuario.dateOfBirth); // Verificar el formato
+
+    // Obtener el token del almacenamiento local
+    const token = localStorage.getItem('token');
+    console.log("Es el token", token);
+    
+    // Configurar las cabeceras
+    const headers = new HttpHeaders({
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+    });
+    
+    return this.http.put(url, usuario, { headers });
+}
 
   eliminarUsuario(email: string): Observable<any> {
     return this.http.delete(`${this.URL}Account/users/${email}`);

@@ -23,7 +23,7 @@ public class RegisterViewModel : IValidatableObject
     public string? Apellido { get; set; }
 
     [Required(ErrorMessage = "La fecha de nacimiento es requerida.")]
-    public DateTime FechaNacimiento { get; set; }
+    public DateTime DateOfBirth { get; set; }
 
     [Required(ErrorMessage = "El nombre del país es requerido.")]
     public string PaisNombre { get; set; }
@@ -49,7 +49,7 @@ public class RegisterViewModel : IValidatableObject
         }
 
         // TO DO
-        errors.AddRange(FechaNacimiento.ValidateFechaNacimiento());
+        errors.AddRange(DateOfBirth.ValidateFechaNacimiento());
         errors.AddRange(PaisNombre.ValidatePaisNombre());
 
         return errors;
