@@ -103,8 +103,6 @@ export class RegistroComponent implements OnInit {
       this.showValidationErrors();
       return;
     }
-
-    const fechaNacISO = new Date(this.registroForm.value.FechaNac).toISOString();
   
     const usuario: Usuario = {
       Email: this.registroForm.value.Correo,
@@ -113,7 +111,7 @@ export class RegistroComponent implements OnInit {
       Nombre: this.registroForm.value.Nombre,
       Apellido: this.registroForm.value.Apellido,
       PaisNombre: this.registroForm.value.PaisNombre,
-      FechaNacimiento: fechaNacISO,
+      DateOfBirth: this.registroForm.value.FechaNac,
       Empleo: this.registroForm.value.Empleo,
       
     };

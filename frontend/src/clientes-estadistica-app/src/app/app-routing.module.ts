@@ -28,7 +28,7 @@ const routes: Routes = [
   { path: 'home', component: HomeComponent },
   {path: 'perfil', component: PerfilComponent},
   { path: "registro", component: RegistroComponent },
-  { path: "registroAdmin", component: RegistroAdminComponent },
+  { path: "registroadmin", component: RegistroAdminComponent },
   { path: 'users-info', component: UsersInfoComponent, canActivate: [AuthGuard], },
   { path: 'dashboard', component: DashboardComponent, canActivate: [AuthGuard], },
   { path: 'dashboardclientes', component: DashboardClientesComponent},

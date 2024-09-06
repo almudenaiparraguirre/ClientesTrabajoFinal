@@ -7,8 +7,7 @@ export interface Usuario {
     Nombre: string;
     Apellido: string;
     PaisNombre: number;
-    FechaNacimiento: string;
+    DateOfBirth: string;
     Empleo: string,
-     // Asegúrate de que FechaNac sea de tipo Date
   }
   
