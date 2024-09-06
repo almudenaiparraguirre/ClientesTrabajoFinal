@@ -1,4 +1,3 @@
-
 using Microsoft.OpenApi.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
@@ -10,13 +9,13 @@ using System.Security.Claims;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// 1. Agregar servicios a la aplicaci�n
+// 1. Agregar servicios a la aplicación
 builder.Services.AddDbContext<Contexto>(options =>
 {
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
 });
 
-// Cargar la configuraci�n de Identity desde appsettings.json
+// Cargar la configuración de Identity desde appsettings.json
 builder.Services.Configure<IdentitySettings>(builder.Configuration.GetSection("Identity"));
 var identitySettings = builder.Configuration.GetSection("Identity").Get<IdentitySettings>();
 
@@ -59,40 +58,34 @@ builder.Services.AddAuthentication(x =>
     };
 });
 
-// Configuraciï¿½n de CORS para permitir solicitudes desde orï¿½genes especï¿½ficos.
+// Configuración de CORS para permitir solicitudes desde orígenes específicos.
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowLocalhost",
-        builder => builder
-            .WithOrigins("http://localhost:4200")  // Permite solicitudes desde localhost:4200.
-            .AllowAnyHeader()  // Permite cualquier encabezado.
-            .AllowAnyMethod()  // Permite cualquier mï¿½todo HTTP.
-            .AllowCredentials());  // Permite el uso de credenciales.
+    options.AddPolicy("AllowLocalhost", builder =>
+        builder.WithOrigins("http://localhost:4200")
+               .AllowAnyHeader()
+               .AllowAnyMethod()
+               .AllowCredentials());
 
-    options.AddPolicy("AllowAzureHost",
-        builder => builder
-            .WithOrigins("https://delightful-ocean-0ed177403.5.azurestaticapps.net")  // Permite solicitudes desde el host de Azure.
-            .AllowAnyHeader()  // Permite cualquier encabezado.
-            .AllowAnyMethod()  // Permite cualquier mï¿½todo HTTP.
-            .AllowCredentials());  // Permite el uso de credenciales.
+    options.AddPolicy("AllowAzureHost", builder =>
+        builder.WithOrigins("https://delightful-ocean-0ed177403.5.azurestaticapps.net")
+               .AllowAnyHeader()
+               .AllowAnyMethod()
+               .AllowCredentials());
 });
 
-// Configurar pol�ticas de autorizaci�n
+// Configurar políticas de autorización
 builder.Services.AddAuthorization(options =>
 {
-    // Define la pol�tica para el permiso ManageAll
     options.AddPolicy("ManageAllPolicy", policy =>
         policy.RequireClaim("Permissions", "ManageAll"));
-
-    // Puedes definir m�s pol�ticas aqu� seg�n sea necesario 
     options.AddPolicy("ManageAdminsPolicy", policy =>
         policy.RequireClaim("Permissions", "ManageAdmins"));
-
     options.AddPolicy("ManageClientsPolicy", policy =>
         policy.RequireClaim("Permissions", "ManageClients"));
 });
 
-// Configuraci�n de Serilog
+// Configuración de Serilog
 Log.Logger = new LoggerConfiguration()
     .MinimumLevel.Information()
     .Filter.ByExcluding(logEvent => logEvent.Level == Serilog.Events.LogEventLevel.Debug)
@@ -117,13 +110,11 @@ builder.Services.AddTransient<IMonitoringDataRepository, MonitoringDataRepositor
 builder.Services.AddScoped<IAccessMonitoringDataRepository, AccessMonitoringDataRepository>();
 builder.Services.AddScoped<ITokenRepository, TokenRepository>();
 
-
 // Configurar MediatR
 builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(Program).Assembly));
 
 // Configurar SignalR
 builder.Services.AddSignalR();
-
 
 // Agregar Swagger
 builder.Services.AddEndpointsApiExplorer();
@@ -159,16 +150,13 @@ builder.Services.AddSingleton<SignalRClientService>(provider =>
     new SignalRClientService("https://localhost:7040/simuladorHub",
         provider.GetRequiredService<IServiceScopeFactory>()));
 
-//builder.Services.AddSingleton<SignalRClientService>(provider =>
-//  new SignalRClientService("https://localhost:7050/simuladorHub"));
-
 // Paso intermedio entre el 1 y el 2 (Construye la app)
 var app = builder.Build();
 
 // Aplica las migraciones de base de datos.
 ApplyMigrations(app);
 
-// Llamar a la inicializaci�n de datos (SeedData)
+// Llamar a la inicialización de datos (SeedData)
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
@@ -191,22 +179,22 @@ if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();  // Habilita Swagger en desarrollo.
     app.UseSwaggerUI();  // Habilita la interfaz de usuario de Swagger.
-    app.UseCors("AllowLocalhost");  // Usa la polï¿½tica de CORS para localhost.
+    app.UseCors("AllowLocalhost");  // Usa la política de CORS para localhost.
 }
 else
 {
-    app.UseCors("AllowAzureHost");  // Usa la polï¿½tica de CORS para el host de Azure.
+    app.UseCors("AllowAzureHost");  // Usa la política de CORS para el host de Azure.
 }
 
-
-    // Redireccionar de http a https
-    app.UseHttpsRedirection();
+// Redireccionar de http a https
+app.UseHttpsRedirection();
 
 // Usar CORS
-app.UseCors("AllowSpecificOrigins");
+app.UseCors();  // Asegúrate de que el uso de CORS esté aquí antes de la autenticación y autorización
 
-app.UseAuthentication(); // Agregar autenticaci�n
-app.UseAuthorization();
+// Usar autenticación y autorización
+app.UseAuthentication(); // Agregar autenticación
+app.UseAuthorization();  // Agregar autorización
 
 app.MapHub<NotificationHub>("/notificationHub");
 
@@ -219,7 +207,7 @@ var listeningTasks = signalRClientServices.Select(service => service.StartListen
 
 await Task.WhenAll(listeningTasks);
 
-// Ejecutar la aplicaci�n
+// Ejecutar la aplicación
 app.Run();
 
 static void ApplyMigrations(WebApplication app)
@@ -232,12 +220,10 @@ static void ApplyMigrations(WebApplication app)
             // Obtiene el contexto de base de datos y aplica las migraciones.
             var context = services.GetRequiredService<Contexto>();
             context.Database.Migrate();
-           
-
         }
         catch (Exception ex)
         {
-            // Registra cualquier error que ocurra durante la aplicaciï¿½n de migraciones.
+            // Registra cualquier error que ocurra durante la aplicación de migraciones.
             var logger = services.GetRequiredService<ILogger<Program>>();
             logger.LogError(ex, "An error occurred while migrating the database.");
         }
