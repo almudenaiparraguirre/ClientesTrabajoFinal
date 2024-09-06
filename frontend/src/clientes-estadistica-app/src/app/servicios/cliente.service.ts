@@ -10,8 +10,8 @@ import { AuthService } from './auth.service';
 })
 export class ClienteService {
 
-  private readonly URL = "https://localhost:44339/api";
-  //private readonly URL = environment.apiUrl + "/api";
+  //private readonly URL = "https://localhost:44339/api";
+  private readonly URL = environment.apiUrl + "/api";
 
   constructor(private http: HttpClient, private authService: AuthService) { }
 
