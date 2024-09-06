@@ -45,6 +45,10 @@ export class UserService {
     console.log(usuario); // Asegúrate de que los campos estén presentes y correctos DEBUG
     return this.http.post<any>(`${this.URL}Account/register`, usuario);
   }
+  registrarUsuarioAdmin(usuario: any): Observable<any> {
+    console.log(usuario); // Asegúrate de que los campos estén presentes y correctos DEBUG
+    return this.http.post<any>(`${this.URL}Account/registerAdmin`, usuario);
+  }
 
   añadirRolUsuario(usuario: any): Observable<any> {
     console.log(usuario); // Asegúrate de que los campos estén presentes y correctos DEBUG
@@ -78,7 +82,7 @@ export class UserService {
     
     // Si la fecha de nacimiento está definida, convertirla a formato ISO
     if (usuario.dateOfBirth) {
-      usuario.dateOfBirth = new Date(usuario.dateOfBirth).toISOString(); // "1995-10-11"
+      usuario.dateOfBirth = new Date(usuario.dateOfBirth); // "1995-10-11"
       console.log(usuario)
       console.log("Fecha mandada al back (solo fecha)", usuario.dateOfBirth);
   }

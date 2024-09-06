@@ -69,17 +69,5 @@ namespace ApiBasesDeDatosProyecto.Utilidades
             }
         }
 
-        public static IEnumerable<System.ComponentModel.DataAnnotations.ValidationResult> ValidatePaisNombre(this string paisNombre)
-        {
-            if (string.IsNullOrWhiteSpace(paisNombre))
-            {
-                yield return new System.ComponentModel.DataAnnotations.ValidationResult("El país es requerido.");
-            }
-
-            if (paisNombre.Length < 2)
-            {
-                yield return new System.ComponentModel.DataAnnotations.ValidationResult("El nombre del país debe tener al menos 2 caracteres.");
-            }
-        }
     }
 }

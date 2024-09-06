@@ -249,7 +249,7 @@ public class AccountController : ControllerBase
             Apellido = model.Apellido,
             Email = model.Email,
             Empleo = model.Empleo,
-            FechaNacimiento = model.DateOfBirth,
+            dateOfBirth = model.DateOfBirth,
             PaisId = paisregistro.Id,
         };
 
@@ -260,6 +260,35 @@ public class AccountController : ControllerBase
     }
 
 
+    [AllowAnonymous]
+    [HttpPost("registerAdmin")]
+    public async Task<IActionResult> RegisterAdmin([FromBody] RegisterViewModel model)
+    {
+        TryValidateModel(model);
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState);
+        }
+
+        var user = new ApplicationUser
+        {
+            FullName = $"{model.Nombre} {model.Apellido}",
+            UserName = model.Email,
+            Email = model.Email,
+            DateOfBirth = model.DateOfBirth,
+        };
+
+        var result = await _userManager.CreateAsync(user, model.Password);
+        if (!result.Succeeded)
+        {
+            return BadRequest(result.Errors);
+        }
+        // Asignar el rol predeterminado (por ejemplo, "Client") durante el registro
+        await _userManager.AddToRoleAsync(user, "Admin");
+
+
+        return Ok(new { Message = "Usuario registrado y rol asignado con éxito.", User = user });
+    }
 
     // Cliente: Ver solo sus propios datos
     //[Authorize(Roles = "Client")]
@@ -306,7 +335,7 @@ public async Task<ActionResult> GetCompleteUserInfoByToken(string token)
                 {
                     nombre = cliente.Nombre,
                     apellido = cliente.Apellido,
-                    FechaNacimiento = cliente.FechaNacimiento,
+                    dateOfBirth = cliente.dateOfBirth,
                     Empleo = cliente.Empleo,
                     PaisID = cliente.PaisId,
                     Email = cliente.Email,
@@ -424,7 +453,7 @@ public async Task<ActionResult> GetCompleteUserInfoByToken(string token)
             PaisId = pais.Id,
             Empleo = model.Empleo,
             Email = model.Email,
-            FechaNacimiento = model.FechaNacimiento,
+            dateOfBirth = model.FechaNacimiento,
         };
 
         await _clienteService.RegisterClientAsync(cliente);

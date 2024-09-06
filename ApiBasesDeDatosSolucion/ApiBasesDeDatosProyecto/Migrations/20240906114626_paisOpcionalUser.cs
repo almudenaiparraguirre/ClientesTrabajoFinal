@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace ApiBasesDeDatosProyecto.Migrations
 {
     /// <inheritdoc />
-    public partial class accessData : Migration
+    public partial class paisOpcionalUser : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -245,7 +245,7 @@ namespace ApiBasesDeDatosProyecto.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Nombre = table.Column<string>(type: "nvarchar(25)", maxLength: 25, nullable: false),
                     Apellido = table.Column<string>(type: "nvarchar(30)", maxLength: 30, nullable: false),
-                    FechaNacimiento = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    dateOfBirth = table.Column<DateTime>(type: "datetime2", nullable: false),
                     Empleo = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     PaisId = table.Column<int>(type: "int", nullable: false),
                     Email = table.Column<string>(type: "nvarchar(max)", nullable: false)
@@ -274,12 +274,12 @@ namespace ApiBasesDeDatosProyecto.Migrations
 
             migrationBuilder.InsertData(
                 table: "Clientes",
-                columns: new[] { "Id", "Apellido", "Email", "Empleo", "FechaNacimiento", "Nombre", "PaisId" },
+                columns: new[] { "Id", "Apellido", "Email", "Empleo", "Nombre", "PaisId", "dateOfBirth" },
                 values: new object[,]
                 {
-                    { 1, "Perez", "amin1@gmail.com", "Delincuente", new DateTime(1990, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Juan", 1 },
-                    { 2, "Lopez", "amin2@gmail.com", "Profesor", new DateTime(1985, 5, 23, 0, 0, 0, 0, DateTimeKind.Unspecified), "Maria", 2 },
-                    { 3, "Gomez", "amin3@gmail.com", "Abogado", new DateTime(1978, 11, 12, 0, 0, 0, 0, DateTimeKind.Unspecified), "Carlos", 3 }
+                    { 1, "Perez", "amin1@gmail.com", "Delincuente", "Juan", 1, new DateTime(1990, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
+                    { 2, "Lopez", "amin2@gmail.com", "Profesor", "Maria", 2, new DateTime(1985, 5, 23, 0, 0, 0, 0, DateTimeKind.Unspecified) },
+                    { 3, "Gomez", "amin3@gmail.com", "Abogado", "Carlos", 3, new DateTime(1978, 11, 12, 0, 0, 0, 0, DateTimeKind.Unspecified) }
                 });
 
             migrationBuilder.CreateIndex(

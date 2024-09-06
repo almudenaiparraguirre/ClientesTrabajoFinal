@@ -25,8 +25,8 @@ public class RegisterViewModel : IValidatableObject
     [Required(ErrorMessage = "La fecha de nacimiento es requerida.")]
     public DateTime DateOfBirth { get; set; }
 
-    [Required(ErrorMessage = "El nombre del país es requerido.")]
-    public string PaisNombre { get; set; }
+    
+    public string? PaisNombre { get; set; }
 
     // Método de validación
 
@@ -48,8 +48,7 @@ public class RegisterViewModel : IValidatableObject
             errors.AddRange(Nombre.ValidateNombre());
         }
 
-        // TO DO
-        errors.AddRange(PaisNombre.ValidatePaisNombre());
+
 
         return errors;
     }

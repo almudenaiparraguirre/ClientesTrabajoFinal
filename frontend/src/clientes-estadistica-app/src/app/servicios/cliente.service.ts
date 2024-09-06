@@ -10,8 +10,8 @@ import { AuthService } from './auth.service';
 })
 export class ClienteService {
 
-  //private readonly URL = "https://localhost:44339/api/Cliente";
-  private readonly URL = environment.apiUrl + "/api";
+  private readonly URL = "https://localhost:44339/api";
+  //private readonly URL = environment.apiUrl + "/api";
 
   constructor(private http: HttpClient, private authService: AuthService) { }
 
@@ -24,7 +24,7 @@ export class ClienteService {
       'Authorization': `Bearer ${token}` // Agregar el token al encabezado
     });
 
-    return this.http.get<Cliente[]>(this.URL, { headers }); // Pasar los encabezados
+    return this.http.get<Cliente[]>(`${this.URL}/Cliente`, { headers }); // Pasar los encabezados
   }
 
   registrarCliente(cliente: Cliente): Observable<any> {

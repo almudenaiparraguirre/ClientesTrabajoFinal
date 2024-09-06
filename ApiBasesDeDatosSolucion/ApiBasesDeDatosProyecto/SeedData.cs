@@ -26,7 +26,7 @@ public static class SeedData
         var superAdmin = await userManager.FindByEmailAsync(superAdminEmail);
         if (superAdmin == null)
         {
-            superAdmin = new ApplicationUser { UserName = superAdminEmail, Email = superAdminEmail };
+            superAdmin = new ApplicationUser { UserName = superAdminEmail, Email = superAdminEmail,FullName = "superAdmin" };
             await userManager.CreateAsync(superAdmin, "SuperPassword123!");
         }
 
@@ -44,7 +44,7 @@ public static class SeedData
         var adminUser = await userManager.FindByEmailAsync(adminEmail);
         if (adminUser == null)
         {
-            adminUser = new ApplicationUser { UserName = adminEmail, Email = adminEmail };
+            adminUser = new ApplicationUser { UserName = adminEmail, Email = adminEmail, FullName = "Admin" };
             await userManager.CreateAsync(adminUser, "AdminPassword123!");
         }
 
@@ -61,7 +61,7 @@ public static class SeedData
         var clientUser = await userManager.FindByEmailAsync(clientEmail);
         if (clientUser == null)
         {
-            clientUser = new ApplicationUser { UserName = clientEmail, Email = clientEmail };
+            clientUser = new ApplicationUser { UserName = clientEmail, Email = clientEmail,FullName = "ClientePorDefecto",DateOfBirth =  DateTime.Parse("2024-09-06T10:09:57.420Z")  };
             await userManager.CreateAsync(clientUser, "ClientPassword123!");
         }
 

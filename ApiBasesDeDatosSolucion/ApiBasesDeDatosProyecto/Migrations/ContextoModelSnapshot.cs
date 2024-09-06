@@ -43,9 +43,6 @@ namespace ApiBasesDeDatosProyecto.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime>("FechaNacimiento")
-                        .HasColumnType("datetime2");
-
                     b.Property<string>("Nombre")
                         .IsRequired()
                         .HasMaxLength(25)
@@ -53,6 +50,9 @@ namespace ApiBasesDeDatosProyecto.Migrations
 
                     b.Property<int>("PaisId")
                         .HasColumnType("int");
+
+                    b.Property<DateTime>("dateOfBirth")
+                        .HasColumnType("datetime2");
 
                     b.HasKey("Id");
 
@@ -67,9 +67,9 @@ namespace ApiBasesDeDatosProyecto.Migrations
                             Apellido = "Perez",
                             Email = "amin1@gmail.com",
                             Empleo = "Delincuente",
-                            FechaNacimiento = new DateTime(1990, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Nombre = "Juan",
-                            PaisId = 1
+                            PaisId = 1,
+                            dateOfBirth = new DateTime(1990, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
                         },
                         new
                         {
@@ -77,9 +77,9 @@ namespace ApiBasesDeDatosProyecto.Migrations
                             Apellido = "Lopez",
                             Email = "amin2@gmail.com",
                             Empleo = "Profesor",
-                            FechaNacimiento = new DateTime(1985, 5, 23, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Nombre = "Maria",
-                            PaisId = 2
+                            PaisId = 2,
+                            dateOfBirth = new DateTime(1985, 5, 23, 0, 0, 0, 0, DateTimeKind.Unspecified)
                         },
                         new
                         {
@@ -87,9 +87,9 @@ namespace ApiBasesDeDatosProyecto.Migrations
                             Apellido = "Gomez",
                             Email = "amin3@gmail.com",
                             Empleo = "Abogado",
-                            FechaNacimiento = new DateTime(1978, 11, 12, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Nombre = "Carlos",
-                            PaisId = 3
+                            PaisId = 3,
+                            dateOfBirth = new DateTime(1978, 11, 12, 0, 0, 0, 0, DateTimeKind.Unspecified)
                         });
                 });
 

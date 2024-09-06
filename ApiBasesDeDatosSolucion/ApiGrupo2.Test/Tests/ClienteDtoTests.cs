@@ -18,7 +18,7 @@ namespace ApiBasesDeDatosProyecto.Tests
                 UserId = "user123",
                 Nombre = "Juan",
                 Apellido = "Perez",
-                FechaNacimiento = new DateTime(1990, 1, 1),
+                dateOfBirth = new DateTime(1990, 1, 1),
                 Empleo = "Desarrollador",
                 NombrePais = "España",
                 Email = "juan.perez@example.com",
@@ -42,7 +42,7 @@ namespace ApiBasesDeDatosProyecto.Tests
                 // Missing UserId
                 Nombre = "Juan",
                 Apellido = "Perez",
-                FechaNacimiento = new DateTime(1990, 1, 1),
+                dateOfBirth = new DateTime(1990, 1, 1),
                 // Missing Email
                 PaisId = 1
             };
@@ -65,7 +65,7 @@ namespace ApiBasesDeDatosProyecto.Tests
                 UserId = "user123",
                 Nombre = new string('A', 26), // Exceeds max length of 25
                 Apellido = "Perez",
-                FechaNacimiento = new DateTime(1990, 1, 1),
+                dateOfBirth = new DateTime(1990, 1, 1),
                 Empleo = "Desarrollador",
                 NombrePais = "España",
                 Email = "juan.perez@example.com",

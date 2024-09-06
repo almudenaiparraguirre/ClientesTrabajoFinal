@@ -220,7 +220,7 @@ namespace ApiBasesDeDatosProyecto.Controllers
             // Mapear las propiedades del DTO al cliente existente
             clienteExistente.Nombre = clienteDto.Nombre;
             clienteExistente.Apellido = clienteDto.Apellido;
-            clienteExistente.FechaNacimiento = clienteDto.FechaNacimiento;
+            clienteExistente.dateOfBirth = clienteDto.dateOfBirth;
             clienteExistente.PaisId = clienteDto.PaisId;
             clienteExistente.Empleo = clienteDto.Empleo;
 

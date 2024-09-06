@@ -10,7 +10,7 @@ export class Usuario {
   nombre: string;
   apellido: string;
   paisNombre: string;
-  dateOfBirth: string;
+  dateOfBirth: Date;
   passwordHash: string;
   securityStamp: string;
   concurrencyStamp: string;

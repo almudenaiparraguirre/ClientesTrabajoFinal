@@ -37,7 +37,7 @@ namespace ApiBasesDeDatosProyecto.Context
                     Id = 1,
                     Nombre = "Juan",
                     Apellido = "Perez",
-                    FechaNacimiento = new DateTime(1990, 1, 1),
+                    dateOfBirth = new DateTime(1990, 1, 1),
                     PaisId = 1,
                     Empleo = "Delincuente",
                     Email = "amin1@gmail.com"
@@ -47,7 +47,7 @@ namespace ApiBasesDeDatosProyecto.Context
                     Id = 2,
                     Nombre = "Maria",
                     Apellido = "Lopez",
-                    FechaNacimiento = new DateTime(1985, 5, 23),
+                    dateOfBirth = new DateTime(1985, 5, 23),
                     PaisId = 2,
                     Empleo = "Profesor",
                     Email = "amin2@gmail.com"
@@ -57,7 +57,7 @@ namespace ApiBasesDeDatosProyecto.Context
                     Id = 3,
                     Nombre = "Carlos",
                     Apellido = "Gomez",
-                    FechaNacimiento = new DateTime(1978, 11, 12),
+                    dateOfBirth = new DateTime(1978, 11, 12),
                     PaisId = 3,
                     Empleo = "Abogado",
                     Email = "amin3@gmail.com"
