@@ -67,7 +67,7 @@ builder.Services.AddCors(options =>
                .AllowAnyMethod()
                .AllowCredentials());
 
-    options.AddPolicy("AllowAzureHost", builder =>
+    options.AddPolicy("AllowAzureHost", builder => 
         builder.WithOrigins("https://delightful-ocean-0ed177403.5.azurestaticapps.net")
                .AllowAnyHeader()
                .AllowAnyMethod()
@@ -190,7 +190,7 @@ else
 app.UseHttpsRedirection();
 
 // Usar CORS
-app.UseCors();  // Asegúrate de que el uso de CORS esté aquí antes de la autenticación y autorización
+//app.UseCors();  // Asegúrate de que el uso de CORS esté aquí antes de la autenticación y autorización
 
 // Usar autenticación y autorización
 app.UseAuthentication(); // Agregar autenticación

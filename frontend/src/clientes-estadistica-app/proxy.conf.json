@@ -1,0 +1,8 @@
+{
+    "/api": {
+      "target": "https://backclientes-f4fjfwece9gta3c2.spaincentral-01.azurewebsites.net",
+      "secure": false,
+      "changeOrigin": true
+    }
+  }
+  
