@@ -21,6 +21,8 @@ export class UsersInfoComponent implements OnInit, OnDestroy {
   editMode: 'user' | 'client' = 'user';
   addMode: 'user' | 'client' = 'user';
   randomUserImageUrl: string = '';
+  firstName: string = '';
+  lastName: string = '';
 
   usuarios: Usuario[] = [];
   filteredUsuarios: Usuario[] = [];
@@ -148,16 +150,38 @@ export class UsersInfoComponent implements OnInit, OnDestroy {
   
   editUsuario(usuario: Usuario): void {
     this.selectedUsuario = { ...usuario };
+    // Asumiendo que selectedUsuario.dateOfBirth es un objeto Date o una cadena en formato de fecha
+    if (this.selectedUsuario.dateOfBirth instanceof Date) {
+      this.selectedUsuario.dateOfBirthString = this.formatDate(this.selectedUsuario.dateOfBirth);
+    } else {
+      // Si es una cadena, puedes convertirla a un objeto Date primero
+      this.selectedUsuario.dateOfBirthString = this.formatDate(new Date(this.selectedUsuario.dateOfBirth));
+    }
     this.editMode = 'user';
     this.isModalOpen = true;
   }
 
   editCliente(cliente: Cliente): void {
     this.selectedCliente = { ...cliente };
+    // Asumiendo que selectedUsuario.dateOfBirth es un objeto Date o una cadena en formato de fecha
+    if (this.selectedCliente.dateOfBirth instanceof Date) {
+      this.selectedCliente.dateOfBirthString = this.formatDate(this.selectedCliente.dateOfBirth);
+    } else {
+      // Si es una cadena, puedes convertirla a un objeto Date primero
+      this.selectedCliente.dateOfBirthString = this.formatDate(new Date(this.selectedCliente.dateOfBirth));
+    }
     this.editMode = 'client';
     this.isModalOpen = true;
   }
 
+
+  formatDate(date: Date): string {
+  // Formatea la fecha en YYYY-MM-DD
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0'); // Meses de 0-11
+  const day = String(date.getDate()).padStart(2, '0'); // Día del mes
+  return `${year}-${month}-${day}`;
+}
   deleteUsuario(usuario: Usuario) {
     const confirmacion = confirm(`¿Estás seguro de que deseas eliminar al usuario ${usuario.nombre} ${usuario.apellido}?`);
     if (confirmacion) {

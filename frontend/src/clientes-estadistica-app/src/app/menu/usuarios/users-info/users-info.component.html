@@ -120,16 +120,13 @@
         <div *ngIf="editMode === 'user'">
           <!-- Campos de usuario -->
           <div class="mb-4">
-            <label class="block text-sm font-medium text-gray-700">Nombre</label>
-            <input type="text" [(ngModel)]="selectedUsuario.nombre" name="nombre" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50" />
+            <label class="block text-sm font-medium text-gray-700">Nombre Completo</label>
+            <input type="text" [(ngModel)]="selectedUsuario.fullName" name="nombre" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50" />
           </div>
-          <div class="mb-4">
-            <label class="block text-sm font-medium text-gray-700">Apellido</label>
-            <input type="text" [(ngModel)]="selectedUsuario.apellido" name="apellido" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50" />
-          </div>
+          
           <div class="mb-4">
             <label class="block text-sm font-medium text-gray-700">Fecha de Nacimiento</label>
-            <input type="date" [(ngModel)]="selectedUsuario.dateOfBirth" name="fechaNacimiento" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50" />
+            <input type="date" [(ngModel)]="selectedUsuario.dateOfBirthString" name="fechaNacimiento" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50" />
           </div>
         </div>
         <div *ngIf="editMode === 'client'">
@@ -144,7 +141,7 @@
           </div>
           <div class="mb-4">
             <label class="block text-sm font-medium text-gray-700">Fecha de Nacimiento</label>
-            <input type="date" [(ngModel)]="selectedCliente.dateOfBirth" name="fechaNacimiento" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50" />
+            <input type="date" [(ngModel)]="selectedCliente.dateOfBirthString" name="fechaNacimiento" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50" />
           </div>
           <div class="mb-4">
             <label class="block text-sm font-medium text-gray-700">Empleo</label>

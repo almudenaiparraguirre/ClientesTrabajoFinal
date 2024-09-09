@@ -9,4 +9,6 @@ export class Cliente {
   email: string;
   password?: string;
   confirmPassword?: string;
+  dateOfBirthString: string;
+
 }

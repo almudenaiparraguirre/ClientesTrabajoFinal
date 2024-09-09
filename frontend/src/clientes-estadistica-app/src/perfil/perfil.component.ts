@@ -27,10 +27,17 @@ export class PerfilComponent implements OnInit {
         next: (userData) => {
           this.usuario = userData;
           this.originalData = { ...userData };  // Guardar los datos originales
+          if (this.usuario.dateOfBirth instanceof Date) {
+            this.usuario.dateOfBirthString = this.formatDate(this.usuario.dateOfBirth);
+          } else {
+            // Si es una cadena, puedes convertirla a un objeto Date primero
+            this.usuario.dateOfBirthString = this.formatDate(new Date(this.usuario.dateOfBirth));
+          }
         },
         error: (error) => {
           console.log(error);
         }
+        
       });
     } else {
       this.router.navigate(['/login']);
@@ -38,6 +45,7 @@ export class PerfilComponent implements OnInit {
   }
 
   canActivate(): boolean {
+
     if (this.authService.isLoggedIn()) {
       return true;
     } else {
@@ -59,6 +67,13 @@ export class PerfilComponent implements OnInit {
     this.isEditing = true;
   }
 
+    formatDate(date: Date): string {
+      // Formatea la fecha en YYYY-MM-DD
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, '0'); // Meses de 0-11
+      const day = String(date.getDate()).padStart(2, '0'); // Día del mes
+      return `${year}-${month}-${day}`;
+    }
   // Guardar cambios
   saveChangesClient() {
     // Implementa la lógica para guardar los cambios, por ejemplo, llamando a un servicio

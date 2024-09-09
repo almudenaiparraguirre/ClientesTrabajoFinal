@@ -15,6 +15,8 @@ export class PerfilService {
   constructor(private http: HttpClient) { }
 
   actualizarCliente(cliente: any): Observable<any> {
+    cliente.dateOfBirth = new Date(cliente.dateOfBirthString); // "1995-10-11"
+
     return this.http.put<any>(`${this.URL}cliente/${cliente.email}`, cliente);
   }
 

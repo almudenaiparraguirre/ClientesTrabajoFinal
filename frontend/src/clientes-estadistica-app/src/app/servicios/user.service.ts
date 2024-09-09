@@ -83,7 +83,7 @@ export class UserService {
     
     // Si la fecha de nacimiento está definida, convertirla a formato ISO
     if (usuario.dateOfBirth) {
-      usuario.dateOfBirth = new Date(usuario.dateOfBirth); // "1995-10-11"
+      usuario.dateOfBirth = new Date(usuario.dateOfBirthString); // "1995-10-11"
       console.log(usuario)
       console.log("Fecha mandada al back (solo fecha)", usuario.dateOfBirth);
   }

@@ -16,5 +16,6 @@ export class Usuario {
   concurrencyStamp: string;
   paisId:number;
   isDeleted: boolean;
+  dateOfBirthString : string;
   }
   
