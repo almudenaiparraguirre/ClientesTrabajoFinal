@@ -18,6 +18,24 @@
         .btn-save, .btn-cancel, .btn-edit {
             margin-top: 1rem;
         }
+
+        .btn-edit {
+            background-color: rgb(68, 85, 240);
+            color: white;
+            padding: 5px;
+            border-radius: 5px;
+        }
+
+        .profile-card-title {
+            font-size: 1.5rem; /* Tamaño del texto del título */
+            font-weight: bold; /* Negrita para el título */
+            margin-top: 0;
+        }
+
+        .profile-card-header {
+           padding: 25px;
+        }
+
         .separator {
             border-bottom: 1px solid #e5e7eb; /* Color de la separación */
             margin: 1rem 0; /* Espacio alrededor de la separación */
@@ -54,7 +72,6 @@
     <div class="flex items-center justify-center min-h-screen">
         <div class="profile-card">
             <div class="profile-card-header">
-                <img src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80" alt="Imagen de perfil">
                 <div class="profile-card-title"> {{ usuario?.fullName || usuario?.nombre }} </div>
                 <div class="profile-card-subtitle"> {{ usuario?.rol }} </div>
                 <div class="profile-card-subtitle"> {{ usuario?.email }} </div>
@@ -65,7 +82,7 @@
                     <div *ngIf="!isEditing">
                         <p><strong>Nombre:</strong> {{ usuario?.nombre }} </p>
                         <p><strong>Apellido:</strong> {{ usuario?.apellido }} </p>
-                        <p><strong>Fecha de Nacimiento:</strong> {{ usuario?.fechaNacimiento }} </p>
+                        <p><strong>Fecha de Nacimiento:</strong> {{ usuario?.dateOfBirth | date }} </p>
                         <p><strong>Empleo:</strong> {{ usuario?.empleo }} </p>
                         <p><strong>País ID:</strong> {{ usuario?.paisID }} </p>
                         <p><strong>Rol:</strong> {{ usuario?.rol }} </p>
