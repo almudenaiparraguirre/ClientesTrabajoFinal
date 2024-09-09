@@ -47,6 +47,7 @@ export class UserService {
   }
   registrarUsuarioAdmin(usuario: any): Observable<any> {
     console.log(usuario); // Asegúrate de que los campos estén presentes y correctos DEBUG
+    usuario.dateOfBirth = usuario.dateOfBirth.toISOString();
     return this.http.post<any>(`${this.URL}Account/registerAdmin`, usuario);
   }
 
