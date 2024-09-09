@@ -3,6 +3,7 @@ import { Router } from '@angular/router';
 import { AuthService } from '../app/servicios/auth.service'; // Asegúrate de la ruta correcta
 import { UserService } from '../app/servicios/user.service'; // Asegúrate de la ruta correcta
 import { PerfilService } from 'src/app/servicios/perfil-service';
+import { jwtDecode } from 'jwt-decode';
 
 @Component({
   selector: 'app-perfil',
@@ -59,7 +60,34 @@ export class PerfilComponent implements OnInit {
   }
 
   redirectToUsersInfo() {
-    this.router.navigate(['/users-info']);
+    const token: string | null = this.authService.getToken();
+  
+    if (token) {
+      const decodedToken: any = jwtDecode(token);
+      console.log("Token decodificado:", decodedToken);
+  
+      const userRole = decodedToken['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'];
+      console.log("Rol del usuario:", userRole);
+  
+      // Redirigir según el rol del usuario
+      if (userRole === 'Client') {
+        this.router.navigate(['/perfil']);
+        alert('No tienes permisos para acceder a esta página.');
+      } else if (userRole === 'Admin' || userRole === 'SuperAdmin') {
+        this.router.navigate(['/users-info']);
+      } else {
+        this.router.navigate(['/perfil']);
+        alert('Rol no reconocido.');
+      }
+    } else {
+      // Si el token es nulo, redirigir a la página de login
+      this.router.navigate(['/login']);
+      alert('Sesión no iniciada.');
+    }
+  }
+
+  cerrarSesion() {
+    this.router.navigate(['/login']);
   }
 
   // Habilitar edición
