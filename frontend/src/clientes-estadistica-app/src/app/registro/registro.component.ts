@@ -60,7 +60,7 @@ export class RegistroComponent implements OnInit {
 
   selectCountry(country: any) {
     this.selectedCountry = country;
-    this.registroForm.patchValue({ PaisNombre: country.country });
+    this.registroForm.patchValue({ PaisNombre: country.countryName });
     this.showDropdown = false;
   }
 

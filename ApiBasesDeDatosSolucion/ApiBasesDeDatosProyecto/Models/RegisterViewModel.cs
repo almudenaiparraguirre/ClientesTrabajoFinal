@@ -24,9 +24,9 @@ public class RegisterViewModel : IValidatableObject
 
     [Required(ErrorMessage = "La fecha de nacimiento es requerida.")]
     public DateTime DateOfBirth { get; set; }
-
     
     public string? PaisNombre { get; set; }
+
 
     // Método de validación
 
