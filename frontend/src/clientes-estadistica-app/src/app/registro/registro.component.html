@@ -72,8 +72,8 @@
             <div class="flex items-center">
               <span *ngIf="selectedCountry" 
                     class="w-6 h-4 inline-block bg-cover mr-2" 
-                    [ngStyle]="{'background-image': 'url(' + selectedCountry.flag + ')'}"></span>
-              <span *ngIf="selectedCountry">{{ selectedCountry.country }}</span>
+                    [ngStyle]="{'background-image': 'url(http://purecatamphetamine.github.io/country-flag-icons/3x2/' + selectedCountry.countryCode + '.svg)'}"></span>
+              <span *ngIf="selectedCountry">{{ selectedCountry.countryName }}</span>
               <span *ngIf="!selectedCountry" class="text-gray-500">Selecciona un país</span>
               <svg class="w-4 h-4 ml-auto text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" 
                    xmlns="http://www.w3.org/2000/svg">
@@ -81,19 +81,21 @@
               </svg>
             </div>
           </div>
-      
+        
           <!-- Opciones desplegables -->
           <div class="absolute z-10 mt-2 w-full bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-y-auto" 
                *ngIf="showDropdown">
             <div *ngFor="let country of countries" 
                  (click)="selectCountry(country)" 
                  class="flex items-center px-4 py-2 hover:bg-gray-100 cursor-pointer">
-              <span class="w-6 h-4 inline-block bg-cover mr-2" 
-                    [ngStyle]="{'background-image': 'url(' + country.flag + ')'}"></span>
-              <span>{{ country.country }}</span>
+                 <span class="w-6 h-4 inline-block bg-cover mr-2" 
+                 [ngStyle]="{'background-image': 'url(http://purecatamphetamine.github.io/country-flag-icons/3x2/' + country.countryCode + '.svg)'}">
+           </span>
+              <span>{{ country.countryName }}</span>
             </div>
           </div>
         </div>
+        
       </div>
       
       <div>

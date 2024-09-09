@@ -241,6 +241,8 @@ public class AccountController : ControllerBase
         // Asignar el rol predeterminado (por ejemplo, "Client") durante el registro
         await _userManager.AddToRoleAsync(user, "Client");
 
+        
+
         Pais paisregistro = await _paisRepository.ObtenerPorNombre(model.PaisNombre);
 
         var client = new Cliente
