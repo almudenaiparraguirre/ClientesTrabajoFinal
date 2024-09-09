@@ -8,6 +8,7 @@ using System.Text;
 using System.Security.Claims;
 
 var builder = WebApplication.CreateBuilder(args);
+var urlservicio = "";
 
 // 1. Agregar servicios a la aplicación
 builder.Services.AddDbContext<Contexto>(options =>
@@ -177,19 +178,19 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();  // Habilita Swagger en desarrollo.
     app.UseSwaggerUI();  // Habilita la interfaz de usuario de Swagger.
     app.UseCors("AllowLocalhost");  // Usa la política de CORS para localhost.
-    builder.Services.AddSingleton<SignalRClientService>(provider =>
-    new SignalRClientService("https://localhost:7040/simuladorHub",
-        provider.GetRequiredService<IServiceScopeFactory>()));
 
+    urlservicio = "https://localhost:7040/simuladorHub";
 }
 else
 {
     app.UseCors("AllowAzureHost");  // Usa la política de CORS para el host de Azure.
-    builder.Services.AddSingleton<SignalRClientService>(provider =>
-    new SignalRClientService("https://backgroundservices-cfdjahb2bygxare0.spaincentral-01.azurewebsites.net/",
-        provider.GetRequiredService<IServiceScopeFactory>()));
-
+    urlservicio = "https://backgroundservices-cfdjahb2bygxare0.spaincentral-01.azurewebsites.net/";
+    
 }
+
+builder.Services.AddSingleton<SignalRClientService>(provider =>
+new SignalRClientService(urlservicio,
+    provider.GetRequiredService<IServiceScopeFactory>()));
 
 // Redireccionar de http a https
 app.UseHttpsRedirection();
