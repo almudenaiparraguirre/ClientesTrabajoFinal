@@ -78,7 +78,34 @@ public class SignalRClientService
             }
         });
 
-        await _hubConnection.StartAsync();
+        await TryStartConnectionAsync();
         Console.WriteLine("Conectado al hub de SignalR");
+    }
+
+    private async Task TryStartConnectionAsync()
+    {
+        int retryCount = 0;
+        int maxRetries = 5; // Número máximo de intentos
+        int delay = 2000; // Retraso entre intentos en milisegundos
+
+        while (retryCount < maxRetries)
+        {
+            try
+            {
+                await _hubConnection.StartAsync();
+                Console.WriteLine("Conectado al hub de SignalR");
+                return; // Salir si la conexión es exitosa
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error al conectar al hub de SignalR: {ex.Message}");
+                retryCount++;
+                Console.WriteLine($"Reintentando en {delay} ms...");
+                await Task.Delay(delay); // Espera antes de intentar nuevamente
+            }
+        }
+
+        Console.WriteLine("No se pudo conectar al hub de SignalR después de varios intentos.");
+        // Puedes optar por registrar el error o tomar otras acciones aquí.
     }
 }
