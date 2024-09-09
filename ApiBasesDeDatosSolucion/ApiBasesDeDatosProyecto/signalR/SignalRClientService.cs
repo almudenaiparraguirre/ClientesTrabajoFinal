@@ -82,6 +82,7 @@ public class SignalRClientService
         Console.WriteLine("Conectado al hub de SignalR");
     }
 
+    // funcion para volver a intentar conectarse
     private async Task TryStartConnectionAsync()
     {
         int retryCount = 0;
