@@ -155,7 +155,7 @@ if (builder.Environment.IsDevelopment())
 else
 {
 
-    urlservicio = "https://backgroundservices-cfdjahb2bygxare0.spaincentral-01.azurewebsites.net/";
+    urlservicio = "https://backgroundservices-cfdjahb2bygxare0.spaincentral-01.azurewebsites.net";
 }
 
 builder.Services.AddSingleton<SignalRClientService>(provider =>
