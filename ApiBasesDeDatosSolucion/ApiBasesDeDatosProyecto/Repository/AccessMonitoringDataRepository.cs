@@ -62,7 +62,7 @@ namespace ApiBasesDeDatosProyecto.Repository
         private async Task NotifyChangesAsync()
         {
             // Asume que la API está alojada localmente; ajusta la URL según sea necesario
-            var notifyUrl = "https://localhost:7107/api/ClienteMonitoring/notify";
+            var notifyUrl = "https://backclientes-f4fjfwece9gta3c2.spaincentral-01.azurewebsites.net/api/monitoring/notify";
             var response = await _httpClient.PostAsync(notifyUrl, null);
 
             if (!response.IsSuccessStatusCode)
