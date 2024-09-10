@@ -156,6 +156,7 @@ else
 {
 
     urlservicio = "https://backgroundservices-cfdjahb2bygxare0.spaincentral-01.azurewebsites.net";
+    
 }
 
 builder.Services.AddSingleton<SignalRClientService>(provider =>
@@ -198,7 +199,7 @@ if (app.Environment.IsDevelopment())
 else
 {
     app.UseCors("AllowAzureHost");  // Usa la política de CORS para el host de Azure.
-   
+    app.UseHttpsRedirection();
 }
 
 
