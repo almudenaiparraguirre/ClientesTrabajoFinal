@@ -9,7 +9,7 @@
         public MonitoringBackgroundService(
             ILogger<MonitoringBackgroundService> logger,
             IServiceScopeFactory serviceScopeFactory,
-            int intervalInSeconds = 5) // Puedes cambiar este valor según tu necesidad
+            int intervalInSeconds = 20) // Puedes cambiar este valor según tu necesidad
         {
             _logger = logger;
             _serviceScopeFactory = serviceScopeFactory;
