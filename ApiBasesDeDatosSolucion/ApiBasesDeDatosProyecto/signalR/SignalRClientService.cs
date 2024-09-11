@@ -72,7 +72,12 @@ public class SignalRClientService
             {
                 // Obtener AccessMonitoringDataRepository desde el scope
                 var accessMonitoringDataRepository = scope.ServiceProvider.GetRequiredService<IAccessMonitoringDataRepository>();
-                await accessMonitoringDataRepository.AddCliente(data);
+
+                if (data.TipoAcceso == "Registro")
+                {
+                    await accessMonitoringDataRepository.AddCliente(data);
+                }
+                
                 await accessMonitoringDataRepository.AddAsync(data);
                 Console.WriteLine("Datos de AccessMonitoringData guardados en la base de datos.");
             }
