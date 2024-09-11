@@ -248,6 +248,7 @@ namespace ApiBasesDeDatosProyecto.Context
     new Pais { Id = 221, Nombre = "Zimbabwe", Divisa = "ZWL", Iso = "ZW" }
             );
 
+
             modelBuilder.Entity<Cliente>().HasData(
                 new Cliente
                 {
