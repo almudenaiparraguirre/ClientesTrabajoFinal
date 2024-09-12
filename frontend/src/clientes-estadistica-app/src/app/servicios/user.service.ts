@@ -82,11 +82,9 @@ export class UserService {
     const url = `${this.URL}Account/updateUser?email=${usuario.email}`;
     
     // Si la fecha de nacimiento está definida, convertirla a formato ISO
-    if (usuario.dateOfBirth) {
       usuario.dateOfBirth = new Date(usuario.dateOfBirthString); // "1995-10-11"
       console.log(usuario)
       console.log("Fecha mandada al back (solo fecha)", usuario.dateOfBirth);
-  }
   
 
     console.log("Fecha de nacimiento usuario", usuario.dateOfBirth); // Verificar el formato
@@ -100,8 +98,18 @@ export class UserService {
         'Authorization': `Bearer ${token}`,
         'Content-Type': 'application/json'
     });
+
+    const partesNombre = usuario.fullName.split(" ");
+    const nombre = partesNombre[0];  // Primer nombre
+    const apellido = partesNombre.slice(1).join(" ");  // Todos los apellidos
+
+    const persona = {
+      nombre: nombre,
+      apellido: apellido,
+      dateOfBirth: usuario.dateOfBirth
+    };
     
-    return this.http.put(url, usuario, { headers });
+    return this.http.put(url, persona, { headers });
 }
 
   eliminarUsuario(email: string): Observable<any> {
