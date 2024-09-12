@@ -127,7 +127,7 @@
                 <div *ngIf="usuario?.rol !== 'Client'" class="profile-info">
                     <div *ngIf="!isEditing">
                         <p><strong>Nombre Completo:</strong> {{ usuario?.fullName }} </p>
-                        <p><strong>Fecha de Nacimiento:</strong> {{ usuario?.dateOfBirth }} </p>
+                        <p><strong>Fecha de Nacimiento:</strong> {{ usuario?.dateOfBirth | date }} </p>
                         <p><strong>Email:</strong> {{ usuario?.email }} </p>
                         <p><strong>ID Identidad:</strong> {{ usuario?.idIdentity }} </p>
                         <p><strong>Rol:</strong> {{ usuario?.rol }} </p>
