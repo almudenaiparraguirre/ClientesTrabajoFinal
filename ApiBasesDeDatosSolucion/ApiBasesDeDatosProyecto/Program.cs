@@ -110,6 +110,7 @@ builder.Services.AddScoped<IVistaClientesPaisesRepository, VistaClientesPaisesRe
 builder.Services.AddTransient<IMonitoringDataRepository, MonitoringDataRepository>();
 builder.Services.AddScoped<IAccessMonitoringDataRepository, AccessMonitoringDataRepository>();
 builder.Services.AddScoped<ITokenRepository, TokenRepository>();
+builder.Services.AddHostedService<TableCleanupBackgroundService>();
 
 // Configurar MediatR
 builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(Program).Assembly));
